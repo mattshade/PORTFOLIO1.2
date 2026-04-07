@@ -1,0 +1,650 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Streaming Platform Viewership - AI Data Hub</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+        background-color: #f9fafb;
+        color: #333;
+        line-height: 1.6;
+      }
+      
+      .header {
+        background: white;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        border-bottom: 1px solid #e5e7eb;
+      }
+      
+      .header-content {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 24px 16px;
+      }
+      
+      .back-btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #2563eb;
+        text-decoration: none;
+        font-weight: 500;
+        margin-bottom: 16px;
+        transition: color 0.3s;
+      }
+      
+      .back-btn:hover {
+        color: #1d4ed8;
+      }
+      
+      .dataset-header {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+      }
+      
+      .dataset-header-main {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+      }
+      
+      .dataset-image {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        border-radius: 8px;
+      }
+      
+      .dataset-info {
+        flex: 1;
+      }
+      
+      .dataset-category {
+        display: inline-block;
+        background: #e0f2fe;
+        color: #0369a1;
+        padding: 4px 12px;
+        border-radius: 9999px;
+        font-size: 14px;
+        font-weight: 500;
+        margin-bottom: 8px;
+      }
+      
+      .dataset-title {
+        font-size: 24px;
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 8px;
+        line-height: 1.2;
+      }
+      
+      .dataset-description {
+        font-size: 16px;
+        color: #6b7280;
+        margin-bottom: 16px;
+        line-height: 1.5;
+      }
+      
+      .dataset-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        font-size: 14px;
+        color: #6b7280;
+      }
+      
+      .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+      
+      .tab-navigation {
+        background: white;
+        border-bottom: 1px solid #e5e7eb;
+      }
+      
+      .tab-nav-content {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 0 16px;
+      }
+      
+      .tab-nav {
+        display: flex;
+        gap: 32px;
+      }
+      
+      .tab-btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 16px 4px;
+        border-bottom: 2px solid transparent;
+        background: none;
+        border: none;
+        font-weight: 500;
+        font-size: 14px;
+        color: #6b7280;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+      
+      .tab-btn:hover {
+        color: #374151;
+        border-bottom-color: #d1d5db;
+      }
+      
+      .tab-btn.active {
+        color: #2563eb;
+        border-bottom-color: #2563eb;
+      }
+      
+      .tab-content {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 32px 16px;
+      }
+      
+      .content-section {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        border: 1px solid #e5e7eb;
+        padding: 24px;
+        margin-bottom: 24px;
+      }
+      
+      .section-title {
+        font-size: 20px;
+        font-weight: 600;
+        color: #111827;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      
+      .section-icon {
+        width: 24px;
+        height: 24px;
+        color: #2563eb;
+      }
+      
+      .overview-text {
+        color: #374151;
+        line-height: 1.6;
+        margin-bottom: 20px;
+      }
+      
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+        margin-bottom: 20px;
+      }
+      
+      .stat-card {
+        background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+        border: 1px solid #0ea5e9;
+        border-radius: 8px;
+        padding: 16px;
+      }
+      
+      .stat-card.blue {
+        background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+        border-color: #3b82f6;
+      }
+      
+      .stat-card.green {
+        background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+        border-color: #22c55e;
+      }
+      
+      .stat-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 8px;
+      }
+      
+      .stat-icon {
+        width: 24px;
+        height: 24px;
+        color: #0ea5e9;
+      }
+      
+      .stat-icon.blue {
+        color: #3b82f6;
+      }
+      
+      .stat-icon.green {
+        color: #22c55e;
+      }
+      
+      .stat-label {
+        font-size: 14px;
+        font-weight: 500;
+        color: #374151;
+      }
+      
+      .stat-value {
+        font-size: 20px;
+        font-weight: 700;
+        color: #0369a1;
+      }
+      
+      .stat-value.blue {
+        color: #1e40af;
+      }
+      
+      .stat-value.green {
+        color: #15803d;
+      }
+      
+      .stat-card.purple { background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%); border-color: #a78bfa; }
+      .stat-icon.purple { color: #7c3aed; }
+      .stat-value.purple { color: #5b21b6; }
+      
+      .sample-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 16px;
+      }
+      
+      .sample-table th {
+        background: #f9fafb;
+        padding: 12px;
+        text-align: left;
+        font-weight: 600;
+        color: #374151;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        border-bottom: 1px solid #e5e7eb;
+      }
+      
+      .sample-table td {
+        padding: 12px;
+        border-bottom: 1px solid #e5e7eb;
+        font-size: 14px;
+        color: #111827;
+        font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+      }
+      
+      .dictionary-list {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+      
+      .dictionary-item {
+        border-left: 4px solid #0ea5e9;
+        padding-left: 16px;
+      }
+      
+      .dictionary-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 4px;
+      }
+      
+      .dictionary-field {
+        font-weight: 500;
+        color: #111827;
+      }
+      
+      .dictionary-type {
+        background: #f3f4f6;
+        color: #374151;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+      }
+      
+      .dictionary-description {
+        color: #6b7280;
+        font-size: 14px;
+      }
+      
+      @media (min-width: 1024px) {
+        .dataset-header-main {
+          flex-direction: row;
+        }
+        
+        .dataset-image {
+          width: 256px;
+          height: 128px;
+        }
+      }
+      
+      .hero-kpi { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; background: linear-gradient(135deg, #0369a1 0%, #1e3a5f 100%); border-radius: 16px; padding: 28px 32px; margin-bottom: 24px; color: white; }
+      .hero-kpi-value { font-size: 28px; font-weight: 800; margin-bottom: 4px; }
+      .hero-kpi-label { font-size: 12px; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.05em; }
+      .insight-callout { background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); border-left: 4px solid #0284c7; border-radius: 8px; padding: 20px; margin-bottom: 20px; }
+      .insight-callout strong { color: #0369a1; }
+      .use-case-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-top: 20px; }
+      .use-case-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px; }
+      .use-case-card h4 { font-size: 15px; color: #1e293b; margin-bottom: 8px; }
+      .use-case-card p { font-size: 13px; color: #64748b; line-height: 1.5; }
+      .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; }
+      .chart-container { background: #f9fafb; border-radius: 8px; padding: 20px; min-height: 280px; }
+      .chart-container h3 { font-size: 16px; font-weight: 600; color: #374151; margin-bottom: 16px; }
+      @media (max-width: 768px) {
+        .tab-nav { gap: 16px; }
+        .stats-grid { grid-template-columns: 1fr; }
+        .hero-kpi { grid-template-columns: repeat(2, 1fr); }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="header">
+      <div class="header-content">
+        <a href="index.html" class="back-btn">
+          <span>←</span>
+          <span>Back to Datasets</span>
+        </a>
+        
+        <div class="dataset-header">
+          <div class="dataset-header-main">
+            <img src="https://images.pexels.com/photos/574071/pexels-photo-574071.jpeg?auto=compress&cs=tinysrgb&w=400" alt="Streaming Platform Viewership" class="dataset-image" />
+            <div class="dataset-info">
+              <div class="dataset-category">Streaming</div>
+              <h1 class="dataset-title">Streaming Platform Viewership</h1>
+              <p class="dataset-description">Detailed viewership analytics from multiple streaming platforms with demographic breakdowns and viewing patterns.</p>
+              <div class="dataset-meta">
+                <div class="meta-item">
+                  <span>📅</span>
+                  <span>Updated 2024-12-10</span>
+                </div>
+                <div class="meta-item">
+                  <span>🗄️</span>
+                  <span>5,500,000 records</span>
+                </div>
+                <div class="meta-item">
+                  <span>💾</span>
+                  <span>3.4 GB</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <nav class="tab-navigation">
+      <div class="tab-nav-content">
+        <div class="tab-nav">
+          <button class="tab-btn active" data-tab="overview">
+            <span>👁️</span>
+            <span>Overview</span>
+          </button>
+          <button class="tab-btn" data-tab="sample">
+            <span>📊</span>
+            <span>Sample Data</span>
+          </button>
+          <button class="tab-btn" data-tab="analytics">
+            <span>📈</span>
+            <span>Analytics</span>
+          </button>
+          <button class="tab-btn" data-tab="dictionary">
+            <span>📄</span>
+            <span>Data Dictionary</span>
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <main class="tab-content">
+      <div id="overviewContent" class="tab-panel active">
+        <div class="content-section">
+          <h2 class="section-title">
+            <span class="section-icon">👁️</span>
+            Dataset Overview
+          </h2>
+          <div class="overview-text">
+            <p>Session-level viewership data from Netflix, Hulu, Amazon Prime, and Disney+ enables content performance analysis, retention modeling, and device-based optimization. Essential for understanding how audiences consume streaming content, where they drop off, and what drives completion.</p>
+            <p><strong>Scope & coverage:</strong> Watch time (minutes), completion rate, device (Smart TV, mobile, laptop, tablet), age group, and platform per session. Content metadata includes title, genre, and original vs licensed. Supports analysis by platform, device, demographic, content type, and time of day.</p>
+            <p><strong>Data quality & freshness:</strong> ~5.5M sessions with daily refresh. Completion rates normalized across variable content length; device and age dimensions available for 94% of records. Join keys for content catalog enable title-level performance rollups.</p>
+            <p><strong>Best suited for:</strong> Content acquisition and licensing decisions, retention and churn modeling, device strategy, audience segmentation for ads, and programming schedule optimization.</p>
+          </div>
+          <div class="hero-kpi">
+            <div><div class="hero-kpi-value">5.5M</div><div class="hero-kpi-label">Sessions</div></div>
+            <div><div class="hero-kpi-value">2.3h</div><div class="hero-kpi-label">Avg Watch</div></div>
+            <div><div class="hero-kpi-value">78%</div><div class="hero-kpi-label">Completion</div></div>
+            <div><div class="hero-kpi-value">4</div><div class="hero-kpi-label">Platforms</div></div>
+          </div>
+          <div class="insight-callout">
+            <strong>Key insight:</strong> Smart TV viewing drives 42% higher completion rates than mobile. Originals outperform licensed content by 1.8× in retention. Peak viewing: 8–10pm on weeknights.
+          </div>
+          <div class="use-case-grid">
+            <div class="use-case-card"><h4>📺 Content Performance</h4><p>Compare viewership and completion by title, genre, and release timing.</p></div>
+            <div class="use-case-card"><h4>👥 Audience Behavior</h4><p>Segment by device, age, and geography to optimize content mix.</p></div>
+            <div class="use-case-card"><h4>⏱️ Retention Analysis</h4><p>Identify drop-off points and recommend episode lengths.</p></div>
+          </div>
+        </div>
+
+        <div class="content-section">
+          <h2 class="section-title">
+            <span class="section-icon">📊</span>
+            Viewership Metrics
+          </h2>
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-header">
+                <span class="stat-icon">📺</span>
+                <span class="stat-label">Platforms</span>
+              </div>
+              <div class="stat-value">4</div>
+            </div>
+            
+            <div class="stat-card blue">
+              <div class="stat-header">
+                <span class="stat-icon blue">⏱️</span>
+                <span class="stat-label">Avg Watch Time</span>
+              </div>
+              <div class="stat-value blue">2.3h</div>
+            </div>
+            
+            <div class="stat-card green">
+              <div class="stat-header">
+                <span class="stat-icon green">✅</span>
+                <span class="stat-label">Completion Rate</span>
+              </div>
+              <div class="stat-value green">78%</div>
+            </div>
+            <div class="stat-card purple">
+              <div class="stat-header">
+                <span class="stat-icon purple">📱</span>
+                <span class="stat-label">Top Device</span>
+              </div>
+              <div class="stat-value purple">Smart TV</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div id="analyticsContent" class="tab-panel" style="display: none;">
+        <div class="content-section">
+          <h2 class="section-title"><span class="section-icon">📈</span> Key Visualizations</h2>
+          <div class="charts-grid">
+            <div class="chart-container">
+              <h3>Watch Time by Platform (hrs)</h3>
+              <canvas id="streamChart1"></canvas>
+            </div>
+            <div class="chart-container">
+              <h3>Completion Rate Trend</h3>
+              <canvas id="streamChart2"></canvas>
+            </div>
+            <div class="chart-container">
+              <h3>Device Distribution</h3>
+              <canvas id="streamChart3"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div id="sampleContent" class="tab-panel" style="display: none;">
+        <div class="content-section">
+          <h2 class="section-title">
+            <span class="section-icon">📊</span>
+            Sample Data
+          </h2>
+          <div class="overflow-x-auto">
+            <table class="sample-table">
+              <thead>
+                <tr>
+                  <th>Viewer ID</th>
+                  <th>Content ID</th>
+                  <th>Platform</th>
+                  <th>Watch Time (min)</th>
+                  <th>Completion Rate</th>
+                  <th>Device</th>
+                  <th>Age Group</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>V_12345</td>
+                  <td>C_789</td>
+                  <td>Netflix</td>
+                  <td>127</td>
+                  <td>85%</td>
+                  <td>Smart TV</td>
+                  <td>25-34</td>
+                </tr>
+                <tr>
+                  <td>V_12346</td>
+                  <td>C_790</td>
+                  <td>Hulu</td>
+                  <td>89</td>
+                  <td>92%</td>
+                  <td>Mobile</td>
+                  <td>18-24</td>
+                </tr>
+                <tr>
+                  <td>V_12347</td>
+                  <td>C_791</td>
+                  <td>Amazon Prime</td>
+                  <td>156</td>
+                  <td>78%</td>
+                  <td>Laptop</td>
+                  <td>35-44</td>
+                </tr>
+                <tr><td>V_12348</td><td>C_792</td><td>Disney+</td><td>94</td><td>88%</td><td>Smart TV</td><td>18-24</td></tr>
+                <tr><td>V_12349</td><td>C_793</td><td>Netflix</td><td>201</td><td>91%</td><td>Tablet</td><td>25-34</td></tr>
+                <tr><td>V_12350</td><td>C_794</td><td>Hulu</td><td>67</td><td>72%</td><td>Mobile</td><td>45-54</td></tr>
+                <tr><td>V_12351</td><td>C_795</td><td>Amazon Prime</td><td>178</td><td>84%</td><td>Smart TV</td><td>35-44</td></tr>
+                <tr><td>V_12352</td><td>C_796</td><td>Disney+</td><td>112</td><td>95%</td><td>Smart TV</td><td>8-17</td></tr>
+                <tr><td>V_12353</td><td>C_797</td><td>Netflix</td><td>145</td><td>79%</td><td>Laptop</td><td>25-34</td></tr>
+                <tr><td>V_12354</td><td>C_798</td><td>Hulu</td><td>89</td><td>82%</td><td>Mobile</td><td>18-24</td></tr>
+                <tr><td>V_12355</td><td>C_799</td><td>Amazon Prime</td><td>198</td><td>76%</td><td>Smart TV</td><td>55+</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      
+      <div id="dictionaryContent" class="tab-panel" style="display: none;">
+        <div class="content-section">
+          <h2 class="section-title">
+            <span class="section-icon">📄</span>
+            Data Dictionary
+          </h2>
+          <div class="dictionary-list">
+            <div class="dictionary-item">
+              <div class="dictionary-header">
+                <h3 class="dictionary-field">viewer_id</h3>
+                <span class="dictionary-type">String</span>
+              </div>
+              <p class="dictionary-description">Anonymized unique identifier for each viewer</p>
+            </div>
+            <div class="dictionary-item">
+              <div class="dictionary-header">
+                <h3 class="dictionary-field">content_id</h3>
+                <span class="dictionary-type">String</span>
+              </div>
+              <p class="dictionary-description">Unique identifier for the content watched</p>
+            </div>
+            <div class="dictionary-item">
+              <div class="dictionary-header">
+                <h3 class="dictionary-field">platform</h3>
+                <span class="dictionary-type">String</span>
+              </div>
+              <p class="dictionary-description">Streaming platform name</p>
+            </div>
+            <div class="dictionary-item">
+              <div class="dictionary-header">
+                <h3 class="dictionary-field">watch_time_minutes</h3>
+                <span class="dictionary-type">Integer</span>
+              </div>
+              <p class="dictionary-description">Total minutes watched for this session</p>
+            </div>
+            <div class="dictionary-item">
+              <div class="dictionary-header">
+                <h3 class="dictionary-field">completion_rate</h3>
+                <span class="dictionary-type">Float</span>
+              </div>
+              <p class="dictionary-description">Percentage of content completed (0.0 to 1.0)</p>
+            </div>
+            <div class="dictionary-item">
+              <div class="dictionary-header">
+                <h3 class="dictionary-field">device</h3>
+                <span class="dictionary-type">String</span>
+              </div>
+              <p class="dictionary-description">Device used for viewing (Smart TV, Mobile, Laptop, Tablet)</p>
+            </div>
+            <div class="dictionary-item">
+              <div class="dictionary-header">
+                <h3 class="dictionary-field">age_group</h3>
+                <span class="dictionary-type">String</span>
+              </div>
+              <p class="dictionary-description">Viewer age group bracket</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script>
+      function initStreamCharts() {
+        if (window.streamChartsInit) return;
+        window.streamChartsInit = true;
+        const ctx1 = document.getElementById('streamChart1');
+        const ctx2 = document.getElementById('streamChart2');
+        const ctx3 = document.getElementById('streamChart3');
+        if (!ctx1 || !ctx2 || !ctx3 || !window.Chart) return;
+        new Chart(ctx1, { type: 'bar', data: { labels: ['Netflix','Hulu','Amazon Prime','Disney+'], datasets: [{ label: 'Avg Watch Time (hrs)', data: [2.4, 1.8, 2.6, 1.9], backgroundColor: ['#e50914','#1ce783','#00a8e1','#113ccf'] }] }, options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } } });
+        new Chart(ctx2, { type: 'line', data: { labels: ['Jan','Feb','Mar','Apr','May','Jun'], datasets: [{ label: 'Completion %', data: [74, 76, 77, 78, 79, 78], borderColor: '#0284c7', fill: true, tension: 0.3 }] }, options: { responsive: true, scales: { y: { beginAtZero: true } } } });
+        new Chart(ctx3, { type: 'doughnut', data: { labels: ['Smart TV','Mobile','Laptop','Tablet'], datasets: [{ data: [38, 28, 22, 12], backgroundColor: ['#0284c7','#0ea5e9','#38bdf8','#7dd3fc'] }] }, options: { responsive: true } });
+      }
+      function initTabs() {
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabPanels = document.querySelectorAll('.tab-panel');
+        tabBtns.forEach(btn => {
+          btn.addEventListener('click', () => {
+            const targetTab = btn.getAttribute('data-tab');
+            tabBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            tabPanels.forEach(panel => panel.style.display = 'none');
+            const el = document.getElementById(targetTab + 'Content');
+            if (el) { el.style.display = 'block'; if (targetTab === 'analytics') initStreamCharts(); }
+          });
+        });
+      }
+      document.addEventListener('DOMContentLoaded', initTabs);
+    </script>
+  </body>
+</html>

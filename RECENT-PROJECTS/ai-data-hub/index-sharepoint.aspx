@@ -1,0 +1,631 @@
+<%@ Page Language="C#" %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Data Hub - Dataset Library</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+        line-height: 1.6;
+        color: #333;
+        background-color: #f8fafc;
+      }
+
+      .container {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 0 16px;
+      }
+
+      .header {
+        background: white;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        border-bottom: 1px solid #e5e7eb;
+        margin-bottom: 40px;
+      }
+
+      .header-content {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 24px 16px;
+      }
+
+      .header-main {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .header-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .header-logo {
+        width: 40px;
+        height: 40px;
+        background: #2563eb;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 20px;
+        font-weight: bold;
+      }
+
+      .header-text h1 {
+        font-size: 20px;
+        font-weight: 700;
+        color: #111827;
+        margin: 0;
+        line-height: 1.2;
+      }
+
+      .header-text p {
+        font-size: 14px;
+        color: #6b7280;
+        margin: 0;
+        line-height: 1.2;
+      }
+
+      .header-right {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+        color: #6b7280;
+      }
+
+      .header-right svg {
+        width: 16px;
+        height: 16px;
+      }
+
+      .hero-section {
+        margin-bottom: 32px;
+      }
+
+      .hero-title {
+        font-size: 30px;
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 16px;
+        line-height: 1.2;
+      }
+
+      .hero-description {
+        font-size: 18px;
+        color: #6b7280;
+        line-height: 1.6;
+        max-width: 768px;
+      }
+
+      .search-section {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        border: 1px solid #e5e7eb;
+        padding: 16px;
+        margin-bottom: 24px;
+      }
+
+      .search-container {
+        flex: 1;
+        min-width: 300px;
+        position: relative;
+      }
+
+      .search-input {
+        width: 100%;
+        padding: 8px 12px 8px 40px;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-size: 16px;
+        transition: all 0.2s ease;
+        background: white;
+      }
+
+      .search-input:focus {
+        outline: none;
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+      }
+
+      .search-icon {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9ca3af;
+        font-size: 16px;
+      }
+
+      .filter-select {
+        padding: 8px 12px 8px 40px;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-size: 16px;
+        background: white;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        min-width: 150px;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+        background-position: right 8px center;
+        background-repeat: no-repeat;
+        background-size: 16px;
+        padding-right: 32px;
+      }
+
+      .filter-select:focus {
+        outline: none;
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+      }
+
+      .search-row {
+        display: flex;
+        gap: 16px;
+        align-items: center;
+      }
+
+      .filter-container {
+        position: relative;
+      }
+
+      .filter-icon {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9ca3af;
+        font-size: 16px;
+      }
+
+      .datasets-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+      }
+
+      .datasets-title {
+        font-size: 20px;
+        font-weight: 600;
+        color: #111827;
+        margin: 0;
+      }
+
+      .datasets-count {
+        font-size: 14px;
+        color: #6b7280;
+      }
+
+      .datasets-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 24px;
+        margin-top: 30px;
+      }
+
+      .dataset-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        border: 1px solid #e5e7eb;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        cursor: pointer;
+      }
+
+      .dataset-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      }
+
+      .dataset-thumbnail {
+        position: relative;
+        height: 200px;
+        overflow: hidden;
+      }
+
+      .dataset-thumbnail img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .dataset-badge {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        background: #2563eb;
+        color: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+
+      .dataset-content {
+        padding: 20px;
+      }
+
+      .dataset-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #111827;
+        margin-bottom: 8px;
+        line-height: 1.3;
+      }
+
+      .dataset-description {
+        font-size: 14px;
+        color: #6b7280;
+        line-height: 1.5;
+        margin-bottom: 16px;
+      }
+
+      .dataset-stats {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .stat-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        color: #6b7280;
+      }
+
+      .stat-icon {
+        width: 16px;
+        height: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      @media (max-width: 768px) {
+        .search-row {
+          flex-direction: column;
+          gap: 12px;
+        }
+        
+        .search-container,
+        .filter-container {
+          width: 100%;
+        }
+        
+        .datasets-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+</head>
+<body>
+    <header class="header">
+      <div class="header-content">
+        <div class="header-main">
+          <div class="header-left">
+            <div class="header-logo">📊</div>
+            <div class="header-text">
+              <h1>Data Hub</h1>
+              <p>Comprehensive Dataset Library</p>
+            </div>
+          </div>
+          <div class="header-right">
+            <span>👥</span>
+            <span>Internal & External Access</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="container">
+      <div class="hero-section">
+        <h2 class="hero-title">Explore Our Data Collections</h2>
+        <p class="hero-description">Access comprehensive datasets across social media, streaming, audio, and digital content. Each dataset includes detailed documentation, sample data, and complete data dictionaries to support your research and analysis needs.</p>
+      </div>
+
+      <div class="search-section">
+        <div class="search-row">
+          <div class="search-container">
+            <div class="search-icon">🔍</div>
+            <input 
+              type="text" 
+              id="searchInput" 
+              class="search-input" 
+              placeholder="Search datasets..."
+            />
+          </div>
+          <div class="filter-container">
+            <div class="filter-icon">⚙️</div>
+            <select id="categoryFilter" class="filter-select">
+              <option value="">All</option>
+              <option value="Editorial">Editorial</option>
+              <option value="Audience">Audience</option>
+              <option value="Content">Content</option>
+              <option value="Social Media">Social Media</option>
+              <option value="Streaming">Streaming</option>
+              <option value="Audio">Audio</option>
+              <option value="Advertising">Advertising</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="datasets-header">
+        <h3 class="datasets-title">Available Datasets</h3>
+        <span class="datasets-count" id="datasetsCount">7 datasets found</span>
+      </div>
+
+      <div id="datasetsGrid" class="datasets-grid">
+        <!-- Editorial Data -->
+        <div class="dataset-card" onclick="window.location.href='editorial-data.html'">
+          <div class="dataset-thumbnail">
+            <img src="https://images.pexels.com/photos/265087/pexels-photo-265087.jpeg?auto=compress&cs=tinysrgb&w=400" alt="Editorial Data">
+            <div class="dataset-badge">Editorial</div>
+          </div>
+          <div class="dataset-content">
+            <h3 class="dataset-title">Editorial Data</h3>
+            <p class="dataset-description">Comprehensive consumable content including articles, cards, videos, images, recipes, and other editorial assets with full versioning and lineage</p>
+            <div class="dataset-stats">
+              <div class="stat-item">
+                <span class="stat-icon">📄</span>
+                <span>2.5M+ Articles</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-icon">🎥</span>
+                <span>500K+ Videos</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-icon">🖼️</span>
+                <span>1M+ Images</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Audience Demographics & Behavior -->
+        <div class="dataset-card" onclick="window.location.href='audience-data.html'">
+          <div class="dataset-thumbnail">
+            <img src="https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg?auto=compress&cs=tinysrgb&w=400" alt="Audience Data">
+            <div class="dataset-badge">Audience</div>
+          </div>
+          <div class="dataset-content">
+            <h3 class="dataset-title">Audience Demographics & Behavior</h3>
+            <p class="dataset-description">Detailed audience segmentation data with demographic profiles, preferences, and behavioral patterns and subscription details</p>
+            <div class="dataset-stats">
+              <div class="stat-item">
+                <span class="stat-icon">👥</span>
+                <span>50M+ Users</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-icon">📊</span>
+                <span>25+ Demographics</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-icon">🎯</span>
+                <span>Behavioral Insights</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Digital Content Performance -->
+        <div class="dataset-card" onclick="window.location.href='content-performance.html'">
+          <div class="dataset-thumbnail">
+            <img src="https://images.pexels.com/photos/590022/pexels-photo-590022.jpeg?auto=compress&cs=tinysrgb&w=400" alt="Content Performance">
+            <div class="dataset-badge">Content</div>
+          </div>
+          <div class="dataset-content">
+            <h3 class="dataset-title">Digital Content Performance</h3>
+            <p class="dataset-description">Cross-platform content performance metrics including engagement rates, reach, and conversion analytics</p>
+            <div class="dataset-stats">
+              <div class="stat-item">
+                <span class="stat-icon">📈</span>
+                <span>Engagement Metrics</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-icon">🎯</span>
+                <span>Conversion Rates</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-icon">📱</span>
+                <span>Cross-Platform</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Social Media Engagement Metrics -->
+        <div class="dataset-card" onclick="window.location.href='social-media-engagement.html'">
+          <div class="dataset-thumbnail">
+            <img src="https://images.pexels.com/photos/267350/pexels-photo-267350.jpeg?auto=compress&cs=tinysrgb&w=400" alt="Social Media">
+            <div class="dataset-badge">Social</div>
+          </div>
+          <div class="dataset-content">
+            <h3 class="dataset-title">Social Media Engagement Metrics</h3>
+            <p class="dataset-description">Comprehensive social media performance data across all major platforms including engagement rates, reach, and audience growth</p>
+            <div class="dataset-stats">
+              <div class="stat-item">
+                <span class="stat-icon">📱</span>
+                <span>All Platforms</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-icon">💬</span>
+                <span>Engagement Rates</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-icon">📊</span>
+                <span>Growth Analytics</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Streaming Platform Viewership -->
+        <div class="dataset-card" onclick="window.location.href='streaming-viewership.html'">
+          <div class="dataset-thumbnail">
+            <img src="https://images.pexels.com/photos/114820/pexels-photo-114820.jpeg?auto=compress&cs=tinysrgb&w=400" alt="Streaming">
+            <div class="dataset-badge">Streaming</div>
+          </div>
+          <div class="dataset-content">
+            <h3 class="dataset-title">Streaming Platform Viewership</h3>
+            <p class="dataset-description">Detailed viewership analytics across streaming platforms including watch time, completion rates, and audience demographics</p>
+            <div class="dataset-stats">
+              <div class="stat-item">
+                <span class="stat-icon">📺</span>
+                <span>Watch Time</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-icon">⏱️</span>
+                <span>Completion Rates</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-icon">👥</span>
+                <span>Audience Data</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Podcast Listening Analytics -->
+        <div class="dataset-card" onclick="window.location.href='podcast-analytics.html'">
+          <div class="dataset-thumbnail">
+            <img src="https://images.pexels.com/photos/3783471/pexels-photo-3783471.jpeg?auto=compress&cs=tinysrgb&w=400" alt="Podcast">
+            <div class="dataset-badge">Audio</div>
+          </div>
+          <div class="dataset-content">
+            <h3 class="dataset-title">Podcast Listening Analytics</h3>
+            <p class="dataset-description">Comprehensive podcast performance data including download counts, listening duration, and audience engagement metrics</p>
+            <div class="dataset-stats">
+              <div class="stat-item">
+                <span class="stat-icon">🎧</span>
+                <span>Downloads</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-icon">⏰</span>
+                <span>Listening Time</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-icon">📊</span>
+                <span>Engagement</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Advertising Campaign Performance -->
+        <div class="dataset-card" onclick="window.location.href='ad-performance.html'">
+          <div class="dataset-thumbnail">
+            <img src="https://images.pexels.com/photos/1552617/pexels-photo-1552617.jpeg?auto=compress&cs=tinysrgb&w=400" alt="Advertising">
+            <div class="dataset-badge">Advertising</div>
+          </div>
+          <div class="dataset-content">
+            <h3 class="dataset-title">Advertising Campaign Performance</h3>
+            <p class="dataset-description">Complete advertising performance data including click-through rates, conversion metrics, and ROI analytics across all channels</p>
+            <div class="dataset-stats">
+              <div class="stat-item">
+                <span class="stat-icon">🎯</span>
+                <span>CTR Metrics</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-icon">💰</span>
+                <span>ROI Analytics</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-icon">📊</span>
+                <span>All Channels</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Commerce & E‑commerce Analytics -->
+        <div class="dataset-card" onclick="window.location.href='commerce-analytics.html'">
+          <div class="dataset-thumbnail">
+            <img src="https://images.pexels.com/photos/5632402/pexels-photo-5632402.jpeg?auto=compress&cs=tinysrgb&w=400" alt="Commerce">
+            <div class="dataset-badge">Commerce</div>
+          </div>
+          <div class="dataset-content">
+            <h3 class="dataset-title">Commerce & E‑commerce Analytics</h3>
+            <p class="dataset-description">Transaction data, conversion funnels, cart analytics, and revenue metrics across product categories and customer segments.</p>
+            <div class="dataset-stats">
+              <div class="stat-item">
+                <span class="stat-icon">🛒</span>
+                <span>Transactions</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-icon">📈</span>
+                <span>Conversion Funnel</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-icon">💰</span>
+                <span>Revenue</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Search functionality
+      document.getElementById('searchInput').addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        const cards = document.querySelectorAll('.dataset-card');
+        let visibleCount = 0;
+
+        cards.forEach(card => {
+          const title = card.querySelector('.dataset-title').textContent.toLowerCase();
+          const description = card.querySelector('.dataset-description').textContent.toLowerCase();
+          
+          if (title.includes(searchTerm) || description.includes(searchTerm)) {
+            card.style.display = 'block';
+            visibleCount++;
+          } else {
+            card.style.display = 'none';
+          }
+        });
+
+        document.getElementById('datasetsCount').textContent = `${visibleCount} datasets found`;
+      });
+
+      // Category filter functionality
+      document.getElementById('categoryFilter').addEventListener('change', function() {
+        const selectedCategory = this.value;
+        const cards = document.querySelectorAll('.dataset-card');
+        let visibleCount = 0;
+
+        cards.forEach(card => {
+          const badge = card.querySelector('.dataset-badge').textContent;
+          
+          if (selectedCategory === '' || badge === selectedCategory) {
+            card.style.display = 'block';
+            visibleCount++;
+          } else {
+            card.style.display = 'none';
+          }
+        });
+
+        document.getElementById('datasetsCount').textContent = `${visibleCount} datasets found`;
+      });
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,242 @@
+/* Say hi bubble — form in fixed overlay so View projects / Experience never shift */
+.sayhi-bubble {
+  position: relative;
+  display: inline-flex;
+}
+
+.sayhi-trigger {
+  cursor: pointer;
+}
+
+/* Fixed overlay — form floats above, no layout shift */
+.sayhi-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  animation: sayhiBackdropIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.sayhi-form-wrap {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 100;
+  background: var(--bg-glass);
+  border: 1px solid var(--border-strong);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: 16px;
+  padding: 1.5rem 1.5rem 1.75rem;
+  min-width: 300px;
+  max-width: 360px;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.03),
+    0 24px 48px -12px rgba(0, 0, 0, 0.5),
+    0 0 80px -20px rgba(34, 211, 238, 0.15);
+  animation: sayhiFormIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Talk bubble tail — left side */
+.sayhi-form-wrap::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 1.75rem;
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top: 10px solid var(--border-strong);
+}
+
+@keyframes sayhiBackdropIn {
+  from {
+    opacity: 0;
+    backdrop-filter: blur(0);
+  }
+  to {
+    opacity: 1;
+    backdrop-filter: blur(4px);
+  }
+}
+
+@keyframes sayhiFormIn {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -45%) scale(0.9);
+  }
+  70% {
+    opacity: 1;
+    transform: translate(-50%, -51%) scale(1.02);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* Staggered field reveal */
+.sayhi-form .sayhi-label,
+.sayhi-form .sayhi-input,
+.sayhi-form .sayhi-textarea,
+.sayhi-form .sayhi-actions {
+  animation: sayhiFieldIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+.sayhi-form .sayhi-label:nth-of-type(1),
+.sayhi-form .sayhi-input:nth-of-type(1) { animation-delay: 0.08s; }
+.sayhi-form .sayhi-label:nth-of-type(2),
+.sayhi-form .sayhi-input:nth-of-type(2) { animation-delay: 0.14s; }
+.sayhi-form .sayhi-label:nth-of-type(3),
+.sayhi-form .sayhi-textarea { animation-delay: 0.2s; }
+.sayhi-form .sayhi-actions { animation-delay: 0.28s; }
+
+.sayhi-form .sayhi-success,
+.sayhi-form .sayhi-success .sayhi-cta {
+  animation: sayhiFieldIn 0.35s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+.sayhi-form .sayhi-success p { animation-delay: 0.06s; }
+.sayhi-form .sayhi-success .sayhi-cta { animation-delay: 0.12s; }
+
+@keyframes sayhiFieldIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.sayhi-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.sayhi-close {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  font-weight: 300;
+  line-height: 1;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: color 0.2s ease, background 0.2s ease;
+}
+
+.sayhi-close:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.sayhi-label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.sayhi-input,
+.sayhi-textarea {
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+  color: var(--text);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  transition: border-color 0.2s ease;
+}
+
+.sayhi-input:focus,
+.sayhi-textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.15);
+}
+
+.sayhi-input::placeholder,
+.sayhi-textarea::placeholder {
+  color: var(--text-muted);
+  opacity: 0.7;
+}
+
+.sayhi-textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.sayhi-error {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #f87171;
+}
+
+.sayhi-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  margin-top: 0.25rem;
+}
+
+.sayhi-cta {
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, opacity 0.2s ease;
+}
+
+.sayhi-cta:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.sayhi-cta-primary {
+  background: var(--accent);
+  color: #0a0a0b;
+  border: none;
+}
+
+.sayhi-cta-primary:hover:not(:disabled) {
+  background: #67e8f9;
+}
+
+.sayhi-cta-ghost {
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+}
+
+.sayhi-cta-ghost:hover:not(:disabled) {
+  color: var(--text);
+  border-color: var(--border-strong);
+}
+
+.sayhi-success {
+  text-align: center;
+  padding: 0.5rem 0;
+}
+
+.sayhi-success p {
+  margin: 0 0 1rem;
+  font-size: 0.9375rem;
+  color: var(--text-muted);
+}

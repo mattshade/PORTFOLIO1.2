@@ -1,0 +1,642 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Advertising Campaign Performance - AI Data Hub</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+        background-color: #f9fafb;
+        color: #333;
+        line-height: 1.6;
+      }
+      
+      .header {
+        background: white;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        border-bottom: 1px solid #e5e7eb;
+      }
+      
+      .header-content {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 24px 16px;
+      }
+      
+      .back-btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #2563eb;
+        text-decoration: none;
+        font-weight: 500;
+        margin-bottom: 16px;
+        transition: color 0.3s;
+      }
+      
+      .back-btn:hover {
+        color: #1d4ed8;
+      }
+      
+      .dataset-header {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+      }
+      
+      .dataset-header-main {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+      }
+      
+      .dataset-image {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        border-radius: 8px;
+      }
+      
+      .dataset-info {
+        flex: 1;
+      }
+      
+      .dataset-category {
+        display: inline-block;
+        background: #fef3c7;
+        color: #92400e;
+        padding: 4px 12px;
+        border-radius: 9999px;
+        font-size: 14px;
+        font-weight: 500;
+        margin-bottom: 8px;
+      }
+      
+      .dataset-title {
+        font-size: 24px;
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 8px;
+        line-height: 1.2;
+      }
+      
+      .dataset-description {
+        font-size: 16px;
+        color: #6b7280;
+        margin-bottom: 16px;
+        line-height: 1.5;
+      }
+      
+      .dataset-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        font-size: 14px;
+        color: #6b7280;
+      }
+      
+      .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+      
+      .tab-navigation {
+        background: white;
+        border-bottom: 1px solid #e5e7eb;
+      }
+      
+      .tab-nav-content {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 0 16px;
+      }
+      
+      .tab-nav {
+        display: flex;
+        gap: 32px;
+      }
+      
+      .tab-btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 16px 4px;
+        border-bottom: 2px solid transparent;
+        background: none;
+        border: none;
+        font-weight: 500;
+        font-size: 14px;
+        color: #6b7280;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+      
+      .tab-btn:hover {
+        color: #374151;
+        border-bottom-color: #d1d5db;
+      }
+      
+      .tab-btn.active {
+        color: #2563eb;
+        border-bottom-color: #2563eb;
+      }
+      
+      .tab-content {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 32px 16px;
+      }
+      
+      .content-section {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        border: 1px solid #e5e7eb;
+        padding: 24px;
+        margin-bottom: 24px;
+      }
+      
+      .section-title {
+        font-size: 20px;
+        font-weight: 600;
+        color: #111827;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      
+      .section-icon {
+        width: 24px;
+        height: 24px;
+        color: #2563eb;
+      }
+      
+      .overview-text {
+        color: #374151;
+        line-height: 1.6;
+        margin-bottom: 20px;
+      }
+      
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+        margin-bottom: 20px;
+      }
+      
+      .stat-card {
+        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+        border: 1px solid #f59e0b;
+        border-radius: 8px;
+        padding: 16px;
+      }
+      
+      .stat-card.blue {
+        background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+        border-color: #3b82f6;
+      }
+      
+      .stat-card.green {
+        background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+        border-color: #22c55e;
+      }
+      
+      .stat-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 8px;
+      }
+      
+      .stat-icon {
+        width: 24px;
+        height: 24px;
+        color: #f59e0b;
+      }
+      
+      .stat-icon.blue {
+        color: #3b82f6;
+      }
+      
+      .stat-icon.green {
+        color: #22c55e;
+      }
+      
+      .stat-label {
+        font-size: 14px;
+        font-weight: 500;
+        color: #374151;
+      }
+      
+      .stat-value {
+        font-size: 20px;
+        font-weight: 700;
+        color: #92400e;
+      }
+      
+      .stat-value.blue {
+        color: #1e40af;
+      }
+      
+      .stat-value.green {
+        color: #15803d;
+      }
+      
+      .sample-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 16px;
+      }
+      
+      .sample-table th {
+        background: #f9fafb;
+        padding: 12px;
+        text-align: left;
+        font-weight: 600;
+        color: #374151;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        border-bottom: 1px solid #e5e7eb;
+      }
+      
+      .sample-table td {
+        padding: 12px;
+        border-bottom: 1px solid #e5e7eb;
+        font-size: 14px;
+        color: #111827;
+        font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+      }
+      
+      .dictionary-list {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+      
+      .dictionary-item {
+        border-left: 4px solid #f59e0b;
+        padding-left: 16px;
+      }
+      
+      .dictionary-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 4px;
+      }
+      
+      .dictionary-field {
+        font-weight: 500;
+        color: #111827;
+      }
+      
+      .dictionary-type {
+        background: #f3f4f6;
+        color: #374151;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+      }
+      
+      .dictionary-description {
+        color: #6b7280;
+        font-size: 14px;
+      }
+      
+      .stat-card.purple { background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%); border-color: #a78bfa; }
+      .stat-icon.purple { color: #7c3aed; }
+      .stat-value.purple { color: #5b21b6; }
+      .hero-kpi { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; background: linear-gradient(135deg, #b45309 0%, #92400e 100%); border-radius: 16px; padding: 28px 32px; margin-bottom: 24px; color: white; }
+      .hero-kpi-value { font-size: 28px; font-weight: 800; margin-bottom: 4px; }
+      .hero-kpi-label { font-size: 12px; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.05em; }
+      .insight-callout { background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-left: 4px solid #f59e0b; border-radius: 8px; padding: 20px; margin-bottom: 20px; }
+      .insight-callout strong { color: #92400e; }
+      .use-case-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-top: 20px; }
+      .use-case-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px; }
+      .use-case-card h4 { font-size: 15px; color: #1e293b; margin-bottom: 8px; }
+      .use-case-card p { font-size: 13px; color: #64748b; line-height: 1.5; }
+      .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; }
+      .chart-container { background: #f9fafb; border-radius: 8px; padding: 20px; min-height: 280px; }
+      .chart-container h3 { font-size: 16px; font-weight: 600; color: #374151; margin-bottom: 16px; }
+      
+      @media (min-width: 1024px) {
+        .dataset-header-main {
+          flex-direction: row;
+        }
+        
+        .dataset-image {
+          width: 256px;
+          height: 128px;
+        }
+      }
+      
+      @media (max-width: 768px) {
+        .tab-nav { gap: 16px; }
+        .stats-grid { grid-template-columns: 1fr; }
+        .hero-kpi { grid-template-columns: repeat(2, 1fr); }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="header">
+      <div class="header-content">
+        <a href="index.html" class="back-btn">
+          <span>←</span>
+          <span>Back to Datasets</span>
+        </a>
+        
+        <div class="dataset-header">
+          <div class="dataset-header-main">
+            <img src="https://images.pexels.com/photos/590016/pexels-photo-590016.jpeg?auto=compress&cs=tinysrgb&w=400" alt="Advertising Campaign Performance" class="dataset-image" />
+            <div class="dataset-info">
+              <div class="dataset-category">Advertising</div>
+              <h1 class="dataset-title">Advertising Campaign Performance</h1>
+              <p class="dataset-description">Comprehensive advertising metrics across digital platforms with ROI analysis and audience targeting effectiveness.</p>
+              <div class="dataset-meta">
+                <div class="meta-item">
+                  <span>📅</span>
+                  <span>Updated 2024-12-11</span>
+                </div>
+                <div class="meta-item">
+                  <span>🗄️</span>
+                  <span>700,000 records</span>
+                </div>
+                <div class="meta-item">
+                  <span>💾</span>
+                  <span>400 MB</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <nav class="tab-navigation">
+      <div class="tab-nav-content">
+        <div class="tab-nav">
+          <button class="tab-btn active" data-tab="overview">
+            <span>👁️</span>
+            <span>Overview</span>
+          </button>
+          <button class="tab-btn" data-tab="sample">
+            <span>📊</span>
+            <span>Sample Data</span>
+          </button>
+          <button class="tab-btn" data-tab="analytics">
+            <span>📈</span>
+            <span>Analytics</span>
+          </button>
+          <button class="tab-btn" data-tab="dictionary">
+            <span>📄</span>
+            <span>Data Dictionary</span>
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <main class="tab-content">
+      <div id="overviewContent" class="tab-panel active">
+        <div class="content-section">
+          <h2 class="section-title">
+            <span class="section-icon">👁️</span>
+            Dataset Overview
+          </h2>
+          <div class="overview-text">
+            <p>Campaign-level advertising metrics from Google Ads, Facebook Ads, LinkedIn, and Twitter enable ROAS optimization, audience comparison, and creative performance analysis. This dataset is the source of truth for paid media spend, conversions, and efficiency benchmarking.</p>
+            <p><strong>Scope & coverage:</strong> Impressions, clicks, CTR, cost, and conversions at the campaign level. Supports breakdown by platform, audience segment, creative format, and date. Includes attribution windows and optional creative metadata (format, copy length) where available.</p>
+            <p><strong>Data quality & freshness:</strong> ~700K campaigns refreshed daily. Cost in USD; conversions use platform-defined attribution. Cross-platform CPA and ROAS comparable when segment definitions align; join keys to audience and conversion datasets for unified analytics.</p>
+            <p><strong>Best suited for:</strong> Budget allocation, audience targeting optimization, creative A/B analysis, ROAS and CPA benchmarking, and cross-channel attribution modeling.</p>
+          </div>
+          <div class="hero-kpi">
+            <div><div class="hero-kpi-value">700K</div><div class="hero-kpi-label">Campaigns</div></div>
+            <div><div class="hero-kpi-value">2%</div><div class="hero-kpi-label">Avg CTR</div></div>
+            <div><div class="hero-kpi-value">4%</div><div class="hero-kpi-label">Conv Rate</div></div>
+            <div><div class="hero-kpi-value">$3M</div><div class="hero-kpi-label">Total Spend</div></div>
+          </div>
+          <div class="insight-callout">
+            <strong>Key insight:</strong> Google Ads delivers 1.4× higher conversion rates than social platforms at similar CPA. Video ads achieve 2.3× CTR of static. Best performing audiences: remarketing (6% conv) and lookalikes (3% conv).
+          </div>
+          <div class="use-case-grid">
+            <div class="use-case-card"><h4>💰 ROAS Optimization</h4><p>Compare cost per acquisition and ROAS by campaign, audience, and creative format.</p></div>
+            <div class="use-case-card"><h4>🎯 Audience Performance</h4><p>Identify high-converting segments for budget reallocation and targeting expansion.</p></div>
+            <div class="use-case-card"><h4>📊 Creative Analysis</h4><p>Model CTR and conversion by ad format, copy length, and creative elements.</p></div>
+          </div>
+        </div>
+
+        <div class="content-section">
+          <h2 class="section-title">
+            <span class="section-icon">📊</span>
+            Performance Metrics
+          </h2>
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-header">
+                <span class="stat-icon">💰</span>
+                <span class="stat-label">Avg CTR</span>
+              </div>
+              <div class="stat-value">2%</div>
+            </div>
+            
+            <div class="stat-card blue">
+              <div class="stat-header">
+                <span class="stat-icon blue">📈</span>
+                <span class="stat-label">Total Spend</span>
+              </div>
+              <div class="stat-value blue">$3M</div>
+            </div>
+            
+            <div class="stat-card green">
+              <div class="stat-header">
+                <span class="stat-icon green">🎯</span>
+                <span class="stat-label">Conversion Rate</span>
+              </div>
+              <div class="stat-value green">4%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div id="analyticsContent" class="tab-panel" style="display: none;">
+        <div class="content-section">
+          <h2 class="section-title"><span class="section-icon">📈</span> Key Visualizations</h2>
+          <div class="charts-grid">
+            <div class="chart-container">
+              <h3>CTR by Platform</h3>
+              <canvas id="adChart1"></canvas>
+            </div>
+            <div class="chart-container">
+              <h3>Monthly Spend Trend</h3>
+              <canvas id="adChart2"></canvas>
+            </div>
+            <div class="chart-container">
+              <h3>Conversion Funnel</h3>
+              <canvas id="adChart3"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div id="sampleContent" class="tab-panel" style="display: none;">
+        <div class="content-section">
+          <h2 class="section-title">
+            <span class="section-icon">📊</span>
+            Sample Data
+          </h2>
+          <div class="overflow-x-auto">
+            <table class="sample-table">
+              <thead>
+                <tr>
+                  <th>Campaign ID</th>
+                  <th>Platform</th>
+                  <th>Impressions</th>
+                  <th>Clicks</th>
+                  <th>CTR</th>
+                  <th>Cost</th>
+                  <th>Conversions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>AD_001</td>
+                  <td>Google Ads</td>
+                  <td>125,000</td>
+                  <td>2,340</td>
+                  <td>1.87%</td>
+                  <td>$890.50</td>
+                  <td>45</td>
+                </tr>
+                <tr>
+                  <td>AD_002</td>
+                  <td>Facebook Ads</td>
+                  <td>89,000</td>
+                  <td>1,890</td>
+                  <td>2.12%</td>
+                  <td>$567.80</td>
+                  <td>32</td>
+                </tr>
+                <tr>
+                  <td>AD_003</td>
+                  <td>LinkedIn Ads</td>
+                  <td>45,000</td>
+                  <td>890</td>
+                  <td>1.98%</td>
+                  <td>$1,234.90</td>
+                  <td>28</td>
+                </tr>
+                <tr><td>AD_004</td><td>Google Ads</td><td>210,000</td><td>4,620</td><td>2.20%</td><td>$1,450.00</td><td>89</td></tr>
+                <tr><td>AD_005</td><td>Facebook Ads</td><td>156,000</td><td>3,432</td><td>2.20%</td><td>$892.30</td><td>67</td></tr>
+                <tr><td>AD_006</td><td>Twitter Ads</td><td>78,000</td><td>1,248</td><td>1.60%</td><td>$567.00</td><td>34</td></tr>
+                <tr><td>AD_007</td><td>Google Ads</td><td>189,000</td><td>3,402</td><td>1.80%</td><td>$1,289.50</td><td>78</td></tr>
+                <tr><td>AD_008</td><td>LinkedIn Ads</td><td>62,000</td><td>1,302</td><td>2.10%</td><td>$1,890.00</td><td>42</td></tr>
+                <tr><td>AD_009</td><td>Facebook Ads</td><td>134,000</td><td>2,816</td><td>2.10%</td><td>$756.20</td><td>56</td></tr>
+                <tr><td>AD_010</td><td>Google Ads</td><td>178,000</td><td>3,738</td><td>2.10%</td><td>$1,234.00</td><td>72</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      
+      <div id="dictionaryContent" class="tab-panel" style="display: none;">
+        <div class="content-section">
+          <h2 class="section-title">
+            <span class="section-icon">📄</span>
+            Data Dictionary
+          </h2>
+          <div class="dictionary-list">
+            <div class="dictionary-item">
+              <div class="dictionary-header">
+                <h3 class="dictionary-field">campaign_id</h3>
+                <span class="dictionary-type">String</span>
+              </div>
+              <p class="dictionary-description">Unique identifier for each advertising campaign</p>
+            </div>
+            <div class="dictionary-item">
+              <div class="dictionary-header">
+                <h3 class="dictionary-field">platform</h3>
+                <span class="dictionary-type">String</span>
+              </div>
+              <p class="dictionary-description">Advertising platform name</p>
+            </div>
+            <div class="dictionary-item">
+              <div class="dictionary-header">
+                <h3 class="dictionary-field">impressions</h3>
+                <span class="dictionary-type">Integer</span>
+              </div>
+              <p class="dictionary-description">Total number of ad impressions</p>
+            </div>
+            <div class="dictionary-item">
+              <div class="dictionary-header">
+                <h3 class="dictionary-field">clicks</h3>
+                <span class="dictionary-type">Integer</span>
+              </div>
+              <p class="dictionary-description">Total number of clicks received</p>
+            </div>
+            <div class="dictionary-item">
+              <div class="dictionary-header">
+                <h3 class="dictionary-field">ctr</h3>
+                <span class="dictionary-type">Float</span>
+              </div>
+              <p class="dictionary-description">Click-through rate (clicks/impressions)</p>
+            </div>
+            <div class="dictionary-item">
+              <div class="dictionary-header">
+                <h3 class="dictionary-field">cost</h3>
+                <span class="dictionary-type">Float</span>
+              </div>
+              <p class="dictionary-description">Total campaign cost in USD</p>
+            </div>
+            <div class="dictionary-item">
+              <div class="dictionary-header">
+                <h3 class="dictionary-field">conversions</h3>
+                <span class="dictionary-type">Integer</span>
+              </div>
+              <p class="dictionary-description">Number of conversions attributed to the campaign</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script>
+      function initAdCharts() {
+        if (window.adChartsInit) return;
+        window.adChartsInit = true;
+        const ctx1 = document.getElementById('adChart1');
+        const ctx2 = document.getElementById('adChart2');
+        const ctx3 = document.getElementById('adChart3');
+        if (!ctx1 || !ctx2 || !ctx3 || !window.Chart) return;
+        new Chart(ctx1, { type: 'bar', data: { labels: ['Google Ads','Facebook Ads','LinkedIn','Twitter'], datasets: [{ label: 'CTR %', data: [2.2, 2.1, 2.0, 1.6], backgroundColor: ['#4285f4','#1877f2','#0a66c2','#1da1f2'] }] }, options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } } });
+        new Chart(ctx2, { type: 'line', data: { labels: ['Jul','Aug','Sep','Oct','Nov','Dec'], datasets: [{ label: 'Spend ($K)', data: [380, 420, 458, 445, 478, 520], borderColor: '#f59e0b', fill: true, tension: 0.3 }] }, options: { responsive: true, scales: { y: { beginAtZero: true } } } });
+        new Chart(ctx3, { type: 'doughnut', data: { labels: ['Impressions','Clicks','Conversions'], datasets: [{ data: [68, 22, 10], backgroundColor: ['#f59e0b','#3b82f6','#22c55e'] }] }, options: { responsive: true } });
+      }
+      function initTabs() {
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabPanels = document.querySelectorAll('.tab-panel');
+        tabBtns.forEach(btn => {
+          btn.addEventListener('click', () => {
+            const targetTab = btn.getAttribute('data-tab');
+            tabBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            tabPanels.forEach(panel => panel.style.display = 'none');
+            const el = document.getElementById(targetTab + 'Content');
+            if (el) { el.style.display = 'block'; if (targetTab === 'analytics') initAdCharts(); }
+          });
+        });
+      }
+      document.addEventListener('DOMContentLoaded', initTabs);
+    </script>
+  </body>
+</html>

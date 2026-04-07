@@ -1,0 +1,20 @@
+{
+  "useOxfordComma": true,
+  "numeralThreshold": 9,
+  "preferPercentSymbol": true,
+  "headlineCase": "sentence",
+  "preferSmartQuotes": true,
+  "useMonthAbbrevWithDay": true,
+  "useStateAbbrevDateline": true,
+  "usePeriodsInUsAbbrev": true,
+  "allowedAcronyms": ["API", "NASA", "FBI", "EU", "UN", "NATO", "UAE"],
+  "inclusiveTerms": {
+    "crazy": "unreasonable",
+    "insane": "extreme",
+    "master/slave": "primary/replica",
+    "blacklist": "blocklist",
+    "whitelist": "allowlist",
+    "guys": "everyone",
+    "manpower": "staffing"
+  }
+}

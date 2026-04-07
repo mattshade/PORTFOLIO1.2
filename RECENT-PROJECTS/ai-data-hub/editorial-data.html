@@ -1,0 +1,754 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Editorial Data - AI Data Hub</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+        background-color: #f9fafb;
+        color: #333;
+        line-height: 1.6;
+      }
+      
+      .header {
+        background: white;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        border-bottom: 1px solid #e5e7eb;
+      }
+      
+      .header-content {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 24px 16px;
+      }
+      
+      .back-btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #2563eb;
+        text-decoration: none;
+        font-weight: 500;
+        margin-bottom: 16px;
+        transition: color 0.3s;
+      }
+      
+      .back-btn:hover {
+        color: #1d4ed8;
+      }
+      
+      .dataset-header {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+      }
+      
+      .dataset-header-main {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+      }
+      
+      .dataset-image {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        border-radius: 8px;
+      }
+      
+      .dataset-info {
+        flex: 1;
+      }
+      
+      .dataset-category {
+        display: inline-block;
+        background: #dbeafe;
+        color: #1e40af;
+        padding: 4px 12px;
+        border-radius: 9999px;
+        font-size: 14px;
+        font-weight: 500;
+        margin-bottom: 8px;
+      }
+      
+      .dataset-title {
+        font-size: 24px;
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 8px;
+        line-height: 1.2;
+      }
+      
+      .dataset-description {
+        font-size: 16px;
+        color: #6b7280;
+        margin-bottom: 16px;
+        line-height: 1.5;
+      }
+      
+      .dataset-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        font-size: 14px;
+        color: #6b7280;
+      }
+      
+      .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+      
+      .tab-navigation {
+        background: white;
+        border-bottom: 1px solid #e5e7eb;
+      }
+      
+      .tab-nav-content {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 0 16px;
+      }
+      
+      .tab-nav {
+        display: flex;
+        gap: 32px;
+      }
+      
+      .tab-btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 16px 4px;
+        border-bottom: 2px solid transparent;
+        background: none;
+        border: none;
+        font-weight: 500;
+        font-size: 14px;
+        color: #6b7280;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+      
+      .tab-btn:hover {
+        color: #374151;
+        border-bottom-color: #d1d5db;
+      }
+      
+      .tab-btn.active {
+        color: #2563eb;
+        border-bottom-color: #2563eb;
+      }
+      
+      .tab-content {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 32px 16px;
+      }
+      
+      .content-section {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        border: 1px solid #e5e7eb;
+        padding: 24px;
+        margin-bottom: 24px;
+      }
+      
+      .section-title {
+        font-size: 20px;
+        font-weight: 600;
+        color: #111827;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      
+      .section-icon {
+        width: 24px;
+        height: 24px;
+        color: #2563eb;
+      }
+      
+      .overview-text {
+        color: #374151;
+        line-height: 1.6;
+        margin-bottom: 20px;
+      }
+      
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+        margin-bottom: 20px;
+      }
+      
+      .stat-card {
+        background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+        border: 1px solid #bae6fd;
+        border-radius: 8px;
+        padding: 16px;
+      }
+      
+      .stat-card.green {
+        background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+        border-color: #bbf7d0;
+      }
+      
+      .stat-card.purple {
+        background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
+        border-color: #d8b4fe;
+      }
+      
+      .stat-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 8px;
+      }
+      
+      .stat-icon {
+        width: 24px;
+        height: 24px;
+        color: #2563eb;
+      }
+      
+      .stat-icon.green {
+        color: #16a34a;
+      }
+      
+      .stat-icon.purple {
+        color: #9333ea;
+      }
+      
+      .stat-label {
+        font-size: 14px;
+        font-weight: 500;
+        color: #374151;
+      }
+      
+      .stat-value {
+        font-size: 20px;
+        font-weight: 700;
+        color: #1e40af;
+      }
+      
+      .stat-value.green {
+        color: #15803d;
+      }
+      
+      .stat-value.purple {
+        color: #7c3aed;
+      }
+      
+      .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 24px;
+      }
+      
+      .feature-column {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+      
+      .feature-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+      }
+      
+      .feature-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        margin-top: 6px;
+        flex-shrink: 0;
+      }
+      
+      .feature-dot.blue {
+        background: #2563eb;
+      }
+      
+      .feature-dot.green {
+        background: #16a34a;
+      }
+      
+      .feature-dot.purple {
+        background: #9333ea;
+      }
+      
+      .feature-dot.orange {
+        background: #ea580c;
+      }
+      
+      .feature-content h3 {
+        font-weight: 600;
+        color: #111827;
+        margin-bottom: 4px;
+      }
+      
+      .feature-content p {
+        font-size: 14px;
+        color: #6b7280;
+      }
+      
+      .sample-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 16px;
+      }
+      
+      .sample-table th {
+        background: #f9fafb;
+        padding: 12px;
+        text-align: left;
+        font-weight: 600;
+        color: #374151;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        border-bottom: 1px solid #e5e7eb;
+      }
+      
+      .sample-table td {
+        padding: 12px;
+        border-bottom: 1px solid #e5e7eb;
+        font-size: 14px;
+        color: #111827;
+        font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+      }
+      
+      .dictionary-list {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+      
+      .dictionary-item {
+        border-left: 4px solid #2563eb;
+        padding-left: 16px;
+      }
+      
+      .dictionary-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 4px;
+      }
+      
+      .dictionary-field {
+        font-weight: 500;
+        color: #111827;
+      }
+      
+      .dictionary-type {
+        background: #f3f4f6;
+        color: #374151;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+      }
+      
+      .dictionary-description {
+        color: #6b7280;
+        font-size: 14px;
+      }
+      
+      @media (min-width: 1024px) {
+        .dataset-header-main {
+          flex-direction: row;
+        }
+        
+        .dataset-image {
+          width: 256px;
+          height: 128px;
+        }
+      }
+      
+      .charts-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 24px;
+        margin-top: 16px;
+      }
+      
+      .chart-container {
+        background: #f9fafb;
+        border-radius: 8px;
+        padding: 20px;
+        min-height: 280px;
+      }
+      
+      .chart-container h3 {
+        font-size: 16px;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 16px;
+      }
+      
+      @media (max-width: 768px) {
+        .tab-nav {
+          gap: 16px;
+        }
+        
+        .stats-grid {
+          grid-template-columns: 1fr;
+        }
+        
+        .features-grid {
+          grid-template-columns: 1fr;
+        }
+        
+        .charts-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="header">
+      <div class="header-content">
+        <a href="index.html" class="back-btn">
+          <span>←</span>
+          <span>Back to Datasets</span>
+        </a>
+        
+        <div class="dataset-header">
+          <div class="dataset-header-main">
+            <img src="assets/thumbnails/editorial-data.png" alt="Editorial Data" class="dataset-image" />
+            <div class="dataset-info">
+              <div class="dataset-category">Editorial</div>
+              <h1 class="dataset-title">Editorial Data</h1>
+              <p class="dataset-description">Comprehensive consumable content including articles, cards, videos, images, recipes, and other editorial assets with full versioning and lineage tracking.</p>
+              <div class="dataset-meta">
+                <div class="meta-item">
+                  <span>📅</span>
+                  <span>Updated 2024-12-15</span>
+                </div>
+                <div class="meta-item">
+                  <span>🗄️</span>
+                  <span>5,000,000 records</span>
+                </div>
+                <div class="meta-item">
+                  <span>💾</span>
+                  <span>TBD GB</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <nav class="tab-navigation">
+      <div class="tab-nav-content">
+        <div class="tab-nav">
+          <button class="tab-btn active" data-tab="overview">
+            <span>👁️</span>
+            <span>Overview</span>
+          </button>
+          <button class="tab-btn" data-tab="sample">
+            <span>📊</span>
+            <span>Sample Data</span>
+          </button>
+          <button class="tab-btn" data-tab="analytics">
+            <span>📈</span>
+            <span>Analytics</span>
+          </button>
+          <button class="tab-btn" data-tab="dictionary">
+            <span>📄</span>
+            <span>Data Dictionary</span>
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <main class="tab-content">
+      <div id="overviewContent" class="tab-panel active">
+        <div class="content-section">
+          <h2 class="section-title">
+            <span class="section-icon">👁️</span>
+            Dataset Overview
+          </h2>
+          <div class="overview-text">
+            <p>This dataset contains a comprehensive archive of consumable content including articles, cards, videos, images, recipes, and other editorial assets. It serves as the canonical source of truth for content metadata, versioning, and lineage across the organization.</p>
+            <p><strong>Scope & coverage:</strong> Data spans from June 2005 to present with 20 million total versions across 5 million documents. Content is US-centric and includes support entities such as authors, taxonomy, organizations, persons, and products. One record per document version with full change history.</p>
+            <p><strong>Key capabilities:</strong> Sophisticated versioning model supporting as-of views for historical analysis. Enables content gap analysis, trend detection, author attribution, and taxonomy-driven content discovery. Join keys available for integration with performance and engagement datasets.</p>
+            <p><strong>Best suited for:</strong> Content strategy, editorial planning, author performance analysis, taxonomy management, and historical content trend analysis.</p>
+          </div>
+        </div>
+
+        <div class="content-section">
+          <h2 class="section-title">
+            <span class="section-icon">📊</span>
+            Dataset Statistics
+          </h2>
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-header">
+                <span class="stat-icon">🗄️</span>
+                <span class="stat-label">Total Versions</span>
+              </div>
+              <div class="stat-value">20M</div>
+            </div>
+            
+            <div class="stat-card green">
+              <div class="stat-header">
+                <span class="stat-icon green">📅</span>
+                <span class="stat-label">Data Span</span>
+              </div>
+              <div class="stat-value green">June 2005 - Present</div>
+            </div>
+            
+            <div class="stat-card purple">
+              <div class="stat-header">
+                <span class="stat-icon purple">🌍</span>
+                <span class="stat-label">Coverage</span>
+              </div>
+              <div class="stat-value purple">US-Centric</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-section">
+          <h2 class="section-title">
+            <span class="section-icon">👥</span>
+            Key Features
+          </h2>
+          <div class="features-grid">
+            <div class="feature-column">
+              <div class="feature-item">
+                <div class="feature-dot blue"></div>
+                <div class="feature-content">
+                  <h3>Support Entities</h3>
+                  <p>Authors, taxonomy, organizations, persons, products</p>
+                </div>
+              </div>
+              <div class="feature-item">
+                <div class="feature-dot green"></div>
+                <div class="feature-content">
+                  <h3>Versioning Model</h3>
+                  <p>One record per document version with as-of views support</p>
+                </div>
+              </div>
+            </div>
+            <div class="feature-column">
+              <div class="feature-item">
+                <div class="feature-dot purple"></div>
+                <div class="feature-content">
+                  <h3>Source Lineage</h3>
+                  <p>CMS → SNS → API → JSON (S3) → Delta → Unity Catalog</p>
+                </div>
+              </div>
+              <div class="feature-item">
+                <div class="feature-dot orange"></div>
+                <div class="feature-content">
+                  <h3>Processing</h3>
+                  <p>Live processing with &lt;30m latency</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div id="analyticsContent" class="tab-panel" style="display: none;">
+        <div class="content-section">
+          <h2 class="section-title">
+            <span class="section-icon">📈</span>
+            Key Visualizations
+          </h2>
+          <div class="charts-grid">
+            <div class="chart-container">
+              <h3>Content Type Distribution</h3>
+              <canvas id="editorialChart1"></canvas>
+            </div>
+            <div class="chart-container">
+              <h3>Asset Categories</h3>
+              <canvas id="editorialChart2"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div id="sampleContent" class="tab-panel" style="display: none;">
+        <div class="content-section">
+          <h2 class="section-title">
+            <span class="section-icon">📊</span>
+            Sample Data
+          </h2>
+          <div class="overflow-x-auto">
+            <table class="sample-table">
+              <thead>
+                <tr>
+                  <th>Document ID</th>
+                  <th>Content Type</th>
+                  <th>Title</th>
+                  <th>Author</th>
+                  <th>Organization</th>
+                  <th>Version</th>
+                  <th>Created Date</th>
+                  <th>Taxonomy</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>DOC_001</td>
+                  <td>Article</td>
+                  <td>Breaking News Story</td>
+                  <td>John Smith</td>
+                  <td>News Division</td>
+                  <td>1</td>
+                  <td>2024-12-14</td>
+                  <td>News, Politics</td>
+                </tr>
+                <tr>
+                  <td>DOC_002</td>
+                  <td>Video</td>
+                  <td>Cooking Tutorial</td>
+                  <td>Jane Doe</td>
+                  <td>Morning Show</td>
+                  <td>2</td>
+                  <td>2024-12-13</td>
+                  <td>Lifestyle, Food</td>
+                </tr>
+                <tr>
+                  <td>DOC_003</td>
+                  <td>Recipe</td>
+                  <td>Holiday Dessert</td>
+                  <td>Chef Mike</td>
+                  <td>Culinary Network</td>
+                  <td>1</td>
+                  <td>2024-12-12</td>
+                  <td>Food, Holiday</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      
+      <div id="dictionaryContent" class="tab-panel" style="display: none;">
+        <div class="content-section">
+          <h2 class="section-title">
+            <span class="section-icon">📄</span>
+            Data Dictionary
+          </h2>
+          <div class="dictionary-list">
+            <div class="dictionary-item">
+              <div class="dictionary-header">
+                <h3 class="dictionary-field">document_id</h3>
+                <span class="dictionary-type">String</span>
+              </div>
+              <p class="dictionary-description">Unique identifier for each document</p>
+            </div>
+            <div class="dictionary-item">
+              <div class="dictionary-header">
+                <h3 class="dictionary-field">content_type</h3>
+                <span class="dictionary-type">String</span>
+              </div>
+              <p class="dictionary-description">Type of content (Article, Video, Image, Recipe, Card)</p>
+            </div>
+            <div class="dictionary-item">
+              <div class="dictionary-header">
+                <h3 class="dictionary-field">title</h3>
+                <span class="dictionary-type">String</span>
+              </div>
+              <p class="dictionary-description">Document title or headline</p>
+            </div>
+            <div class="dictionary-item">
+              <div class="dictionary-header">
+                <h3 class="dictionary-field">author</h3>
+                <span class="dictionary-type">String</span>
+              </div>
+              <p class="dictionary-description">Content author or creator</p>
+            </div>
+            <div class="dictionary-item">
+              <div class="dictionary-header">
+                <h3 class="dictionary-field">organization</h3>
+                <span class="dictionary-type">String</span>
+              </div>
+              <p class="dictionary-description">Publishing organization or brand</p>
+            </div>
+            <div class="dictionary-item">
+              <div class="dictionary-header">
+                <h3 class="dictionary-field">version</h3>
+                <span class="dictionary-type">Integer</span>
+              </div>
+              <p class="dictionary-description">Document version number</p>
+            </div>
+            <div class="dictionary-item">
+              <div class="dictionary-header">
+                <h3 class="dictionary-field">created_date</h3>
+                <span class="dictionary-type">Date</span>
+              </div>
+              <p class="dictionary-description">Date when content was created (YYYY-MM-DD format)</p>
+            </div>
+            <div class="dictionary-item">
+              <div class="dictionary-header">
+                <h3 class="dictionary-field">taxonomy</h3>
+                <span class="dictionary-type">Array</span>
+              </div>
+              <p class="dictionary-description">Content classification tags and categories</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script>
+      function initTabs() {
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabPanels = document.querySelectorAll('.tab-panel');
+        
+        tabBtns.forEach(btn => {
+          btn.addEventListener('click', () => {
+            const targetTab = btn.getAttribute('data-tab');
+            tabBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            tabPanels.forEach(panel => panel.style.display = 'none');
+            document.getElementById(targetTab + 'Content').style.display = 'block';
+            if (targetTab === 'analytics' && typeof initEditorialCharts === 'function') initEditorialCharts();
+          });
+        });
+      }
+
+      function initEditorialCharts() {
+        if (window.editorialChartsInit) return;
+        window.editorialChartsInit = true;
+        new Chart(document.getElementById('editorialChart1'), {
+          type: 'bar',
+          data: {
+            labels: ['Articles', 'Videos', 'Images', 'Recipes', 'Cards'],
+            datasets: [{ label: 'Documents (M)', data: [2.1, 1.4, 1.2, 0.5, 0.3], backgroundColor: ['#2563eb','#22c55e','#f59e0b','#ef4444','#8b5cf6'] }]
+          },
+          options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { display: false } } }
+        });
+        new Chart(document.getElementById('editorialChart2'), {
+          type: 'doughnut',
+          data: {
+            labels: ['News', 'Lifestyle', 'Sports', 'Entertainment', 'Food', 'Other'],
+            datasets: [{ data: [32, 18, 14, 12, 10, 14], backgroundColor: ['#3b82f6','#22c55e','#f59e0b','#ef4444','#8b5cf6','#6b7280'] }]
+          },
+          options: { responsive: true, maintainAspectRatio: true }
+        });
+      }
+
+      document.addEventListener('DOMContentLoaded', initTabs);
+    </script>
+  </body>
+</html>

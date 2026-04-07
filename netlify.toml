@@ -1,0 +1,36 @@
+# Build the portfolio and optionally copy pre-built projects into dist/projects/
+# To include project demos: build each app in RECENT-PROJECTS (dist/ or out/), then run this build.
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# SPA fallbacks for hosted projects (must come before portfolio catch-all)
+[[redirects]]
+  from = "/projects/chatgpt-dashboard/*"
+  to = "/projects/chatgpt-dashboard/index.html"
+  status = 200
+[[redirects]]
+  from = "/projects/executive-ai-dashboard/*"
+  to = "/projects/executive-ai-dashboard/index.html"
+  status = 200
+[[redirects]]
+  from = "/projects/dev-agents-dashboard/*"
+  to = "/projects/dev-agents-dashboard/index.html"
+  status = 200
+[[redirects]]
+  from = "/projects/github-copilot-dashboard/*"
+  to = "/projects/github-copilot-dashboard/index.html"
+  status = 200
+[[redirects]]
+  from = "/projects/cfr-dashboard-bugz/*"
+  to = "/projects/cfr-dashboard-bugz/index.html"
+  status = 200
+# ai-data-hub: static HTML pages — no redirect; files served directly
+# Portfolio SPA fallback (catch-all)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
