@@ -29,6 +29,13 @@
   to = "/projects/cfr-dashboard-bugz/index.html"
   status = 200
 # ai-data-hub: static HTML pages — no redirect; files served directly
+
+# Avoid long-lived CDN cache of replaced PDFs (resume download)
+[[headers]]
+  for = "/*.pdf"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
 # Portfolio SPA fallback (catch-all)
 [[redirects]]
   from = "/*"

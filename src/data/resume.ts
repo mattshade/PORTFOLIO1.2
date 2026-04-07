@@ -29,8 +29,8 @@ export const resume = {
   /** Portfolio / personal site — shown on resume and in structured data */
   portfolioUrl: 'https://www.mattshade.com/',
   github: '',
-  /** Download link — served from `public/Matt_Shade.pdf` */
-  resumePdf: '/Matt_Shade.pdf',
+  /** Download link — served from `public/Matt_Shade.pdf`. Bump `v=` when you replace the file so prod CDNs/browsers fetch the new PDF. */
+  resumePdf: '/Matt_Shade.pdf?v=2',
 
   selectedImpact: [
     'Strategically scaled high-performance, multidisciplinary engineering organizations, recruiting top-tier talent and management to accelerate enterprise subscription growth and execute critical digital platform delivery.',
