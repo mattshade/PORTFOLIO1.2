@@ -1,4 +1,4 @@
-// Edit this file to match your resume. PDF/HTML downloads are generated via `npm run generate:resume-ats`.
+// Edit this file for the on-site resume page. The downloadable file is `public/Matt_Shade.pdf` (replace manually). Optional: `npm run generate:resume-ats` rebuilds ATS PDF/HTML from this data.
 
 export interface ExperienceItem {
   role: string
@@ -29,7 +29,7 @@ export const resume = {
   /** Portfolio / personal site — shown on resume and in structured data */
   portfolioUrl: 'https://www.mattshade.com/',
   github: '',
-  /** ATS-friendly PDF/HTML — run `npm run generate:resume-ats` after editing this file */
+  /** Download link — served from `public/Matt_Shade.pdf` */
   resumePdf: '/Matt_Shade.pdf',
 
   selectedImpact: [
