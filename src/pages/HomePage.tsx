@@ -33,7 +33,7 @@ export function HomePage() {
       </div>
       <div className="app-content">
         <Nav />
-        <main>
+        <main id="main-content">
           <Hero />
           <Bio />
           <Projects />

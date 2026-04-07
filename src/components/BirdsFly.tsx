@@ -13,6 +13,12 @@ class Boid {
   landX: number
   landY: number
   hopTimer: number
+  /** Which wire (0..1 maps to wire index) — rerolled when taking off */
+  wirePreference: number
+  /** Horizontal slot along the wire (0..1 within padded span) — rerolled when taking off */
+  landTargetT: number
+  landPadL: number
+  landPadR: number
 
   constructor(x: number, y: number, index: number) {
     this.x = x
@@ -22,6 +28,10 @@ class Boid {
     this.landX = 0
     this.landY = 0
     this.hopTimer = 0
+    this.wirePreference = Math.random()
+    this.landTargetT = Math.random()
+    this.landPadL = 0.04 + Math.random() * 0.07
+    this.landPadR = 0.04 + Math.random() * 0.07
     this.vx = (Math.random() * 2 - 1) * 2
     this.vy = (Math.random() * 2 - 1) * 2
     this.maxSpeed = 2.0
@@ -220,6 +230,17 @@ class Boid {
     const mag = 0.8 + Math.random() * 1.2
     this.vx += Math.cos(angle) * mag
     this.vy += Math.sin(angle) * mag
+    this.wirePreference = Math.random()
+    this.landTargetT = Math.random()
+    this.landPadL = 0.04 + Math.random() * 0.07
+    this.landPadR = 0.04 + Math.random() * 0.07
+  }
+
+  rerollLandingTargets() {
+    this.wirePreference = Math.random()
+    this.landTargetT = Math.random()
+    this.landPadL = 0.04 + Math.random() * 0.07
+    this.landPadR = 0.04 + Math.random() * 0.07
   }
 
   draw(ctx: CanvasRenderingContext2D) {
@@ -355,6 +376,7 @@ export function BirdsFly({
           for (const boid of flock) {
             if (boid.isLanded) {
               boid.isLanded = false
+              boid.rerollLandingTargets()
               boid.vy = -2 - Math.random() * 2
               boid.vx = (Math.random() - 0.5) * 3
             }
@@ -373,15 +395,16 @@ export function BirdsFly({
                 b.hopTimer = 30
               }
             } else {
-              const wireIndex = b.index % activeWires.length
+              const nWires = activeWires.length
+              const wireIndex = Math.min(
+                nWires - 1,
+                Math.floor(b.wirePreference * nWires)
+              )
               const wire = activeWires[wireIndex]
-              
-              const totalOnWire = Math.ceil((flock.length - wireIndex) / activeWires.length)
-              const rankOnWire = Math.floor(b.index / activeWires.length)
-              // Shrink the spread slightly so they don't sit on the extreme edges
-              const spread = 0.1 + ((rankOnWire + 0.5) / Math.max(1, totalOnWire)) * 0.8
-              
-              const landingX = wire.left + spread * wire.width
+
+              // Per-boid random along wire; pads reroll each time they leave a wire
+              const span = Math.max(0.12, 1 - b.landPadL - b.landPadR)
+              const landingX = wire.left + (b.landPadL + b.landTargetT * span) * wire.width
               const landingY = wire.top - 2
               
               const dx = landingX - b.x
@@ -402,6 +425,7 @@ export function BirdsFly({
           for (const b of flock) {
             if (b.isLanded) {
               b.isLanded = false
+              b.rerollLandingTargets()
               b.vx = (Math.random() - 0.5) * 1.5
               b.vy = -1 - Math.random() * 1
             }

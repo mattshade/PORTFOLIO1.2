@@ -3,32 +3,37 @@ import { resume } from '../data/resume'
 import './Resume.css'
 
 export function Resume() {
-  const handlePrint = () => window.print()
-
   return (
     <div className="resume-page">
       <header className="resume-no-print resume-header">
         <Link to="/" className="resume-back">← Back</Link>
-        <button type="button" onClick={handlePrint} className="resume-print-btn">
-          Print / Save as PDF
-        </button>
+        {resume.resumePdf && (
+          <a href={resume.resumePdf} download className="resume-download-btn">
+            Download resume (PDF)
+          </a>
+        )}
       </header>
       <article className="resume-doc">
         <header className="resume-doc-header">
           <h1 className="resume-name">{resume.name}</h1>
           <p className="resume-title">{resume.title}</p>
           <p className="resume-tagline">{resume.tagline}</p>
-          <div className="resume-contact-row">
+          <address className="resume-contact-row">
             {resume.email && (
               <a href={`mailto:${resume.email}`} className="resume-contact">{resume.email}</a>
             )}
+            {resume.portfolioUrl && (
+              <a href={resume.portfolioUrl} target="_blank" rel="noopener noreferrer" className="resume-contact">
+                mattshade.com
+              </a>
+            )}
             {resume.linkedin && (
-              <a href={resume.linkedin} target="_blank" rel="noopener noreferrer" className="resume-contact">LinkedIn</a>
+              <a href={resume.linkedin} target="_blank" rel="noopener noreferrer" className="resume-contact">LinkedIn profile</a>
             )}
             {resume.github && (
-              <a href={resume.github} target="_blank" rel="noopener noreferrer" className="resume-contact">GitHub</a>
+              <a href={resume.github} target="_blank" rel="noopener noreferrer" className="resume-contact">GitHub profile</a>
             )}
-          </div>
+          </address>
         </header>
 
         {resume.selectedImpact && resume.selectedImpact.length > 0 && (
@@ -67,9 +72,11 @@ export function Resume() {
 
         <section className="resume-section">
           <h2 className="resume-section-title">Skills</h2>
-          <p className="resume-skills">
-            {resume.skills.join(' · ')}
-          </p>
+          <ul className="resume-skills-list">
+            {resume.skills.map((skill) => (
+              <li key={skill}>{skill}</li>
+            ))}
+          </ul>
         </section>
         {resume.education && resume.education.length > 0 && (
           <section className="resume-section">

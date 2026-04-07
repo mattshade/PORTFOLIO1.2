@@ -24,6 +24,9 @@ export function Nav() {
 
   return (
     <nav className="nav" aria-label="Main">
+      <a href="#main-content" className="skip-link">
+        Skip to main content
+      </a>
       <div className="nav-inner">
         <Link 
           to="/" 

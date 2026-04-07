@@ -23,31 +23,7 @@
 
 .experience-item:hover {
   box-shadow: var(--shadow-sm);
-}
-
-.experience-item:nth-child(8n + 1):hover {
-  border-color: var(--hover-pink-2);
-}
-.experience-item:nth-child(8n + 2):hover {
-  border-color: var(--hover-pink-3);
-}
-.experience-item:nth-child(8n + 3):hover {
-  border-color: var(--hover-pink-4);
-}
-.experience-item:nth-child(8n + 4):hover {
-  border-color: var(--hover-pink-5);
-}
-.experience-item:nth-child(8n + 5):hover {
-  border-color: var(--hover-pink-6);
-}
-.experience-item:nth-child(8n + 6):hover {
-  border-color: var(--hover-pink-7);
-}
-.experience-item:nth-child(8n + 7):hover {
-  border-color: var(--hover-pink-8);
-}
-.experience-item:nth-child(8n + 8):hover {
-  border-color: var(--hover-pink-1);
+  border-color: var(--accent);
 }
 
 .experience-header {
@@ -142,31 +118,7 @@
 
 .skills-item:hover {
   box-shadow: var(--shadow-sm);
-}
-
-.skills-item:nth-child(8n + 1):hover {
-  border-color: var(--hover-pink-5);
-}
-.skills-item:nth-child(8n + 2):hover {
-  border-color: var(--hover-pink-6);
-}
-.skills-item:nth-child(8n + 3):hover {
-  border-color: var(--hover-pink-7);
-}
-.skills-item:nth-child(8n + 4):hover {
-  border-color: var(--hover-pink-8);
-}
-.skills-item:nth-child(8n + 5):hover {
-  border-color: var(--hover-pink-1);
-}
-.skills-item:nth-child(8n + 6):hover {
-  border-color: var(--hover-pink-2);
-}
-.skills-item:nth-child(8n + 7):hover {
-  border-color: var(--hover-pink-3);
-}
-.skills-item:nth-child(8n + 8):hover {
-  border-color: var(--hover-pink-4);
+  border-color: var(--accent);
 }
 
 @media (max-width: 768px) {

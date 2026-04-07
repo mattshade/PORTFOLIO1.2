@@ -1,4 +1,4 @@
-// Edit this file to match your resume. You can paste from your PDF or type in your details.
+// Edit this file to match your resume. PDF/HTML downloads are generated via `npm run generate:resume-ats`.
 
 export interface ExperienceItem {
   role: string
@@ -17,27 +17,32 @@ export interface EducationItem {
 export const resume = {
   name: 'Matt Shade',
   title: 'AI Engineering Director | Engineering Leadership | Design Engineering',
-  tagline: 'Hands-on engineering and design leader with deep experience building consumer platforms, scaling teams, modernizing digital products, and applying AI to real workflow problems.',
-  summary: 'Hands-on engineering and design leader with deep experience building consumer platforms, scaling teams, modernizing digital products, and applying AI to real workflow problems. Combines leadership across engineering, product, design, and editorial with strong technical depth in web, mobile, cloud, and AI-enabled systems. Known for translating prototypes and experimentation into practical platform improvements, team growth, and measurable operational impact.',
+  tagline:
+    'Hands-on engineering and design leader with deep experience building consumer platforms, scaling teams, modernizing digital products, and applying AI to real workflow problems.',
+  summary:
+    'Hands-on engineering and design leader with deep experience building consumer platforms, scaling teams, modernizing digital products, and applying AI to real workflow problems. Combines leadership across engineering, product, design, and editorial with strong technical depth in web, mobile, cloud, and AI-enabled systems. Known for translating prototypes and experimentation into practical platform improvements, team growth, and measurable operational impact.',
+  /** Mirrored in index.html (noscript) for no-JS crawlers — keep in sync */
   email: 'hellomattshade@gmail.com',
-  /** Netlify Forms: used when deployed (no config needed). Formspree: set if you prefer it over Netlify. */
-  contactFormEndpoint: '', // e.g. https://formspree.io/f/yourformid for Formspree
-  contactFormName: 'contact', // Must match the hidden form in index.html for Netlify
-  linkedin: 'https://linkedin.com/in/matt-shade-66125515', // e.g. https://linkedin.com/in/mattshade
-  github: '',   // e.g. https://github.com/mattshade
+  contactFormEndpoint: '',
+  contactFormName: 'contact',
+  linkedin: 'https://linkedin.com/in/matt-shade-66125515',
+  /** Portfolio / personal site — shown on resume and in structured data */
+  portfolioUrl: 'https://www.mattshade.com/',
+  github: '',
+  /** ATS-friendly PDF/HTML — run `npm run generate:resume-ats` after editing this file */
   resumePdf: '/Matt_Shade.pdf',
 
   selectedImpact: [
     'Strategically scaled high-performance, multidisciplinary engineering organizations, recruiting top-tier talent and management to accelerate enterprise subscription growth and execute critical digital platform delivery.',
-    'Spearheaded a massive architectural consolidation of video infrastructure, synthesizing 8 disparate live and short-form video player integrations into 2 globally standardized systems—drastically reducing platform fragmentation and operational overhead.',
+    'Spearheaded a massive architectural consolidation of video infrastructure, synthesizing 8 disparate live and short-form video player integrations into 2 globally standardized systems, drastically reducing platform fragmentation and operational overhead.',
     'Orchestrated the strategic sunsetting of a monolithic legacy application ecosystem, immediately capturing substantial cost savings and reclaiming extensive engineering bandwidth previously lost to technical debt and maintenance.',
     'Architected and deployed specialized GenAI agents designed to optimize critical newsroom operations, significantly accelerating high-stakes newsgathering, streamlining on-air scheduling logistics, and bridging design-to-engineering execution.',
-    'Pioneered comprehensive AI-enablement initiatives—curating hands-on workshops and strategic office hours—that successfully fostered deep institutional adoption of agentic tools, driving measurable gains in cross-functional velocity and output quality.'
+    'Pioneered comprehensive AI-enablement initiatives (curating hands-on workshops and strategic office hours) that successfully fostered deep institutional adoption of agentic tools, driving measurable gains in cross-functional velocity and output quality.',
   ],
 
   education: [
     { school: 'Mount Ida College', degree: 'Associate of Arts, Graphic Design' },
-    { school: 'Katherine Gibbs School', degree: 'Associate of Arts, Visual Communications' }
+    { school: 'Katherine Gibbs School', degree: 'Associate of Arts, Visual Communications' },
   ] as EducationItem[],
 
   experience: [
@@ -68,7 +73,7 @@ export const resume = {
       ],
     },
     {
-      role: 'Senior Engineering Manager, Engagement',
+      role: 'Senior Engineering Manager',
       company: 'CNBC',
       period: 'Sep 2015 - Oct 2021',
       location: 'Englewood Cliffs, NJ',
@@ -122,6 +127,6 @@ export const resume = {
     'Interaction design',
     'Experimentation frameworks',
     'CI/CD',
-    'Figma'
+    'Figma',
   ],
 }

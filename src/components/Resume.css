@@ -10,8 +10,30 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
   max-width: 800px;
   margin: 0 auto 2rem;
+}
+
+.resume-download-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--accent);
+  background: var(--accent-dim);
+  border: 1px solid rgba(147, 197, 114, 0.35);
+  border-radius: 8px;
+  text-decoration: none;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.resume-download-btn:hover {
+  background: color-mix(in srgb, var(--accent) 28%, #ffffff);
+  color: color-mix(in srgb, var(--accent) 72%, #000000);
+  border-color: color-mix(in srgb, var(--accent) 55%, #000000);
 }
 
 .resume-back {
@@ -23,24 +45,6 @@
 
 .resume-back:hover {
   color: var(--hover-pink-2);
-}
-
-.resume-print-btn {
-  padding: 0.5rem 1rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--accent);
-  background: var(--accent-dim);
-  border: 1px solid rgba(147, 197, 114, 0.35);
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
-}
-
-.resume-print-btn:hover {
-  background: color-mix(in srgb, var(--accent) 28%, #ffffff);
-  color: color-mix(in srgb, var(--accent) 72%, #000000);
-  border-color: color-mix(in srgb, var(--accent) 55%, #000000);
 }
 
 .resume-doc {
@@ -81,6 +85,8 @@
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
+  margin: 0;
+  font-style: normal;
 }
 
 .resume-contact {
@@ -159,10 +165,17 @@
   color: var(--text-muted);
 }
 
-.resume-skills {
+.resume-skills-list {
   margin: 0;
+  padding-left: 1.25rem;
   color: var(--text-muted);
   font-size: 0.9375rem;
+  line-height: 1.5;
+  list-style: disc;
+}
+
+.resume-skills-list li {
+  margin-bottom: 0.2rem;
 }
 
 @media (max-width: 640px) {
@@ -213,23 +226,25 @@
   }
 
   .resume-doc {
-    color: #1a1a1a;
+    font-family: var(--font-sans);
+    color: #171717;
     max-width: none;
     font-size: 10pt;
     line-height: 1.35;
   }
 
   .resume-name {
-    color: #0a0a0a;
+    color: #93c572;
     font-size: 1.5rem;
     margin: 0 0 0.2rem;
   }
 
   .resume-title {
-    color: #0891b2;
+    color: #93c572;
     font-size: 0.75rem;
     margin: 0 0 0.35rem;
     letter-spacing: 0.08em;
+    font-family: var(--font-mono);
   }
 
   .resume-tagline {
@@ -248,27 +263,29 @@
   .resume-company,
   .resume-period,
   .resume-highlights li,
-  .resume-skills {
+  .resume-skills-list,
+  .resume-skills-list li {
     color: #525252;
   }
 
   .resume-section-title {
-    color: #0891b2;
-    border-color: #e5e5e5;
+    color: #93c572;
+    border-color: rgba(147, 197, 114, 0.45);
     font-size: 0.875rem;
     margin: 0 0 0.5rem;
     padding-bottom: 0.2rem;
   }
 
   .resume-contact {
-    color: #0891b2;
+    color: #93c572;
     font-size: 0.8125rem;
   }
 
   .resume-doc-header {
     margin-bottom: 0.6rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 1px solid #e5e5e5;
+    padding: 0 0 0.5rem 0.65rem;
+    border-left: 4px solid #93c572;
+    border-bottom: 1px solid #ebebeb;
   }
 
   .resume-section {
@@ -311,9 +328,16 @@
     line-height: 1.3;
   }
 
-  .resume-skills {
+  .resume-skills-list {
     font-size: 0.8125rem;
     line-height: 1.35;
+    padding-left: 1rem;
+    margin: 0;
+  }
+
+  .resume-skills-list li {
+    font-size: 0.8125rem;
+    margin-bottom: 0.1rem;
   }
 
   body {

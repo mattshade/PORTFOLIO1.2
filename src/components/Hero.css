@@ -76,6 +76,20 @@
   pointer-events: none;
 }
 
+/* Same .bird-wire as sections — positioned in hero for boids */
+.hero-phone-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: clamp(5.5rem, 14vh, 9.5rem);
+  z-index: 2;
+  pointer-events: none;
+}
+
+.hero-phone-line .bird-wire {
+  margin: 0;
+}
+
 /* Cursor-following ambient glow — strong, responsive */
 .hero-cursor-glow {
   position: absolute;

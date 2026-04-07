@@ -5,9 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "node scripts/build-projects.cjs && vite build && node scripts/copy-projects.cjs",
-    "build:portfolio": "vite build && node scripts/copy-projects.cjs",
-    "preview": "vite preview"
+    "build": "npm run generate:resume-ats && node scripts/build-projects.cjs && vite build && node scripts/copy-projects.cjs",
+    "build:portfolio": "npm run generate:resume-ats && vite build && node scripts/copy-projects.cjs",
+    "preview": "vite preview",
+    "generate:resume-ats": "tsx scripts/generate-ats-resume.ts"
   },
   "dependencies": {
     "react": "^18.3.1",
@@ -15,9 +16,12 @@
     "react-router-dom": "^7.13.1"
   },
   "devDependencies": {
+    "@types/pdfkit": "^0.17.5",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.4",
+    "pdfkit": "^0.18.0",
+    "tsx": "^4.19.2",
     "typescript": "^5.6.3",
     "vite": "^6.0.1"
   }

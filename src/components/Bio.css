@@ -10,6 +10,11 @@
   padding: 0 1.25rem;
 }
 
+.bio-section-title {
+  margin: 0 0 1.25rem;
+  text-align: left;
+}
+
 .bio-block {
   position: relative;
   padding: 2rem 1.75rem;

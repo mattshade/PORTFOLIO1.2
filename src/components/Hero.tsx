@@ -12,6 +12,9 @@ export function Hero() {
       className="hero" 
       aria-label="Introduction"
     >
+      <div className="hero-phone-line" aria-hidden>
+        <div className="bird-wire" />
+      </div>
       <div className="hero-content">
         <p className="hero-eyebrow" style={{ animationDelay: '0ms' }}>
           {titleSegments.map((segment, i) => (
