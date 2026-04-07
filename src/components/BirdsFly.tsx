@@ -391,7 +391,7 @@ export function BirdsFly({
               )
               b.landY = nearest.top - 2 // Perch slightly above the line
               
-              if (idleTime > 30000 && Math.random() < 0.0015 && b.hopTimer === 0) {
+              if (idleTime > 5000 && Math.random() < 0.0015 && b.hopTimer === 0) {
                 b.hopTimer = 30
               }
             } else {
