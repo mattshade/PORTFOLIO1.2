@@ -99,7 +99,7 @@
   top: calc(var(--cursor-y, 0.5) * 100%);
   transform: translate(-50%, -50%);
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(15, 118, 110, 0.08) 0%, rgba(20, 184, 166, 0.04) 40%, transparent 70%);
+  background: radial-gradient(circle, rgba(173, 235, 179, 0.12) 0%, rgba(173, 235, 179, 0.06) 40%, transparent 70%);
   filter: blur(80px);
   opacity: 0;
   transition: opacity 0.3s ease, left 0.1s cubic-bezier(0.2, 0, 0.2, 1), top 0.1s cubic-bezier(0.2, 0, 0.2, 1);
@@ -117,7 +117,7 @@
 .hero:hover .hero-grid {
   opacity: 1;
   background-image:
-    radial-gradient(rgba(45, 212, 191, 0.15) 1.5px, transparent 1.5px);
+    radial-gradient(rgba(173, 235, 179, 0.2) 1.5px, transparent 1.5px);
 }
 
 .hero-content {
@@ -168,7 +168,7 @@
 }
 
 .hero-name:hover {
-  color: var(--hover-pink-4);
+  color: var(--hover);
 }
 
 .hero-tagline {
@@ -189,7 +189,7 @@
 }
 
 .hero-tagline:hover .hero-tagline-highlight {
-  color: var(--hover-pink-6);
+  color: var(--hover);
 }
 
 .hero-ctas {
@@ -225,7 +225,7 @@
 }
 
 .hero-cta-primary:hover {
-  background: var(--accent);
+  background: var(--hover);
   color: #0a0a0a;
   transform: translateY(-4px) scale(1.02);
   box-shadow: var(--shadow-md);
@@ -240,8 +240,8 @@
 }
 
 .hero-cta-secondary:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+  border-color: var(--hover);
+  color: var(--hover);
   background: var(--bg-elevated);
   box-shadow: var(--shadow-md);
   transform: translateY(-2px);
@@ -270,15 +270,15 @@
 }
 
 .hero-cta-bubble:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+  border-color: var(--hover);
+  color: var(--hover);
   background: var(--accent-dim);
-  box-shadow: 0 0 32px rgba(147, 197, 114, 0.28);
+  box-shadow: 0 0 32px rgba(173, 235, 179, 0.4);
   transform: translateY(-2px);
 }
 
 .hero-cta-bubble:hover::after {
-  border-top-color: var(--accent);
+  border-top-color: var(--hover);
 }
 
 @media (max-width: 480px) {
@@ -318,7 +318,7 @@
 }
 
 .hero-scroll:hover {
-  color: var(--hover-pink-8);
+  color: var(--hover);
 }
 
 .hero-scroll-line {

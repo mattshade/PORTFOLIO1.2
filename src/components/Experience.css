@@ -23,7 +23,7 @@
 
 .experience-item:hover {
   box-shadow: var(--shadow-sm);
-  border-color: var(--accent);
+  border-color: var(--hover);
 }
 
 .experience-header {
@@ -118,7 +118,7 @@
 
 .skills-item:hover {
   box-shadow: var(--shadow-sm);
-  border-color: var(--accent);
+  border-color: var(--hover);
 }
 
 @media (max-width: 768px) {

@@ -31,9 +31,9 @@
 }
 
 .resume-download-btn:hover {
-  background: color-mix(in srgb, var(--accent) 28%, #ffffff);
-  color: color-mix(in srgb, var(--accent) 72%, #000000);
-  border-color: color-mix(in srgb, var(--accent) 55%, #000000);
+  background: color-mix(in srgb, var(--hover) 28%, #ffffff);
+  color: color-mix(in srgb, var(--hover) 72%, #000000);
+  border-color: color-mix(in srgb, var(--hover) 55%, #000000);
 }
 
 .resume-back {
@@ -44,7 +44,7 @@
 }
 
 .resume-back:hover {
-  color: var(--hover-pink-2);
+  color: var(--hover);
 }
 
 .resume-doc {
@@ -97,7 +97,7 @@
 }
 
 .resume-contact:hover {
-  color: var(--hover-pink-8);
+  color: var(--hover);
 }
 
 .resume-section {
@@ -121,6 +121,23 @@
 
 .resume-job:last-child {
   margin-bottom: 0;
+}
+
+.resume-section--education,
+.resume-edu {
+  text-align: left;
+}
+
+.resume-edu {
+  margin-bottom: 1.75rem;
+}
+
+.resume-edu:last-child {
+  margin-bottom: 0;
+}
+
+.resume-edu .resume-company {
+  color: var(--text-muted);
 }
 
 .resume-job-header {
@@ -231,6 +248,12 @@
     max-width: none;
     font-size: 10pt;
     line-height: 1.35;
+    text-align: left;
+  }
+
+  .resume-section,
+  .resume-section--education {
+    text-align: left;
   }
 
   .resume-name {
@@ -300,6 +323,21 @@
 
   .resume-job:last-child {
     margin-bottom: 0;
+  }
+
+  .resume-edu {
+    break-inside: avoid;
+    margin-bottom: 0.5rem;
+    text-align: left;
+  }
+
+  .resume-edu:last-child {
+    margin-bottom: 0;
+  }
+
+  .resume-edu .resume-role,
+  .resume-edu .resume-company {
+    text-align: left;
   }
 
   .resume-role {

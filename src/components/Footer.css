@@ -22,7 +22,7 @@
 }
 
 .footer-link:hover {
-  color: var(--hover-pink-4);
+  color: var(--hover);
 }
 
 .footer-copy {

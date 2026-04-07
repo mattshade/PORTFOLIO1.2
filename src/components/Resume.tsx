@@ -79,12 +79,12 @@ export function Resume() {
           </ul>
         </section>
         {resume.education && resume.education.length > 0 && (
-          <section className="resume-section">
+          <section className="resume-section resume-section--education">
             <h2 className="resume-section-title">Education</h2>
             {resume.education.map((edu, i) => (
-              <div key={i} className="resume-job" style={{ marginBottom: '1rem' }}>
+              <div key={i} className="resume-edu">
                 <h3 className="resume-role">{edu.school}</h3>
-                <p className="resume-company" style={{ color: 'var(--text-muted)' }}>{edu.degree}</p>
+                <p className="resume-company">{edu.degree}</p>
               </div>
             ))}
           </section>

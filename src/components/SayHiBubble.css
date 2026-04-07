@@ -141,7 +141,7 @@
 }
 
 .sayhi-close:hover {
-  color: var(--accent);
+  color: var(--hover);
   background: rgba(255, 255, 255, 0.06);
 }
 
@@ -216,7 +216,7 @@
 }
 
 .sayhi-cta-primary:hover:not(:disabled) {
-  background: color-mix(in srgb, var(--accent) 88%, #000000);
+  background: color-mix(in srgb, var(--hover) 88%, #000000);
   color: #0a0a0b;
 }
 
@@ -227,8 +227,8 @@
 }
 
 .sayhi-cta-ghost:hover:not(:disabled) {
-  color: var(--accent);
-  border-color: var(--accent);
+  color: var(--hover);
+  border-color: var(--hover);
 }
 
 .sayhi-success {

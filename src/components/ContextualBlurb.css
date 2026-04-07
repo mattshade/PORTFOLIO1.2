@@ -68,7 +68,7 @@
 }
 
 .contextual-blurb button:hover {
-  color: var(--accent);
+  color: var(--hover);
   text-decoration: underline;
   opacity: 1;
 }

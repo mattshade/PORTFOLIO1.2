@@ -53,7 +53,7 @@ export const resume = {
       location: 'New York, NY',
       highlights: [
         'Direct comprehensive AI and agentic workflow strategies across the NBC News Group portfolio, establishing a unified vision for intelligent automation and GenAI adoption.',
-        'Partner extensively with cross-functional leadership—including editorial, product, design, and engineering directors—to dramatically accelerate experimentation velocity and resolve day-to-day execution bottlenecks.',
+        'Partner extensively with cross-functional leadership, including editorial, product, design, and engineering directors, to dramatically accelerate experimentation velocity and resolve day-to-day execution bottlenecks.',
         'Architect and deploy specialized custom agents designed to augment newsroom newsgathering capabilities, resulting in significantly enhanced scheduling efficiency for on-air producers and teams.',
         'Establish and lead robust AI-enablement programs, including regular office hours and hands-on technical workshops, empowering teams to confidently integrate agentic tools (e.g., ChatGPT, Copilot, Cursor) into everyday production workflows.',
         'Steer technical architecture and strategic direction for AI-enabled discovery tools, deep personalization engines, and hybrid workflow systems leveraging React, Node.js, Python, and scalable cloud-native infrastructure (AWS/GCP).',

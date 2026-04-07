@@ -85,8 +85,8 @@ function buildAtsHtml(): string {
   const educationHtml = resume.education
     .map(
       (edu) => `<div class="edu">
-  <div class="job-top"><h3>${escapeHtml(edu.school)}</h3></div>
-  <p class="company">${escapeHtml(edu.degree)}</p>
+  <h3 class="edu-school">${escapeHtml(edu.school)}</h3>
+  <p class="edu-degree">${escapeHtml(edu.degree)}</p>
 </div>`
     )
     .join('\n')
@@ -140,8 +140,9 @@ function buildAtsHtml(): string {
     ul.tight li { margin-bottom: 2pt; }
     .skills-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 4pt 18pt; margin-top: 2pt; }
     .skills-cols ul { margin: 0; padding-left: 14pt; }
-    .edu { margin: 0 0 5pt; page-break-inside: avoid; }
-    .edu .company { margin-top: 0; }
+    .edu { margin: 0 0 6pt; page-break-inside: avoid; text-align: left; }
+    .edu-school { margin: 0; font-size: 9.5pt; font-weight: 700; color: #171717; }
+    .edu-degree { margin: 2pt 0 0; font-size: 8.75pt; color: #6b7280; }
   </style>
 </head>
 <body>
@@ -217,39 +218,51 @@ function writeAtsPdf(outPath: string): Promise<void> {
       doc.text(title.toUpperCase(), { width: contentW(), characterSpacing: 0.4 })
       doc.moveDown(0.12)
       sectionRule()
-      doc.font('Helvetica').fillColor('#000000')
+      doc.font('Helvetica').fillColor('#171717')
     }
 
-    doc.font('Helvetica-Bold').fontSize(16).fillColor(SITE_ACCENT).text(sanitizePdfText(resume.name), { width: contentW() })
+    const HEADER_INDENT = 14
+    const HEADER_BAR_W = 4
+    const headerTextW = contentW() - HEADER_INDENT
+    const headerStartY = doc.y
+    doc.x = leftX() + HEADER_INDENT
+
+    doc.font('Helvetica-Bold').fontSize(16).fillColor(SITE_ACCENT).text(sanitizePdfText(resume.name), { width: headerTextW })
     doc.moveDown(0.15)
     doc.font('Helvetica-Bold').fontSize(9.5).fillColor(SITE_ACCENT).text(sanitizePdfText(resume.title).toUpperCase(), {
-      width: contentW(),
+      width: headerTextW,
       characterSpacing: 0.5,
     })
     doc.moveDown(0.18)
-    doc.font('Helvetica').fontSize(8.75).fillColor('#333333').text(sanitizePdfText(resume.tagline), {
-      width: contentW(),
+    doc.font('Helvetica').fontSize(8.75).fillColor('#6b7280').text(sanitizePdfText(resume.tagline), {
+      width: headerTextW,
       lineGap: 1,
     })
     doc.moveDown(0.22)
-    doc.fillColor('#222222')
+    doc.fillColor('#171717')
     const contactLine = [resume.email, resume.portfolioUrl, resume.linkedin, resume.github]
       .filter(Boolean)
       .map((s) => sanitizePdfText(s as string))
       .join('  |  ')
-    doc.fontSize(8.5).text(contactLine, { width: contentW(), lineGap: 1 })
-    doc.fillColor('#000000')
+    doc.fontSize(8.5).text(contactLine, { width: headerTextW, lineGap: 1 })
+    doc.fillColor('#171717')
+
+    doc.save()
+    doc.rect(leftX(), headerStartY, HEADER_BAR_W, Math.max(doc.y - headerStartY, 8)).fill(SITE_ACCENT)
+    doc.restore()
+
+    doc.x = leftX()
     doc.moveDown(0.45)
 
     sectionTitle('Summary')
-    doc.font('Helvetica').fontSize(9).lineGap(1.5)
-    doc.text(sanitizePdfText(resume.summary), { width: contentW(), align: 'justify' })
+    doc.font('Helvetica').fontSize(9).fillColor('#171717').lineGap(1.5)
+    doc.text(sanitizePdfText(resume.summary), { width: contentW(), align: 'left' })
     doc.lineGap(0)
     doc.moveDown(tightSectionGap / 10)
 
     if (resume.selectedImpact?.length) {
       sectionTitle('Selected Impact')
-      doc.fontSize(8.75).lineGap(1.2)
+      doc.font('Helvetica').fontSize(8.75).fillColor('#525252').lineGap(1.2)
       for (const item of resume.selectedImpact) {
         checkPage(28)
         doc.text(`• ${sanitizePdfText(item)}`, { width: contentW(), indent: 10 })
@@ -267,18 +280,18 @@ function writeAtsPdf(outPath: string): Promise<void> {
         ? `${sanitizePdfText(job.company)}  ·  ${sanitizePdfText(job.location)}  ·  ${period}`
         : `${sanitizePdfText(job.company)}  ·  ${period}`
 
-      doc.font('Helvetica-Bold').fontSize(9.5).fillColor('#000000').text(sanitizePdfText(job.role), { width: contentW() })
+      doc.font('Helvetica-Bold').fontSize(9.5).fillColor('#171717').text(sanitizePdfText(job.role), { width: contentW() })
       doc.moveDown(0.06)
-      doc.font('Helvetica').fontSize(8).fillColor('#222222').text(metaLine, { width: contentW() })
+      doc.font('Helvetica').fontSize(8).fillColor('#6b7280').text(metaLine, { width: contentW() })
       doc.moveDown(0.12)
-      doc.fillColor('#000000')
+      doc.fillColor('#171717')
       if (job.description) {
-        doc.fontSize(8.5).fillColor('#333333').text(sanitizePdfText(job.description), { width: contentW(), lineGap: 1 })
+        doc.fontSize(8.5).fillColor('#525252').text(sanitizePdfText(job.description), { width: contentW(), lineGap: 1 })
         doc.moveDown(0.12)
-        doc.fillColor('#000000')
+        doc.fillColor('#171717')
       }
       if (job.highlights?.length) {
-        doc.font('Helvetica').fontSize(8.5).fillColor('#111111')
+        doc.font('Helvetica').fontSize(8.5).fillColor('#525252')
         for (const h of job.highlights) {
           checkPage(22)
           doc.text(`• ${sanitizePdfText(h)}`, { width: contentW(), indent: 10, lineGap: 1.2 })
@@ -303,28 +316,40 @@ function writeAtsPdf(outPath: string): Promise<void> {
     for (let i = 0; i < maxRows; i++) {
       const y = startY + i * lineH
       if (leftCol[i]) {
-        doc.font('Helvetica').fontSize(8.5).fillColor('#111111').text(`• ${leftCol[i]}`, baseLeft, y, {
+        doc.font('Helvetica').fontSize(8.5).fillColor('#525252').text(`• ${leftCol[i]}`, baseLeft, y, {
           width: colW,
           lineHeight: lineH,
         })
       }
       if (rightCol[i]) {
-        doc.font('Helvetica').fontSize(8.5).text(`• ${rightCol[i]}`, baseLeft + colW + colGap, y, {
+        doc.font('Helvetica').fontSize(8.5).fillColor('#525252').text(`• ${rightCol[i]}`, baseLeft + colW + colGap, y, {
           width: colW,
           lineHeight: lineH,
         })
       }
     }
     doc.y = startY + maxRows * lineH + 2
-    doc.fillColor('#000000')
+    doc.fillColor('#171717')
+    /* Skills used absolute x for the right column; reset flow position so Education is left-aligned */
+    doc.x = leftX()
 
     sectionTitle('Education')
     for (const edu of resume.education) {
       checkPage(28)
-      doc.font('Helvetica-Bold').fontSize(9.5).text(sanitizePdfText(edu.school), { width: contentW() })
-      doc.font('Helvetica').fontSize(8.75).fillColor('#222222').text(sanitizePdfText(edu.degree), { width: contentW() })
-      doc.fillColor('#000000')
-      doc.moveDown(0.3)
+      doc.x = leftX()
+      doc.font('Helvetica-Bold').fontSize(9.5).fillColor('#171717')
+      doc.text(sanitizePdfText(edu.school), {
+        width: contentW(),
+        align: 'left',
+      })
+      doc.moveDown(0.08)
+      doc.font('Helvetica').fontSize(8.75).fillColor('#6b7280')
+      doc.text(sanitizePdfText(edu.degree), {
+        width: contentW(),
+        align: 'left',
+      })
+      doc.fillColor('#171717')
+      doc.moveDown(0.28)
     }
 
     doc.end()

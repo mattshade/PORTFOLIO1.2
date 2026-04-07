@@ -21,7 +21,7 @@
 
 .project-card:hover {
   transform: translateY(-4px);
-  border-color: var(--accent);
+  border-color: var(--hover);
   box-shadow: var(--shadow-md);
 }
 
