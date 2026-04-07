@@ -84,7 +84,6 @@ export function Projects() {
   return (
     <section id="projects" className="section projects">
       <div className="section-inner" style={{ position: 'relative' }}>
-        <div className="bird-wire" aria-hidden />
         <h2 className="section-title">
           Projects
 

@@ -11,6 +11,9 @@ class Boid {
   drawSeed: number
   color: string
   isLanded: boolean
+  isLandedOnNav: boolean
+  landedElement: Element | null
+  targetElement: Element | null
   landX: number
   landY: number
   hopTimer: number
@@ -38,6 +41,9 @@ class Boid {
     ]
     this.color = boidPalette[Math.floor(Math.random() * boidPalette.length)]
     this.isLanded = false
+    this.isLandedOnNav = false
+    this.landedElement = null
+    this.targetElement = null
     this.landX = 0
     this.landY = 0
     this.hopTimer = 0
@@ -228,6 +234,10 @@ class Boid {
 
 
   update() {
+    // Tiny random jitter to break circular vortex patterns
+    this.vx += (Math.random() - 0.5) * 0.06
+    this.vy += (Math.random() - 0.5) * 0.06
+    
     this.x += this.vx
     this.y += this.vy
     let speed = Math.hypot(this.vx, this.vy)
@@ -311,6 +321,7 @@ export function BirdsFly({
   const propsRef = useRef({ scrollY })
   propsRef.current = { scrollY }
 
+
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
@@ -381,35 +392,49 @@ export function BirdsFly({
 
         const { scrollY: sy } = propsRef.current
 
-        const wires = Array.from(document.querySelectorAll('.bird-wire, .bird-perch, .bird-perch-card'))
+        const wires = Array.from(document.querySelectorAll('.bird-wire, .bird-perch, .bird-perch-card, .nav'))
         const activeWires = wires
           .map((w) => {
             const rect = w.getBoundingClientRect()
+            const isNav = w.classList.contains('nav')
+            const isPerch = w.classList.contains('bird-perch')
+            const isCard = w.classList.contains('bird-perch-card')
+            const isNavPerch = isPerch && !!w.closest('.nav')
+            
+            // If it is the nav, the birds land on the bottom edge (the visual wire)
+            const landTop = isNav ? rect.bottom : rect.top
+            
             const isHovered = w.matches(':hover')
             const wasHovered = hoverStates.get(w) || false
             const justHovered = isHovered && !wasHovered
             hoverStates.set(w, isHovered)
 
             return {
-              top: rect.top,
+              top: landTop,
               bottom: rect.bottom,
               left: rect.left,
               width: rect.width,
-              isPerch: w.classList.contains('bird-perch'),
-              isCard: w.classList.contains('bird-perch-card'),
+              isNav: isNav,
+              isPerch: isPerch,
+              isCard: isCard,
+              isNavPerch: isNavPerch,
               justHovered
             }
           })
           .filter((r) => r.top > -50 && r.bottom < height + 50)
 
-        // React to scrolling
+
+        // React to scrolling — only some birds take off, creating organic staggered flight
         if (isScrolling) {
           for (const boid of flock) {
-            if (boid.isLanded) {
+            if (boid.isLanded && Math.random() < 0.08) {
               boid.isLanded = false
+              boid.isLandedOnNav = false
+              boid.landedElement = null
+              boid.targetElement = null
               boid.rerollLandingTargets()
-              boid.vy = -2 - Math.random() * 2
-              boid.vx = (Math.random() - 0.5) * 3
+              boid.vy = -1.5 - Math.random() * 1.5
+              boid.vx = (Math.random() - 0.5) * 2
             }
           }
         }
@@ -421,13 +446,22 @@ export function BirdsFly({
                 Math.abs(curr.top - b.y) < Math.abs(prev.top - b.y) ? curr : prev
               )
               
-              if (nearest.isCard && nearest.justHovered) {
+              const isPerchType = nearest.isCard || nearest.isPerch || nearest.isNav
+              
+              if (isPerchType && nearest.justHovered) {
                 b.isLanded = false
+                b.isLandedOnNav = false
+                b.landedElement = null
+                b.targetElement = null
                 b.rerollLandingTargets()
                 b.vx = (Math.random() - 0.5) * 4
                 b.vy = -3 - Math.random() * 2
                 continue
               }
+              
+              const nearestEl = wires[activeWires.indexOf(nearest)]
+              b.isLandedOnNav = nearest.isNav
+              b.landedElement = nearestEl
 
               const yOffsetNearest = nearest.isPerch ? (nearest.bottom - nearest.top) * 0.35 : -2
               b.landY = nearest.top + yOffsetNearest
@@ -436,12 +470,25 @@ export function BirdsFly({
                 b.hopTimer = 30
               }
             } else {
-              const nWires = activeWires.length
+              // SIMPLE FILTER: only boids 0-2 can land on NAV menu items
+              // Summary text .bird-perch spans are open to all boids
+              const canLandOnNavPerch = b.index < 3
+              const boidsWires = activeWires.filter(w => {
+                if (w.isNavPerch && !canLandOnNavPerch) return false
+                return true
+              })
+              
+              if (boidsWires.length === 0) continue
+              
+              const nWires = boidsWires.length
               const wireIndex = Math.min(
                 nWires - 1,
                 Math.floor(b.wirePreference * nWires)
               )
-              const wire = activeWires[wireIndex]
+              const wire = boidsWires[wireIndex]
+              const wireEl = wires[activeWires.indexOf(wire)]
+
+              b.targetElement = wireEl
 
               // Per-boid random along wire; pads reroll each time they leave a wire
               const span = Math.max(0.12, 1 - b.landPadL - b.landPadR)
@@ -454,6 +501,8 @@ export function BirdsFly({
               const d = Math.hypot(dx, dy)
               if (d < 10) {
                 b.isLanded = true
+                b.isLandedOnNav = wire.isNav
+                b.landedElement = wireEl
                 b.landX = landingX
                 b.landY = landingY
               } else {
@@ -467,6 +516,9 @@ export function BirdsFly({
           for (const b of flock) {
             if (b.isLanded) {
               b.isLanded = false
+              b.isLandedOnNav = false
+              b.landedElement = null
+              b.targetElement = null
               b.rerollLandingTargets()
               b.vx = (Math.random() - 0.5) * 1.5
               b.vy = -1 - Math.random() * 1
@@ -474,7 +526,7 @@ export function BirdsFly({
           }
         }
 
-        if (frame > 0 && frame % 3600 === 0) {
+        if (frame > 0 && frame % 900 === 0) {
           for (const boid of flock) {
             if (!boid.isLanded) boid.scatter()
           }

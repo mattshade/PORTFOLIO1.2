@@ -31,6 +31,25 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&family=Geist:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500&display=swap" rel="stylesheet" />
+    <script>
+      (function() {
+        const link = document.querySelector('link[rel="icon"]');
+        if (!link) return;
+        const svgTemplate = (color) => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="${color}" d="M 12 1 L 20 14 L 23 21 L 16 16 L 12 23 L 8 16 L 1 21 L 4 14 Z"/><circle cx="12" cy="10.5" r="3.2" fill="#ffffff"/><circle cx="12" cy="10.5" r="1.3" fill="#0a0a0b"/></svg>`;
+        
+        function updateFavicon() {
+          const hue = (Date.now() / 200) % 360; // Completes a full cycle in 72 seconds
+          const color = "hsl(" + hue + ", 45%, 60%)";
+          const svg = svgTemplate(color);
+          link.href = 'data:image/svg+xml;base64,' + btoa(svg);
+          document.documentElement.style.setProperty('--logo-hue', hue.toString());
+        }
+
+        // Run once immediately, then interval
+        updateFavicon();
+        setInterval(updateFavicon, 2000); // Subtle update every 2 seconds to save CPU
+      })();
+    </script>
   </head>
   <body style="margin:0;min-height:100vh">
     <noscript>

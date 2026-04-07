@@ -54,7 +54,6 @@ export function Experience() {
   return (
     <section id="experience" className="section experience">
       <div className="section-inner" style={{ position: 'relative' }}>
-        <div className="bird-wire" aria-hidden />
         <h2 className="section-title">
           Experience
 
@@ -76,7 +75,7 @@ export function Experience() {
             <div
               key={i}
               ref={(el) => { cardRefs.current[i] = el }}
-              className={`experience-item glass ${visibleCards.has(i) ? 'in-view' : ''}`}
+              className={`experience-item glass bird-perch-card ${visibleCards.has(i) ? 'in-view' : ''}`}
               style={{ transitionDelay: visibleCards.has(i) ? `${i * 80}ms` : '0ms' }}
             >
               <div className="experience-header">

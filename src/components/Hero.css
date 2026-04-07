@@ -142,7 +142,7 @@
 }
 
 .hero-eyebrow-segment {
-  color: color-mix(in srgb, var(--accent) 68%, #ffffff);
+  color: #999;
 }
 
 .hero-eyebrow-pipe {
@@ -165,10 +165,6 @@
   background-clip: unset;
   animation: fadeUp 0.6s ease-out backwards;
   transition: color 0.35s ease;
-}
-
-.hero-name:hover {
-  color: var(--hover);
 }
 
 .hero-tagline {
