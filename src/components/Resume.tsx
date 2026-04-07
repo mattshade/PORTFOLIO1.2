@@ -31,6 +31,17 @@ export function Resume() {
           </div>
         </header>
 
+        {resume.selectedImpact && resume.selectedImpact.length > 0 && (
+          <section className="resume-section">
+            <h2 className="resume-section-title">Selected Impact</h2>
+            <ul className="resume-highlights">
+              {resume.selectedImpact.map((item, i) => (
+                <li key={i}>{item}</li>
+              ))}
+            </ul>
+          </section>
+        )}
+
         <section className="resume-section">
           <h2 className="resume-section-title">Experience</h2>
           {resume.experience.map((job, i) => (
@@ -60,6 +71,17 @@ export function Resume() {
             {resume.skills.join(' · ')}
           </p>
         </section>
+        {resume.education && resume.education.length > 0 && (
+          <section className="resume-section">
+            <h2 className="resume-section-title">Education</h2>
+            {resume.education.map((edu, i) => (
+              <div key={i} className="resume-job" style={{ marginBottom: '1rem' }}>
+                <h3 className="resume-role">{edu.school}</h3>
+                <p className="resume-company" style={{ color: 'var(--text-muted)' }}>{edu.degree}</p>
+              </div>
+            ))}
+          </section>
+        )}
       </article>
     </div>
   )

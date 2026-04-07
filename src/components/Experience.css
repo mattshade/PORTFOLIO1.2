@@ -22,7 +22,32 @@
 }
 
 .experience-item:hover {
-  border-color: rgba(45, 212, 191, 0.4);
+  box-shadow: var(--shadow-sm);
+}
+
+.experience-item:nth-child(8n + 1):hover {
+  border-color: var(--hover-pink-2);
+}
+.experience-item:nth-child(8n + 2):hover {
+  border-color: var(--hover-pink-3);
+}
+.experience-item:nth-child(8n + 3):hover {
+  border-color: var(--hover-pink-4);
+}
+.experience-item:nth-child(8n + 4):hover {
+  border-color: var(--hover-pink-5);
+}
+.experience-item:nth-child(8n + 5):hover {
+  border-color: var(--hover-pink-6);
+}
+.experience-item:nth-child(8n + 6):hover {
+  border-color: var(--hover-pink-7);
+}
+.experience-item:nth-child(8n + 7):hover {
+  border-color: var(--hover-pink-8);
+}
+.experience-item:nth-child(8n + 8):hover {
+  border-color: var(--hover-pink-1);
 }
 
 .experience-header {
@@ -116,8 +141,32 @@
 }
 
 .skills-item:hover {
-  border-color: rgba(45, 212, 191, 0.4);
-  box-shadow: 0 0 12px rgba(45, 212, 191, 0.15);
+  box-shadow: var(--shadow-sm);
+}
+
+.skills-item:nth-child(8n + 1):hover {
+  border-color: var(--hover-pink-5);
+}
+.skills-item:nth-child(8n + 2):hover {
+  border-color: var(--hover-pink-6);
+}
+.skills-item:nth-child(8n + 3):hover {
+  border-color: var(--hover-pink-7);
+}
+.skills-item:nth-child(8n + 4):hover {
+  border-color: var(--hover-pink-8);
+}
+.skills-item:nth-child(8n + 5):hover {
+  border-color: var(--hover-pink-1);
+}
+.skills-item:nth-child(8n + 6):hover {
+  border-color: var(--hover-pink-2);
+}
+.skills-item:nth-child(8n + 7):hover {
+  border-color: var(--hover-pink-3);
+}
+.skills-item:nth-child(8n + 8):hover {
+  border-color: var(--hover-pink-4);
 }
 
 @media (max-width: 768px) {
@@ -174,5 +223,19 @@
 
   .experience-item {
     padding: 1rem;
+  }
+}
+
+.experience-blurb {
+  bottom: 0;
+  right: -260px;
+  top: -10px;
+  bottom: auto;
+}
+
+@media (max-width: 1024px) {
+  .experience-blurb {
+    right: 0;
+    top: -60px;
   }
 }

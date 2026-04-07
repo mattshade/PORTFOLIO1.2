@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import ExplainerBubble from '../components/ExplainerBubble'
 
 export const metadata: Metadata = {
   title: 'Developer Agent Competitive Analysis | February 2026',
@@ -13,7 +14,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="antialiased">{children}</body>
+      <body className="antialiased">
+        {children}
+        <ExplainerBubble />
+      </body>
     </html>
   )
 }

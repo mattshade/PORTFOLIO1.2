@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
 import { resume } from '../data/resume'
+
 import './Experience.css'
 
 const PULL_STRENGTH = 2.5
@@ -52,8 +53,24 @@ export function Experience() {
 
   return (
     <section id="experience" className="section experience">
-      <div className="section-inner">
-        <h2 className="section-title">Experience</h2>
+      <div className="section-inner" style={{ position: 'relative' }}>
+        <div className="bird-wire" aria-hidden />
+        <h2 className="section-title">
+          Experience
+
+        </h2>
+
+        {resume.selectedImpact && resume.selectedImpact.length > 0 && (
+          <div className="experience-impact" style={{ marginTop: '2.5rem', marginBottom: '4rem' }}>
+            <h3 className="skills-title" style={{ marginBottom: '1rem' }}>Selected Impact</h3>
+            <ul className="experience-highlights" style={{ margin: 0, paddingLeft: '1.25rem' }}>
+              {resume.selectedImpact.map((item, i) => (
+                <li key={i} className="experience-highlight">{item}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+
         <div className="experience-list">
           {resume.experience.map((job, i) => (
             <div

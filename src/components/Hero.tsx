@@ -1,47 +1,25 @@
-import { useState, useCallback, MouseEvent } from 'react'
+
 import { resume } from '../data/resume'
 import { SayHiBubble } from './SayHiBubble'
+
 import './Hero.css'
 
 export function Hero() {
-  const [mouseX, setMouseX] = useState(0.5)
-  const [mouseY, setMouseY] = useState(0.5)
-  const [isHovering, setIsHovering] = useState(false)
-
-  const handleMouseMove = useCallback((e: MouseEvent<HTMLElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect()
-    if (rect.width <= 0 || rect.height <= 0) return
-    setMouseX((e.clientX - rect.left) / rect.width)
-    setMouseY((e.clientY - rect.top) / rect.height)
-  }, [])
+  const titleSegments = resume.title.split(/\s*\|\s*/).map((s) => s.trim()).filter(Boolean)
 
   return (
     <section 
       className="hero" 
       aria-label="Introduction"
-      onMouseMove={handleMouseMove}
-      onMouseEnter={() => setIsHovering(true)}
-      onMouseLeave={() => setIsHovering(false)}
-      style={
-        isHovering
-          ? {
-              ['--cursor-x' as string]: mouseX,
-              ['--cursor-y' as string]: mouseY,
-            }
-          : undefined
-      }
     >
-      <div className="hero-bg">
-        <div className="hero-cursor-glow" aria-hidden />
-        <div className="hero-grid" aria-hidden />
-        <div className="hero-glow hero-glow-1" aria-hidden />
-        <div className="hero-glow hero-glow-2" aria-hidden />
-        <div className="hero-glow hero-glow-3" aria-hidden />
-        <div className="hero-gradient" aria-hidden />
-      </div>
       <div className="hero-content">
         <p className="hero-eyebrow" style={{ animationDelay: '0ms' }}>
-          {resume.title}
+          {titleSegments.map((segment, i) => (
+            <span key={i}>
+              {i > 0 && <span className="hero-eyebrow-pipe"> | </span>}
+              <span className="hero-eyebrow-segment">{segment}</span>
+            </span>
+          ))}
         </p>
         <h1 className="hero-title">
           <span className="hero-name" style={{ animationDelay: '80ms' }}>{resume.name}</span>
@@ -66,6 +44,7 @@ export function Hero() {
           <span className="hero-scroll-line" />
           <span className="hero-scroll-dot" />
         </a>
+
       </div>
     </section>
   )

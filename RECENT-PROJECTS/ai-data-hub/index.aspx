@@ -703,5 +703,45 @@
         });
       });
     </script>
-  </body>
+      <style>
+      .explainer-overlay {
+        position: fixed; bottom: 2rem; right: 2rem; z-index: 999999; max-width: 380px;
+        background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(0,0,0,0.1); border-radius: 12px; padding: 1.25rem 1.5rem;
+        box-shadow: 0 10px 40px -10px rgba(0,0,0,0.15);
+        transform: translateY(20px); opacity: 0; pointer-events: none;
+        transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
+        font-family: system-ui, -apple-system, sans-serif;
+        text-align: left;
+      }
+      .explainer-overlay.visible { transform: translateY(0); opacity: 1; pointer-events: auto; }
+      .explainer-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; }
+      .explainer-title { font-size: 0.95rem; font-weight: 600; color: #111; margin: 0; display: flex; align-items: center; gap: 0.5rem; }
+      .explainer-close { background: none; border: none; color: #666; cursor: pointer; padding: 0.25rem; margin: -0.25rem; border-radius: 4px; font-size: 1.25rem; line-height: 1; transition: background 0.2s, color 0.2s; }
+      .explainer-close:hover { background: rgba(0,0,0,0.05); color: #000; }
+      .explainer-text { font-size: 0.875rem; color: #444; line-height: 1.5; margin: 0; }
+      .explainer-btn { display: inline-block; margin-top: 1rem; width: 100%; padding: 0.5rem; text-align: center; background: #93C572; color: #0a0a0b; border: none; border-radius: 6px; font-size: 0.875rem; font-weight: 500; cursor: pointer; transition: opacity 0.2s; }
+      .explainer-btn:hover { opacity: 0.9; }
+      @media (max-width: 480px) { .explainer-overlay { bottom: 1rem; right: 1rem; left: 1rem; max-width: none; } }
+    </style>
+    <script>
+      (function() {
+        var text = 'Welcome to the central nervous system of our data strategy. This mock internal data catalog shows how cross-functional teams slice, dice, and discover crucial machine learning datasets without getting lost in a labyrinth of spreadsheets.';
+        var init = function() {
+          var el = document.createElement('div');
+          el.className = 'explainer-overlay';
+          el.innerHTML = '<div class="explainer-header"><h4 class="explainer-title"><span>👀</span> Context Note</h4><button class="explainer-close" aria-label="Close">&times;</button></div><p class="explainer-text">' + text + '</p><button class="explainer-btn">Got it</button>';
+          document.body.appendChild(el);
+          setTimeout(function() { el.classList.add('visible'); }, 600);
+          var dismiss = function() {
+            el.classList.remove('visible');
+            setTimeout(function() { el.remove(); }, 400);
+          };
+          el.querySelector('.explainer-close').addEventListener('click', dismiss);
+          el.querySelector('.explainer-btn').addEventListener('click', dismiss);
+        };
+        if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', init); } else { init(); }
+      })();
+    </script>
+</body>
 </html>

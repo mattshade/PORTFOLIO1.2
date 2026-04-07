@@ -5,11 +5,12 @@
   right: 0;
   z-index: 100;
   padding: 1rem 1.5rem;
-  background: rgba(10, 10, 11, 0.8);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--border);
-  transition: background 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+  transition: background 0.2s ease, box-shadow 0.2s ease;
 }
 
 .nav-inner {
@@ -26,14 +27,17 @@
   gap: 0.5rem;
   font-weight: 600;
   font-size: 1rem;
-  color: var(--text);
+}
+
+.nav-brand-text {
+  color: #444;
+  display: inline-block;
+  transition: transform 0.1s ease-out;
+  transform: perspective(400px) rotateX(calc(var(--y, 0) * -15deg)) rotateY(calc(var(--x, 0) * 15deg)) translateY(calc(var(--y, 0) * -2px));
 }
 
 .nav-logo {
   flex-shrink: 0;
-}
-
-.nav-home:hover {
   color: var(--accent);
 }
 
@@ -48,7 +52,7 @@
 }
 
 .nav-links a:hover {
-  color: var(--text);
+  color: var(--accent);
 }
 
 .nav-link-active {

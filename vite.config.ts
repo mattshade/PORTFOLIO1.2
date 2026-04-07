@@ -3,17 +3,29 @@ import react from '@vitejs/plugin-react'
 import path from 'path'
 import fs from 'fs'
 
+/** Same mapping as scripts/copy-projects.cjs — used when dist/projects/ is missing in dev */
+const PROJECT_SLUG_MAP: Record<string, { dir: string; output: string | null }> = {
+  'chatgpt-dashboard': { dir: 'chatgpt-dashboard', output: 'dist' },
+  'github-copilot-dashboard': { dir: 'github-copilot-dashboard', output: 'dist' },
+  'dev-agents-dashboard': { dir: 'dev-agents-dashboard', output: 'out' },
+  'executive-ai-dashboard': { dir: 'Executive AI Usage Dashboard', output: 'dist' },
+  'ai-data-hub': { dir: 'ai-data-hub', output: null },
+  'cfr-dashboard-bugz': { dir: 'cfr-dashboard-bugz', output: null },
+}
+
 function serveProjectsPlugin() {
   return {
     name: 'serve-projects',
     enforce: 'pre' as const,
     configureServer(server: import('vite').ViteDevServer) {
-      const distProjects = path.resolve(process.cwd(), 'dist/projects')
-      if (!fs.existsSync(distProjects)) return
+      const cwd = process.cwd()
+      const distProjects = path.resolve(cwd, 'dist/projects')
+      const recentRoot = path.resolve(cwd, 'RECENT-PROJECTS')
 
       const types: Record<string, string> = {
         '.html': 'text/html',
         '.js': 'application/javascript',
+        '.mjs': 'application/javascript',
         '.css': 'text/css',
         '.json': 'application/json',
         '.png': 'image/png',
@@ -22,20 +34,51 @@ function serveProjectsPlugin() {
         '.ico': 'image/x-icon',
         '.woff': 'font/woff',
         '.woff2': 'font/woff2',
+        '.map': 'application/json',
+      }
+
+      function resolveProjectFile(slug: string, rest: string): string | null {
+        const requestFile = rest || 'index.html'
+        const candidates: string[] = []
+
+        if (fs.existsSync(distProjects)) {
+          candidates.push(path.join(distProjects, slug, requestFile))
+          if (!rest) candidates.push(path.join(distProjects, slug, 'index.html'))
+        }
+
+        const map = PROJECT_SLUG_MAP[slug]
+        if (!map) {
+          for (const p of candidates) {
+            if (fs.existsSync(p) && fs.statSync(p).isFile()) return p
+          }
+          return null
+        }
+
+        const projectRoot = path.join(recentRoot, map.dir)
+        if (map.output) {
+          const buildDir = path.join(projectRoot, map.output)
+          candidates.push(path.join(buildDir, requestFile))
+          if (!rest) candidates.push(path.join(buildDir, 'index.html'))
+        } else {
+          candidates.push(path.join(projectRoot, requestFile))
+          if (!rest) {
+            candidates.push(path.join(projectRoot, 'index.html'))
+            candidates.push(path.join(projectRoot, 'index.aspx'))
+          }
+        }
+
+        for (const p of candidates) {
+          if (fs.existsSync(p) && fs.statSync(p).isFile()) return p
+        }
+        return null
       }
 
       server.middlewares.use((req, res, next) => {
         const m = req.url?.split('?')[0]?.match(/^\/projects\/([^/]+)\/?(.*)$/)
         if (!m) return next()
         const [, slug, rest = ''] = m
-        const requestFile = rest || 'index.html'
-        const filePath = path.join(distProjects, slug, requestFile)
-        let toServe = filePath
-        if (!fs.existsSync(filePath)) {
-          const indexPath = path.join(distProjects, slug, 'index.html')
-          if (fs.existsSync(indexPath)) toServe = indexPath
-          else return next()
-        }
+        const toServe = resolveProjectFile(slug, rest)
+        if (!toServe) return next()
         const ext = path.extname(toServe)
         res.setHeader('Content-Type', types[ext] || 'application/octet-stream')
         res.setHeader('Cache-Control', 'no-cache')
@@ -61,7 +104,13 @@ export default defineConfig({
   plugins: [injectSiteUrlPlugin(), serveProjectsPlugin(), react()],
   base: '/',
   server: {
-    fs: { allow: [path.resolve(process.cwd(), 'dist')], strict: false },
+    fs: {
+      allow: [
+        path.resolve(process.cwd(), 'dist'),
+        path.resolve(process.cwd(), 'RECENT-PROJECTS'),
+      ],
+      strict: false,
+    },
     hmr: true,
     watch: {
       // Ensure src/data changes trigger HMR

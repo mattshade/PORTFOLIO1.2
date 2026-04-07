@@ -1,16 +1,29 @@
 :root {
-  --bg: #0a0a0b;
-  --bg-elevated: #111113;
-  --bg-glass: rgba(17, 17, 19, 0.72);
-  --border: rgba(255, 255, 255, 0.08);
-  --border-strong: rgba(255, 255, 255, 0.12);
-  --text: #fafafa;
-  --text-muted: #a1a1aa;
-  --accent: #2dd4bf;
-  --accent-dim: rgba(45, 212, 191, 0.15);
-  --glow: rgba(45, 212, 191, 0.25);
-  --font-sans: 'Geist', system-ui, sans-serif;
-  --font-mono: 'Geist Mono', ui-monospace, monospace;
+  --bg: #FFFFFF;
+  --bg-elevated: #FFFFFF;
+  --bg-glass: #FFFFFF;
+  --border: #EBEBEB;
+  --border-strong: #DDDDDD;
+  --text: #171717;
+  --text-muted: #6b7280;
+  --brand: #93C572;
+  --accent: #93C572;
+  /* Hover palette — pinks (default + numbered for variety) */
+  --accent-hover: #ff385c;
+  --hover-pink-1: #ff385c;
+  --hover-pink-2: #ff6b8a;
+  --hover-pink-3: #f472b6;
+  --hover-pink-4: #ec4899;
+  --hover-pink-5: #fda4af;
+  --hover-pink-6: #fb7185;
+  --hover-pink-7: #e879a9;
+  --hover-pink-8: #db2777;
+  --accent-dim: rgba(147, 197, 114, 0.18);
+  --shadow-sm: 0 6px 16px rgba(0, 0, 0, 0.12);
+  --shadow-md: 0 10px 24px rgba(0, 0, 0, 0.15);
+  --shadow-glass: 0 6px 16px rgba(0, 0, 0, 0.12);
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
 * {
@@ -55,7 +68,7 @@ a {
 }
 
 a:hover {
-  color: #67e8f9;
+  color: var(--hover-pink-3);
 }
 
 /* Subtle entrance animations */
@@ -93,17 +106,15 @@ a:hover {
 }
 
 .glass {
-  background: rgba(17, 17, 19, 0.6);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 20px;
+  background: #FFFFFF;
+  border: 1px solid var(--border);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.08); /* Standard Airbnb card shadow */
+  border-radius: 12px; /* Standard Airbnb card radius */
 }
 
 .glass-strong {
-  background: rgba(17, 17, 19, 0.75);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 24px;
+  background: #FFFFFF;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  border-radius: 16px; /* Pill/popup radius */
 }

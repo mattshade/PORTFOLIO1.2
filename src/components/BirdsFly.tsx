@@ -12,6 +12,7 @@ class Boid {
   isLanded: boolean
   landX: number
   landY: number
+  hopTimer: number
 
   constructor(x: number, y: number, index: number) {
     this.x = x
@@ -20,6 +21,7 @@ class Boid {
     this.isLanded = false
     this.landX = 0
     this.landY = 0
+    this.hopTimer = 0
     this.vx = (Math.random() * 2 - 1) * 2
     this.vy = (Math.random() * 2 - 1) * 2
     this.maxSpeed = 2.0
@@ -201,45 +203,6 @@ class Boid {
     return { x: (steerX / steerMag) * capped, y: (steerY / steerMag) * capped }
   }
 
-  /**
-   * Repulsion — birds fly away from the cursor when it gets close.
-   */
-  interact(
-    smoothedMx: number,
-    smoothedMy: number,
-    influence: number,
-    width: number,
-    height: number,
-    breath: number
-  ) {
-    if (influence <= 0) return
-    const cx = smoothedMx * width
-    const cy = smoothedMy * height
-    const dx = this.x - cx
-    const dy = this.y - cy
-    const d = Math.hypot(dx, dy)
-    const outerRadius = 280
-    const innerRadius = 40
-    if (d > outerRadius || d < 4) return
-
-    const dirX = dx / d
-    const dirY = dy / d
-    
-    // Gentle swirling current vector
-    const swirlX = dirY
-    const swirlY = -dirX
-
-    const eff = influence * breath
-    const t = d / outerRadius
-    const bell = 1 - t * t
-    
-    // Organic, soft repel combined with a strong swirling motion
-    const pushStrength = 0.05 * eff * (1 - (innerRadius / d)) * bell
-    const swirlStrength = 0.14 * eff * bell
-    
-    this.vx += dirX * pushStrength + swirlX * swirlStrength
-    this.vy += dirY * pushStrength + swirlY * swirlStrength
-  }
 
   update() {
     this.x += this.vx
@@ -259,8 +222,15 @@ class Boid {
     this.vy += Math.sin(angle) * mag
   }
 
-  draw(ctx: CanvasRenderingContext2D, jumpOffset = 0) {
+  draw(ctx: CanvasRenderingContext2D) {
     ctx.save()
+    let jumpOffset = 0
+    if (this.hopTimer > 0) {
+      const p = 1 - (this.hopTimer / 30)
+      jumpOffset = -Math.sin(p * Math.PI) * 12
+      this.hopTimer--
+    }
+
     const drawX = this.isLanded ? this.landX : this.x
     const drawY = this.isLanded ? this.landY + jumpOffset : this.y
     const angle = this.isLanded ? 0 : Math.atan2(this.vy, this.vx)
@@ -279,9 +249,9 @@ class Boid {
     ctx.lineTo(-0.8, 1.5)      // Lower shoulder
     ctx.closePath()
 
-    ctx.fillStyle = 'rgba(34, 211, 238, 0.95)'
-    ctx.shadowBlur = 6
-    ctx.shadowColor = 'rgba(34, 211, 238, 0.6)'
+    ctx.fillStyle = '#222222'
+    ctx.shadowBlur = 2
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.1)'
     ctx.fill()
 
     // Bullseye eye: white ring + black pupil
@@ -299,21 +269,13 @@ class Boid {
 }
 
 export function BirdsFly({
-  mouseX,
-  mouseY,
-  isHovering,
   scrollY = 0,
-  landingTarget = null,
 }: {
-  mouseX: number
-  mouseY: number
-  isHovering: boolean
   scrollY?: number
-  landingTarget?: DOMRect | null
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const propsRef = useRef({ mouseX, mouseY, isHovering, scrollY, landingTarget })
-  propsRef.current = { mouseX, mouseY, isHovering, scrollY, landingTarget }
+  const propsRef = useRef({ scrollY })
+  propsRef.current = { scrollY }
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -351,12 +313,10 @@ export function BirdsFly({
     }
     initFlock()
 
-    let smoothX = 0.5
-    let smoothY = 0.5
-    let hoverProgress = 0
     let frame = 0
-    const LERP = 0.06
-    const HOVER_RAMP = 0.032
+    
+    let lastGlobalScroll = window.scrollY
+    let lastScrollTime = Date.now()
 
     let animationId: number
     const render = () => {
@@ -372,43 +332,69 @@ export function BirdsFly({
           return
         }
 
-        const { mouseX: mx, mouseY: my, isHovering: hovering, scrollY: sy, landingTarget: target } = propsRef.current
-        smoothX += (mx - smoothX) * LERP
-        smoothY += (my - smoothY) * LERP
-        hoverProgress = Math.max(0, Math.min(1, hoverProgress + (hovering ? HOVER_RAMP : -HOVER_RAMP * 2)))
-        const breath = 0.94 + 0.06 * Math.sin(frame * 0.02)
+        // Handle Scroll detection natively here
+        const currentScroll = window.scrollY
+        const now = Date.now()
+        if (Math.abs(currentScroll - lastGlobalScroll) > 1) {
+          lastScrollTime = now
+        }
+        lastGlobalScroll = currentScroll
+        
+        const idleTime = now - lastScrollTime
+        const isScrolling = idleTime < 300
 
-        const landingX = target ? target.left + target.width / 2 : 0
-        const landingY = target ? target.top + 24 : 0
+        const { scrollY: sy } = propsRef.current
 
-        if (target) {
-          let landingBoid: Boid | null = null
-          let minDist = Infinity
-          for (const b of flock) {
-            if (b.isLanded) {
-              landingBoid = b
-              break
-            }
-            const d = Math.hypot(b.x - landingX, b.y - landingY)
-            if (d < minDist) {
-              minDist = d
-              landingBoid = b
+        const wires = Array.from(document.querySelectorAll('.bird-wire'))
+        const activeWires = wires
+          .map((w) => w.getBoundingClientRect())
+          .filter((r) => r.top > -50 && r.bottom < height + 50)
+
+        // React to scrolling
+        if (isScrolling) {
+          for (const boid of flock) {
+            if (boid.isLanded) {
+              boid.isLanded = false
+              boid.vy = -2 - Math.random() * 2
+              boid.vx = (Math.random() - 0.5) * 3
             }
           }
-          if (landingBoid) {
-            if (landingBoid.isLanded) {
+        }
+
+        if (!isScrolling && activeWires.length > 0) {
+          for (const b of flock) {
+            if (b.isLanded) {
+              const nearest = activeWires.reduce((prev, curr) => 
+                Math.abs(curr.top - b.y) < Math.abs(prev.top - b.y) ? curr : prev
+              )
+              b.landY = nearest.top - 2 // Perch slightly above the line
+              
+              if (idleTime > 30000 && Math.random() < 0.0015 && b.hopTimer === 0) {
+                b.hopTimer = 30
+              }
             } else {
-              const dx = landingX - landingBoid.x
-              const dy = landingY - landingBoid.y
+              const wireIndex = b.index % activeWires.length
+              const wire = activeWires[wireIndex]
+              
+              const totalOnWire = Math.ceil((flock.length - wireIndex) / activeWires.length)
+              const rankOnWire = Math.floor(b.index / activeWires.length)
+              // Shrink the spread slightly so they don't sit on the extreme edges
+              const spread = 0.1 + ((rankOnWire + 0.5) / Math.max(1, totalOnWire)) * 0.8
+              
+              const landingX = wire.left + spread * wire.width
+              const landingY = wire.top - 2
+              
+              const dx = landingX - b.x
+              const dy = landingY - b.y
               const d = Math.hypot(dx, dy)
-              if (d < 12) {
-                landingBoid.isLanded = true
-                landingBoid.landX = landingX
-                landingBoid.landY = landingY
+              if (d < 10) {
+                b.isLanded = true
+                b.landX = landingX
+                b.landY = landingY
               } else {
-                const steer = 0.14 * Math.min(1, 80 / d)
-                landingBoid.vx += (dx / d) * steer
-                landingBoid.vy += (dy / d) * steer
+                const steer = 0.12 * Math.min(1, 80 / d)
+                b.vx += (dx / d) * steer
+                b.vy += (dy / d) * steer
               }
             }
           }
@@ -417,7 +403,7 @@ export function BirdsFly({
             if (b.isLanded) {
               b.isLanded = false
               b.vx = (Math.random() - 0.5) * 1.5
-              b.vy = -2 - Math.random() * 1
+              b.vy = -1 - Math.random() * 1
             }
           }
         }
@@ -431,16 +417,14 @@ export function BirdsFly({
         ctx.clearRect(0, 0, width, height)
 
         const visibleRatio = Math.max(0.12, 1 - sy / 2200)
-        const jumpOffset = Math.sin(frame * 0.18) * 5
 
         for (let boid of flock) {
           if (boid.isLanded) {
-            if (boid.drawSeed < visibleRatio) boid.draw(ctx, jumpOffset)
+            if (boid.drawSeed < visibleRatio) boid.draw(ctx)
             continue
           }
           boid.edges(width, height)
           boid.flock(flock)
-          boid.interact(smoothX, smoothY, hoverProgress, width, height, breath)
           boid.update()
           if (boid.drawSeed < visibleRatio) boid.draw(ctx)
         }

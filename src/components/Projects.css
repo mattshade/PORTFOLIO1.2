@@ -21,8 +21,8 @@
 
 .project-card:hover {
   transform: translateY(-4px);
-  border-color: rgba(34, 211, 238, 0.2);
-  box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.4);
+  border-color: var(--accent);
+  box-shadow: var(--shadow-md);
 }
 
 .project-link {
@@ -144,5 +144,20 @@
 
   .project-title {
     font-size: 1rem;
+  }
+}
+
+.projects-blurb {
+  bottom: 0;
+  right: -260px;
+  /* Next to header inline mostly */
+  top: -10px;
+  bottom: auto;
+}
+
+@media (max-width: 1024px) {
+  .projects-blurb {
+    right: 0;
+    top: -60px;
   }
 }

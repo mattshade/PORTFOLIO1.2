@@ -9,88 +9,119 @@ export interface ExperienceItem {
   highlights?: string[]
 }
 
+export interface EducationItem {
+  school: string
+  degree: string
+}
+
 export const resume = {
   name: 'Matt Shade',
-  title: 'Engineering & Design',
-  tagline: 'Creating and leading teams that craft AI-powered tools and interfaces to turn data into clarity and action.',
+  title: 'AI Engineering Director | Engineering Leadership | Design Engineering',
+  tagline: 'Hands-on engineering and design leader with deep experience building consumer platforms, scaling teams, modernizing digital products, and applying AI to real workflow problems.',
+  summary: 'Hands-on engineering and design leader with deep experience building consumer platforms, scaling teams, modernizing digital products, and applying AI to real workflow problems. Combines leadership across engineering, product, design, and editorial with strong technical depth in web, mobile, cloud, and AI-enabled systems. Known for translating prototypes and experimentation into practical platform improvements, team growth, and measurable operational impact.',
   email: 'hellomattshade@gmail.com',
   /** Netlify Forms: used when deployed (no config needed). Formspree: set if you prefer it over Netlify. */
   contactFormEndpoint: '', // e.g. https://formspree.io/f/yourformid for Formspree
   contactFormName: 'contact', // Must match the hidden form in index.html for Netlify
-  linkedin: '', // e.g. https://linkedin.com/in/mattshade
+  linkedin: 'https://linkedin.com/in/matt-shade-66125515', // e.g. https://linkedin.com/in/mattshade
   github: '',   // e.g. https://github.com/mattshade
   resumePdf: '/Matt_Shade.pdf',
+
+  selectedImpact: [
+    'Strategically scaled high-performance, multidisciplinary engineering organizations, recruiting top-tier talent and management to accelerate enterprise subscription growth and execute critical digital platform delivery.',
+    'Spearheaded a massive architectural consolidation of video infrastructure, synthesizing 8 disparate live and short-form video player integrations into 2 globally standardized systems—drastically reducing platform fragmentation and operational overhead.',
+    'Orchestrated the strategic sunsetting of a monolithic legacy application ecosystem, immediately capturing substantial cost savings and reclaiming extensive engineering bandwidth previously lost to technical debt and maintenance.',
+    'Architected and deployed specialized GenAI agents designed to optimize critical newsroom operations, significantly accelerating high-stakes newsgathering, streamlining on-air scheduling logistics, and bridging design-to-engineering execution.',
+    'Pioneered comprehensive AI-enablement initiatives—curating hands-on workshops and strategic office hours—that successfully fostered deep institutional adoption of agentic tools, driving measurable gains in cross-functional velocity and output quality.'
+  ],
+
+  education: [
+    { school: 'Mount Ida College', degree: 'Associate of Arts, Graphic Design' },
+    { school: 'Katherine Gibbs School', degree: 'Associate of Arts, Visual Communications' }
+  ] as EducationItem[],
 
   experience: [
     {
       role: 'Director of AI Engineering',
       company: 'NBCUniversal',
-      period: 'Jul 2025 – Present',
-      location: 'New York NY',
-      description: 'Lead teams building AI-powered discovery, personalization, and internal dashboards.',
+      period: 'Jul 2025 - Present',
+      location: 'New York, NY',
       highlights: [
-        'Executive dashboards: ChatGPT adoption & Office Hours, AI tool licensing (Slack, Firefly, Copilot), and Developer Agent competitive analysis (Cursor, Copilot, Claude, Codex).',
-        'AI Data Hub: interactive catalog of 8 AI/analytics datasets with search, filters, and Chart.js. SharePoint-deployable.',
-        'Technical direction across React, Node.js, cloud-native. Partner with design, product, news on adaptive interfaces.',
-        'Champion responsible adoption of agentic tools across NBC News.',
+        'Direct comprehensive AI and agentic workflow strategies across the NBC News Group portfolio, establishing a unified vision for intelligent automation and GenAI adoption.',
+        'Partner extensively with cross-functional leadership—including editorial, product, design, and engineering directors—to dramatically accelerate experimentation velocity and resolve day-to-day execution bottlenecks.',
+        'Architect and deploy specialized custom agents designed to augment newsroom newsgathering capabilities, resulting in significantly enhanced scheduling efficiency for on-air producers and teams.',
+        'Establish and lead robust AI-enablement programs, including regular office hours and hands-on technical workshops, empowering teams to confidently integrate agentic tools (e.g., ChatGPT, Copilot, Cursor) into everyday production workflows.',
+        'Steer technical architecture and strategic direction for AI-enabled discovery tools, deep personalization engines, and hybrid workflow systems leveraging React, Node.js, Python, and scalable cloud-native infrastructure (AWS/GCP).',
       ],
     },
     {
       role: 'Director of Engineering, NBC News Group Digital',
       company: 'NBCUniversal',
-      period: 'Oct 2021 – 2025',
-      location: 'New York NY',
-      description: 'Scaled engineering teams across NBC News, TODAY, MSNBC, and CNBC.',
+      period: 'Oct 2021 - Jul 2025',
+      location: 'New York, NY',
       highlights: [
-        'Modernized web and mobile stacks with React and TypeScript. Prototypes and user research to validate concepts.',
-        'Inclusive hiring and coaching. Built teams with high trust and low attrition.',
-        'Introduced AI-assisted workflows and prototyping across product lines.',
+        'Successfully built, mentored, and scaled high-performing engineering teams from the ground up, successfully hiring engineering managers and senior software engineers to drive the subscription business and broader digital portfolio.',
+        'Spearheaded a critical architectural consolidation of live and short-form video player implementations, migrating 8 disparate media players down to 2 globally supported systems, eliminating platform fragmentation and slashing operational complexity.',
+        'Orchestrated the sunsetting and secure retirement of a massive, monolithic legacy application, generating immediate overhead cost savings and reclaiming hundreds of engineering hours previously lost to routine maintenance.',
+        'Championed an aggressive modernization initiative targeting web and mobile application performance, systematically migrating legacy codebases to React and TypeScript while enforcing strict CI/CD practices.',
+        'Cultivated a healthy, inclusive engineering culture focused on psychological safety, resulting in exceptionally high retention rates, streamlined developer onboarding, and a culture of continuous learning.',
       ],
     },
     {
-      role: 'Tech Lead, CNBC.com Engagement',
+      role: 'Senior Engineering Manager, Engagement',
       company: 'CNBC',
-      period: 'Sep 2015 – Oct 2021',
-      location: null,
-      description: 'Interactive and personalization features with real-time data visualization.',
+      period: 'Sep 2015 - Oct 2021',
+      location: 'Englewood Cliffs, NJ',
       highlights: [
-        'Owned subscription flows and stock quotes page. Financial data at scale—clarity, accuracy, speed.',
-        'Prototypes that shaped engagement strategy. Mentored engineers on architecture and experimentation.',
+        'Served as the primary technical lead for elite interactive and personalization initiatives across CNBC.com, delivering resilient, high-traffic features optimized for strict performance under intense market volatility.',
+        'Designed and constructed bespoke subscription workflows and deeply integrated dynamic market-data visualization engines, directly contributing to substantial increases in daily user engagement and subscription conversion metrics.',
+        'Collaborated tightly with product managers and UX/UI designers to develop rapid, high-fidelity coded prototypes that proved invaluable in shaping the long-term strategic direction of core editorial features.',
+        'Established experimentation frameworks that allowed the business to execute reliable A/B testing on pivotal user flows with statistical confidence.',
+        'Provided dedicated mentorship to junior and mid-level engineers, focusing heavily on scalable system architecture, creative problem-solving techniques, and rigorous front-end engineering standards.',
       ],
     },
     {
       role: 'Senior Interactive Designer',
       company: 'CNBC',
-      period: '2007 – 2015',
-      location: null,
-      description: 'Interactive experiences and prototypes for web and iOS.',
+      period: 'Jan 2007 - Sep 2015',
+      location: 'Englewood Cliffs, NJ',
       highlights: [
-        'Interaction design, animation, rapid iteration. Ship fast, learn from users, refine in code.',
-        'Turned ideas into working software people could touch and use.',
+        'Conceptualized, designed, and constructed award-winning interactive experiences, acting as a crucial hybrid bridge between visual design intent and rigorous technical implementation.',
+        'Pioneered prototype-driven product discovery at CNBC, delivering exploratory web and iOS application interfaces that dramatically reduced engineering rework and validated user needs early in the product lifecycle.',
+        'Solidified a deep, foundational expertise in advanced interaction design, CSS/JS animation, and rapid iterative development methodologies.',
+        'Created design systems and UI component libraries that ensured visual consistency, accessibility compliance, and accelerated time-to-market for digital campaigns and news interactive features.',
       ],
     },
   ] as ExperienceItem[],
 
   skills: [
-    'React',
-    'TypeScript',
-    'Next.js',
-    'Vite',
-    'Tailwind CSS',
-    'Node.js',
-    'REST APIs',
-    'Data visualization',
-    'Antigravity',
-    'Claude',
-    'Figma Make',
-    'Runway Ai',
-    'ElevenLabs',
+    'AI engineering leadership',
+    'Engineering management',
+    'Org design',
+    'Hiring & team building',
+    'Product discovery',
+    'Agentic AI & custom agents',
     'ChatGPT',
     'Gemini',
-    'GitHub Copilot',
     'Cursor',
+    'GitHub Copilot',
     'Microsoft Copilot Studio',
-    'Power Automate',
-    'M365',
+    'JavaScript',
+    'TypeScript',
+    'React',
+    'React Native',
+    'Node.js',
+    'Python',
+    'Swift',
+    'PHP',
+    'GraphQL',
+    'AWS & GCP',
+    'Docker',
+    'Design systems',
+    'Coded prototyping',
+    'Interaction design',
+    'Experimentation frameworks',
+    'CI/CD',
+    'Figma'
   ],
 }
