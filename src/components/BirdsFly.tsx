@@ -9,6 +9,7 @@ class Boid {
   maxForce: number
   index: number
   drawSeed: number
+  color: string
   isLanded: boolean
   landX: number
   landY: number
@@ -24,6 +25,18 @@ class Boid {
     this.x = x
     this.y = y
     this.drawSeed = Math.random()
+    const boidPalette = [
+      '#ff5c8a', // pink
+      '#ef4444', // red
+      '#f97316', // orange
+      '#facc15', // yellow
+      '#93C572', // green (site accent)
+      '#22c55e', // vivid green
+      '#38bdf8', // blue
+      '#6366f1', // indigo
+      '#a855f7', // purple
+    ]
+    this.color = boidPalette[Math.floor(Math.random() * boidPalette.length)]
     this.isLanded = false
     this.landX = 0
     this.landY = 0
@@ -270,7 +283,7 @@ class Boid {
     ctx.lineTo(-0.8, 1.5)      // Lower shoulder
     ctx.closePath()
 
-    ctx.fillStyle = '#222222'
+    ctx.fillStyle = this.color
     ctx.shadowBlur = 2
     ctx.shadowColor = 'rgba(0, 0, 0, 0.1)'
     ctx.fill()
