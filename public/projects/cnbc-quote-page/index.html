@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Case study: CNBC quote page — engineering leadership, REST and GraphQL contracts, market data, and chart integration." />
+  <title>CNBC Quote Page · Matt Shade</title>
+  <style>
+    :root {
+      --text: #171717;
+      --muted: #6b7280;
+      --accent: #93c572;
+      --border: #ebebeb;
+      --bg: #ffffff;
+      --card: #fafafa;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-size: 1rem;
+      line-height: 1.6;
+      color: var(--text);
+      background: var(--bg);
+    }
+    .wrap {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 2rem 1.25rem 4rem;
+    }
+    .back {
+      display: inline-block;
+      font-size: 0.9375rem;
+      color: var(--muted);
+      text-decoration: none;
+      margin-bottom: 1.5rem;
+    }
+    .back:hover { color: var(--accent); }
+    h1 {
+      margin: 0 0 0.35rem;
+      font-size: clamp(1.75rem, 4vw, 2.25rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    .eyebrow {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      margin: 0 0 0.5rem;
+    }
+    .lede {
+      margin: 0 0 2rem;
+      color: var(--muted);
+      font-size: 1.0625rem;
+      line-height: 1.65;
+    }
+    figure.hero {
+      margin: 0 0 2.5rem;
+      padding: 0;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      background: var(--card);
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.06);
+    }
+    .hero-image-wrap {
+      padding: 3rem 1.5rem;
+      background: linear-gradient(135deg, #f0f4f8, #d9e2ec);
+      display: flex;
+      justify-content: center;
+    }
+    .browser-frame {
+      width: 100%;
+      max-width: 100%;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 20px 48px rgba(0,0,0,0.15);
+      border: 1px solid rgba(0,0,0,0.08);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .browser-header {
+      height: 28px;
+      background: #f3f3f3;
+      border-bottom: 1px solid #e5e5e5;
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      gap: 6px;
+    }
+    .browser-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+    }
+    .browser-dot.close { background: #ff5f56; }
+    .browser-dot.minimize { background: #ffbd2e; }
+    .browser-dot.maximize { background: #27c93f; }
+
+    figure.hero img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 0 0 10px 10px;
+    }
+    figcaption {
+      padding: 0.85rem 1rem;
+      font-size: 0.8125rem;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+      background: #fff;
+    }
+    h2 {
+      margin: 2rem 0 0.75rem;
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: var(--text);
+      padding-bottom: 0.35rem;
+      border-bottom: 1px solid rgba(147, 197, 114, 0.35);
+    }
+    h2:first-of-type { margin-top: 0; }
+    p {
+      margin: 0 0 1rem;
+      color: var(--muted);
+    }
+    ul {
+      margin: 0 0 1rem;
+      padding-left: 1.2rem;
+      color: var(--muted);
+    }
+    li { margin-bottom: 0.5rem; }
+    .note {
+      margin-top: 2.5rem;
+      padding: 1rem 1.1rem;
+      font-size: 0.875rem;
+      color: var(--muted);
+      border-left: 4px solid var(--accent);
+      background: rgba(147, 197, 114, 0.08);
+      border-radius: 0 8px 8px 0;
+    }
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem 2rem;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #fff;
+      background: var(--text);
+      border-radius: 8px;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .btn-primary:hover {
+      background: #000;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <a class="back" href="/#projects">← Back to portfolio</a>
+    <h1>CNBC Quote Page</h1>
+    <p class="lede">
+      Production work leading engineering alongside product, internal market-data owners, and backend teams on a high-traffic quote experience—defining how financial data reached the UI through REST and GraphQL, and shipping a chart-centric layout users rely on throughout the trading day.
+    </p>
+
+    <figure class="hero">
+      <div class="hero-image-wrap">
+        <div class="browser-frame">
+          <div class="browser-header">
+            <div class="browser-dot close"></div>
+            <div class="browser-dot minimize"></div>
+            <div class="browser-dot maximize"></div>
+          </div>
+          <img
+            src="../cnbcQuotePage.png"
+            alt="Screenshot of the CNBC quote page showing price, chart, key stats, and news modules"
+            loading="lazy"
+          />
+        </div>
+      </div>
+      <figcaption>Representative quote surface: chart, key stats, and modular data blocks driven by typed market data.</figcaption>
+    </figure>
+
+    <h2>Role</h2>
+    <p>
+      Oversaw frontend development and partnered across disciplines to keep delivery aligned with product goals and platform realities—translating roadmap needs into feasible contracts, incremental releases, and stable operations.
+    </p>
+
+    <h2>Data contracts: REST and GraphQL</h2>
+    <p>
+      The page combined multiple data shapes: real-time and delayed fields, reference data, and aggregates suited to different consumers. We used <strong>REST</strong> where resource-style endpoints and caching patterns fit, and <strong>GraphQL</strong> where clients needed to compose fields, avoid over-fetching, or query graph-shaped relationships in one round trip. Aligning those choices with backend capacity and client performance was a core part of the work.
+    </p>
+
+    <h2>Market data depth</h2>
+    <p>
+      Quote UIs only work when engineers and partners share a precise vocabulary for <strong>market data asset types</strong>—equities, options, fundamentals, and related identifiers and conventions. Part of my job was helping the team reason about field meaning, edge cases, and how data behaves in production so API contracts and UI states did not drift from reality.
+    </p>
+
+    <h2>Chart integration</h2>
+    <p>
+      The interactive price chart was a centerpiece: time-range selection, historical and intraday series, and responsive rendering alongside the rest of the page. Integrating it end-to-end—data plumbing, loading and empty states, and performance—was a major cross-team effort tied directly to user trust in the product.
+    </p>
+
+    <ul>
+      <li>Coordinated contract changes with market-data and API owners as requirements evolved.</li>
+      <li>Balanced latency, payload size, and client complexity across REST and GraphQL usage.</li>
+      <li>Kept accessibility and layout resilience in mind as data density changed by symbol and asset class.</li>
+    </ul>
+
+    <p class="note">
+      Screenshot reflects the type of experience shipped on CNBC; branding and layout are property of NBCUniversal / CNBC. This page is a personal case study and is not an official CNBC communication.
+    </p>
+
+    <div style="margin-top: 3.5rem; margin-bottom: 2rem; display: flex; gap: 1rem; align-items: center;">
+      <a href="https://www.cnbc.com/quotes/" rel="noopener noreferrer" class="btn-primary">
+        View Live Project
+        <svg style="margin-left: 0.5rem;" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+      </a>
+      <span style="color: var(--muted); font-size: 0.875rem;">External CNBC link</span>
+    </div>
+  </div>
+</body>
+</html>

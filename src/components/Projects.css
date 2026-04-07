@@ -17,18 +17,39 @@
   padding: 1.5rem;
   transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
   animation: fadeUp 0.5s ease-out backwards;
+  position: relative;
+  overflow: hidden;
+}
+
+.project-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at var(--mouse-x, 100%) var(--mouse-y, 100%), var(--project-accent), transparent 180px);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.project-card:hover::before {
+  opacity: 0.12;
 }
 
 .project-card:hover {
   transform: translateY(-4px);
   border-color: var(--hover);
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 12px 28px -6px rgba(0, 0, 0, 0.12), 0 8px 16px -8px var(--project-accent);
 }
 
 .project-link {
-  display: block;
+  display: flex;
+  flex-direction: column;
   color: inherit;
   height: 100%;
+  position: relative;
+  z-index: 1;
 }
 
 .project-link:hover {
@@ -45,6 +66,21 @@
   overflow: hidden;
   aspect-ratio: 16/10;
   background: var(--bg-elevated);
+}
+
+/* Full-page screenshots: letterbox instead of aggressive crop */
+.project-thumb-wrap--contain {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f3f4f6;
+}
+
+.project-thumb--contain {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: top center;
 }
 
 .project-thumb {
@@ -69,10 +105,57 @@
   color: var(--text);
 }
 
+.project-badges {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-shrink: 0;
+}
+
 .project-badge {
   flex-shrink: 0;
   font-size: 0.875rem;
   color: var(--accent);
+}
+
+.project-badge--case {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+  padding: 0.2rem 0.45rem;
+  border: 1px solid rgba(147, 197, 114, 0.45);
+  border-radius: 6px;
+  background: var(--accent-dim);
+}
+
+.project-subtitle {
+  margin: -0.35rem 0 0.65rem;
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+.project-card--case-study .project-desc {
+  margin-bottom: 0.75rem;
+}
+
+.project-case-list {
+  margin: 0 0 1rem;
+  padding-left: 1.15rem;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  line-height: 1.55;
+}
+
+.project-case-list li {
+  margin-bottom: 0.45rem;
+}
+
+.project-case-list li:last-child {
+  margin-bottom: 0;
 }
 
 .project-desc {

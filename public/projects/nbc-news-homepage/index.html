@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Case study: NBC News Homepage — leading a team to update the look and feel, and improving editorial efficiency across platforms." />
+  <title>NBC News Homepage · Matt Shade</title>
+  <style>
+    :root {
+      --text: #171717;
+      --muted: #6b7280;
+      --accent: #93c572;
+      --border: #ebebeb;
+      --bg: #ffffff;
+      --card: #fafafa;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-size: 1rem;
+      line-height: 1.6;
+      color: var(--text);
+      background: var(--bg);
+    }
+    .wrap {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 2rem 1.25rem 4rem;
+    }
+    .back {
+      display: inline-block;
+      font-size: 0.9375rem;
+      color: var(--muted);
+      text-decoration: none;
+      margin-bottom: 1.5rem;
+    }
+    .back:hover { color: var(--accent); }
+    h1 {
+      margin: 0 0 0.35rem;
+      font-size: clamp(1.75rem, 4vw, 2.25rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    .lede {
+      margin: 0 0 2rem;
+      color: var(--muted);
+      font-size: 1.0625rem;
+      line-height: 1.65;
+    }
+    figure.hero {
+      margin: 0 0 2.5rem;
+      padding: 0;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      background: var(--card);
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.06);
+    }
+    .hero-image-wrap {
+      padding: 3rem 1.5rem;
+      background: linear-gradient(135deg, #f0f4f8, #d9e2ec);
+      display: flex;
+      justify-content: center;
+    }
+    .browser-frame {
+      width: 100%;
+      max-width: 100%;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 20px 48px rgba(0,0,0,0.15);
+      border: 1px solid rgba(0,0,0,0.08);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .browser-header {
+      height: 28px;
+      background: #f3f3f3;
+      border-bottom: 1px solid #e5e5e5;
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      gap: 6px;
+    }
+    .browser-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+    }
+    .browser-dot.close { background: #ff5f56; }
+    .browser-dot.minimize { background: #ffbd2e; }
+    .browser-dot.maximize { background: #27c93f; }
+
+    figure.hero img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 0 0 10px 10px;
+    }
+    figcaption {
+      padding: 0.85rem 1rem;
+      font-size: 0.8125rem;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+      background: #fff;
+    }
+    h2 {
+      margin: 2rem 0 0.75rem;
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: var(--text);
+      padding-bottom: 0.35rem;
+      border-bottom: 1px solid rgba(147, 197, 114, 0.35);
+    }
+    h2:first-of-type { margin-top: 0; }
+    p {
+      margin: 0 0 1rem;
+      color: var(--muted);
+    }
+    ul {
+      margin: 0 0 1rem;
+      padding-left: 1.2rem;
+      color: var(--muted);
+    }
+    li { margin-bottom: 0.5rem; }
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem 2rem;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #fff;
+      background: var(--text);
+      border-radius: 8px;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .btn-primary:hover {
+      background: #000;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <a class="back" href="/#projects">← Back to portfolio</a>
+    <h1>NBC News Homepage</h1>
+    <p class="lede">
+      Led a team to learn a new codebase and completely overhaul the look and feel of the NBC News homepage, successfully unifying the editorial workflow across mobile web and native apps.
+    </p>
+
+    <figure class="hero">
+      <div class="hero-image-wrap">
+        <div class="browser-frame">
+          <div class="browser-header">
+            <div class="browser-dot close"></div>
+            <div class="browser-dot minimize"></div>
+            <div class="browser-dot maximize"></div>
+          </div>
+          <img
+            src="../nbcnewsHP.png"
+            alt="Screenshot of the NBC News Homepage redesign"
+            loading="lazy"
+          />
+        </div>
+      </div>
+      <figcaption>NBC News Homepage refresh bringing visual parity to mobile and web.</figcaption>
+    </figure>
+
+    <h2>The Challenge</h2>
+    <p>
+      The goal was to update the visual design of the NBC News homepage while we simultaneously adopted a completely new codebase. We had to ensure high performance and maintain high traffic reliability during the transition.
+    </p>
+
+    <h2>Editorial Efficiency</h2>
+    <p>
+      An underlying—and critical—problem we solved was editorial efficiency. Previously, the editorial team had to update one CMS to make changes on the web homepage, and then jump to a different CMS to make equivalent changes for the NBC News app. 
+    </p>
+    <p>
+      Our project rebuilt the architecture to allow a single unified workflow, massively streamlining the editorial experience and reducing the time-to-publish for breaking news.
+    </p>
+
+    <h2>Component Consolidation</h2>
+    <p>
+      As part of the project, the team engineered a highly versatile core component whose presentation could be augmented in many different ways. This architectural shift significantly reduced the need for specialized variants, resulting in the deprecation and removal of many previously used bespoke components, vastly simplifying the application.
+    </p>
+
+    <h2>Cross-Platform Parity</h2>
+    <p>
+      By aligning the technical foundation, the project brought true feature and design parity across mobile web and native apps, ensuring a seamless experience for users regardless of how they accessed NBC News.
+    </p>
+
+    <div style="margin-top: 3.5rem; margin-bottom: 2rem; display: flex; gap: 1rem; align-items: center;">
+      <a href="https://www.nbcnews.com/" rel="noopener noreferrer" class="btn-primary">
+        View Live Project
+        <svg style="margin-left: 0.5rem;" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+      </a>
+      <span style="color: var(--muted); font-size: 0.875rem;">External NBC News link</span>
+    </div>
+  </div>
+</body>
+</html>

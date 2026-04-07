@@ -39,6 +39,18 @@ function serveProjectsPlugin() {
 
       function resolveProjectFile(slug: string, rest: string): string | null {
         const requestFile = rest || 'index.html'
+        const publicProjectRoot = path.join(cwd, 'public', 'projects', slug)
+        const publicFile = path.join(publicProjectRoot, requestFile)
+        if (fs.existsSync(publicFile) && fs.statSync(publicFile).isFile()) {
+          return publicFile
+        }
+        if (!rest) {
+          const publicIndex = path.join(publicProjectRoot, 'index.html')
+          if (fs.existsSync(publicIndex) && fs.statSync(publicIndex).isFile()) {
+            return publicIndex
+          }
+        }
+
         const candidates: string[] = []
 
         if (fs.existsSync(distProjects)) {

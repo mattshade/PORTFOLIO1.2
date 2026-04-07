@@ -346,6 +346,8 @@ export function BirdsFly({
       }
     }
     initFlock()
+    
+    const hoverStates = new WeakMap<Element, boolean>()
 
     let frame = 0
     
@@ -379,9 +381,25 @@ export function BirdsFly({
 
         const { scrollY: sy } = propsRef.current
 
-        const wires = Array.from(document.querySelectorAll('.bird-wire'))
+        const wires = Array.from(document.querySelectorAll('.bird-wire, .bird-perch, .bird-perch-card'))
         const activeWires = wires
-          .map((w) => w.getBoundingClientRect())
+          .map((w) => {
+            const rect = w.getBoundingClientRect()
+            const isHovered = w.matches(':hover')
+            const wasHovered = hoverStates.get(w) || false
+            const justHovered = isHovered && !wasHovered
+            hoverStates.set(w, isHovered)
+
+            return {
+              top: rect.top,
+              bottom: rect.bottom,
+              left: rect.left,
+              width: rect.width,
+              isPerch: w.classList.contains('bird-perch'),
+              isCard: w.classList.contains('bird-perch-card'),
+              justHovered
+            }
+          })
           .filter((r) => r.top > -50 && r.bottom < height + 50)
 
         // React to scrolling
@@ -402,7 +420,17 @@ export function BirdsFly({
               const nearest = activeWires.reduce((prev, curr) => 
                 Math.abs(curr.top - b.y) < Math.abs(prev.top - b.y) ? curr : prev
               )
-              b.landY = nearest.top - 2 // Perch slightly above the line
+              
+              if (nearest.isCard && nearest.justHovered) {
+                b.isLanded = false
+                b.rerollLandingTargets()
+                b.vx = (Math.random() - 0.5) * 4
+                b.vy = -3 - Math.random() * 2
+                continue
+              }
+
+              const yOffsetNearest = nearest.isPerch ? (nearest.bottom - nearest.top) * 0.35 : -2
+              b.landY = nearest.top + yOffsetNearest
               
               if (idleTime > 5000 && Math.random() < 0.0015 && b.hopTimer === 0) {
                 b.hopTimer = 30
@@ -418,7 +446,8 @@ export function BirdsFly({
               // Per-boid random along wire; pads reroll each time they leave a wire
               const span = Math.max(0.12, 1 - b.landPadL - b.landPadR)
               const landingX = wire.left + (b.landPadL + b.landTargetT * span) * wire.width
-              const landingY = wire.top - 2
+              const yOffset = wire.isPerch ? (wire.bottom - wire.top) * 0.35 : -2
+              const landingY = wire.top + yOffset
               
               const dx = landingX - b.x
               const dy = landingY - b.y
