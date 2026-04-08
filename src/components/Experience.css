@@ -14,7 +14,6 @@
   opacity: 0;
   transform: translateY(14px);
   transition: opacity 0.55s ease-out, transform 0.55s ease-out, border-color 0.25s ease;
-  will-change: transform, opacity;
 }
 
 .experience-item.in-view {
