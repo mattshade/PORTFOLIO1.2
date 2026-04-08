@@ -349,8 +349,37 @@ export function BirdsFly({
     }
     setSize()
 
+    let cachedWires: any[] = []
+    
+    // Cache wire positions relative to the DOCUMENT to avoid getBoundingClientRect thrashing
+    const updateWireCache = () => {
+      const elements = Array.from(document.querySelectorAll('.bird-wire, .bird-perch, .bird-perch-card, .nav'))
+      cachedWires = elements.map(el => {
+        const rect = el.getBoundingClientRect()
+        const isNav = el.classList.contains('nav')
+        const isPerch = el.classList.contains('bird-perch')
+        const isCard = el.classList.contains('bird-perch-card')
+        
+        return {
+          el,
+          absTop: rect.top + window.scrollY,
+          absBottom: rect.bottom + window.scrollY,
+          absLeft: rect.left + window.scrollX,
+          width: rect.width,
+          height: rect.height,
+          isNav,
+          isPerch,
+          isCard,
+          isNavPerch: isPerch && !!el.closest('.nav')
+        }
+      })
+    }
+
+    updateWireCache()
+
     const handleResize = () => {
       setSize()
+      updateWireCache()
     }
     window.addEventListener('resize', handleResize)
 
@@ -359,7 +388,7 @@ export function BirdsFly({
       flock.length = 0
       const w = Math.max(1, width)
       const h = Math.max(1, height)
-      for (let i = 0; i < 28; i++) {
+      for (let i = 0; i < 18; i++) {
         flock.push(new Boid(Math.random() * w, Math.random() * h, i))
       }
     }
@@ -368,7 +397,6 @@ export function BirdsFly({
     const hoverStates = new WeakMap<Element, boolean>()
 
     let frame = 0
-    
     let lastGlobalScroll = window.scrollY
     let lastScrollTime = Date.now()
 
@@ -387,46 +415,52 @@ export function BirdsFly({
         if (Math.abs(currentScroll - lastGlobalScroll) > 1) {
           lastScrollTime = now
         }
+        
+        const sy = currentScroll
         lastGlobalScroll = currentScroll
         
         const idleTime = now - lastScrollTime
-        const isScrolling = idleTime < 300
+        const isScrolling = idleTime < 250 // Slightly tighter for responsiveness
 
-        const { scrollY: sy } = propsRef.current
+        // HARD OPTIMIZATION: COMPLETELY PAUSE Rendering during scroll for a perfectly smooth experience
+        if (isScrolling) {
+           animationId = requestAnimationFrame(render)
+           return
+        }
 
-        const wires = Array.from(document.querySelectorAll('.bird-wire, .bird-perch, .bird-perch-card, .nav'))
-        const activeWires = wires
-          .map((w) => {
-            const rect = w.getBoundingClientRect()
-            const isNav = w.classList.contains('nav')
-            const isPerch = w.classList.contains('bird-perch')
-            const isCard = w.classList.contains('bird-perch-card')
-            const isNavPerch = isPerch && !!w.closest('.nav')
+        // Refresh cache occasionally
+        if (frame % 200 === 0) updateWireCache()
+
+        // Calculate viewport-relative positions from cache
+        const activeWires = cachedWires
+          .map((wire) => {
+            const relTop = wire.absTop - sy
+            const relBottom = wire.absBottom - sy
+            const relLeft = wire.absLeft // Typically matches window.scrollX context
             
-            // If it is the nav, the birds land on the bottom edge (the visual wire)
-            const landTop = isNav ? rect.bottom : rect.top
-            
-            const isHovered = w.matches(':hover')
-            const wasHovered = hoverStates.get(w) || false
+            // Fast hover check
+            const isHovered = wire.el.matches(':hover')
+            const wasHovered = hoverStates.get(wire.el) || false
             const justHovered = isHovered && !wasHovered
-            hoverStates.set(w, isHovered)
+            hoverStates.set(wire.el, isHovered)
 
             return {
-              top: landTop,
-              bottom: rect.bottom,
-              left: rect.left,
-              width: rect.width,
-              isNav: isNav,
-              isPerch: isPerch,
-              isCard: isCard,
-              isNavPerch: isNavPerch,
-              justHovered
+              top: wire.isNav ? relBottom : relTop,
+              bottom: relBottom,
+              left: relLeft,
+              width: wire.width,
+              isNav: wire.isNav,
+              isPerch: wire.isPerch,
+              isCard: wire.isCard,
+              isNavPerch: wire.isNavPerch,
+              justHovered,
+              el: wire.el
             }
           })
-          .filter((r) => r.top > -50 && r.bottom < height + 50)
+          // Only process wires near the viewport
+          .filter((w) => w.top > -100 && w.top < height + 100)
 
-
-        // React to scrolling — only some birds take off, creating organic staggered flight
+        // React to scrolling — only some birds take off
         if (isScrolling) {
           for (const boid of flock) {
             if (boid.isLanded && Math.random() < 0.08) {
@@ -461,9 +495,8 @@ export function BirdsFly({
                 continue
               }
               
-              const nearestEl = wires[activeWires.indexOf(nearest)]
               b.isLandedOnNav = nearest.isNav
-              b.landedElement = nearestEl
+              b.landedElement = nearest.el
 
               const yOffsetNearest = nearest.isPerch ? (nearest.bottom - nearest.top) * 0.35 : -2
               b.landY = nearest.top + yOffsetNearest
@@ -472,8 +505,6 @@ export function BirdsFly({
                 b.hopTimer = 30
               }
             } else {
-              // SIMPLE FILTER: only boids 0-2 can land on NAV menu items
-              // Summary text .bird-perch spans are open to all boids
               const canLandOnNavPerch = b.index < 3
               const boidsWires = activeWires.filter(w => {
                 if (w.isNavPerch && !canLandOnNavPerch) return false
@@ -488,11 +519,9 @@ export function BirdsFly({
                 Math.floor(b.wirePreference * nWires)
               )
               const wire = boidsWires[wireIndex]
-              const wireEl = wires[activeWires.indexOf(wire)]
 
-              b.targetElement = wireEl
+              b.targetElement = wire.el
 
-              // Per-boid random along wire; pads reroll each time they leave a wire
               const span = Math.max(0.12, 1 - b.landPadL - b.landPadR)
               const landingX = wire.left + (b.landPadL + b.landTargetT * span) * wire.width
               const yOffset = wire.isPerch ? (wire.bottom - wire.top) * 0.35 : -2
@@ -503,21 +532,18 @@ export function BirdsFly({
               const d = Math.hypot(dx, dy)
               
               if (d < 1) {
-                // Total lock - very tight threshold for smoothness
                 b.isLanded = true
                 b.isLandedOnNav = wire.isNav
-                b.landedElement = wireEl
+                b.landedElement = wire.el
                 b.landX = landingX
                 b.landY = landingY
                 b.vx = 0
                 b.vy = 0
               } else {
-                // High-force seek pull for snappy "intent"
                 const steer = 0.35 * Math.min(1, 150 / d)
                 b.vx += (dx / d) * steer
                 b.vy += (dy / d) * steer
                 
-                // Only dampen when we're practically on top of it (last 10px)
                 if (d < 10) {
                   const dampen = 0.8 + (d / 10) * 0.18
                   b.vx *= dampen
@@ -540,6 +566,7 @@ export function BirdsFly({
           }
         }
 
+
         if (frame > 0 && frame % 900 === 0) {
           for (const boid of flock) {
             if (!boid.isLanded) boid.scatter()
@@ -556,7 +583,8 @@ export function BirdsFly({
             continue
           }
           boid.edges(width, height)
-          boid.flock(flock)
+          // Aggressive optimize: No complex math during scroll
+          if (!isScrolling) boid.flock(flock)
           boid.update()
           if (boid.drawSeed < visibleRatio) boid.draw(ctx)
         }
