@@ -34,12 +34,12 @@
 }
 
 .project-card:hover::before {
-  opacity: 0.12;
+  opacity: 0.08;
 }
 
 .project-card:hover {
   transform: translateY(-4px);
-  border-color: var(--hover);
+  border-color: var(--project-accent);
   box-shadow: 0 12px 28px -6px rgba(0, 0, 0, 0.12), 0 8px 16px -8px var(--project-accent);
 }
 
@@ -181,6 +181,16 @@
   padding: 0.25rem 0.5rem;
   background: var(--accent-dim);
   border-radius: 6px;
+  transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+              color 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+              border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid transparent;
+}
+
+.project-card:hover .project-tech li {
+  background: color-mix(in srgb, var(--project-accent) 10%, transparent);
+  color: var(--text);
+  border-color: color-mix(in srgb, var(--project-accent) 20%, transparent);
 }
 
 @media (max-width: 768px) {
