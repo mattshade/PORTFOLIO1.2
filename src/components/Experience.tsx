@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
 import { resume } from '../data/resume'
-
+import { SkillPop } from './SkillPop'
 import './Experience.css'
 
 const PULL_STRENGTH = 2.5
@@ -8,7 +8,10 @@ const PULL_STRENGTH = 2.5
 export function Experience() {
   const [hoveredSkill, setHoveredSkill] = useState<string | null>(null)
   const [pull, setPull] = useState({ x: 0, y: 0 })
+  const [popPos, setPopPos] = useState<{ x: number; y: number; color: string } | null>(null)
   const [visibleCards, setVisibleCards] = useState<Set<number>>(new Set())
+  const [clickedSkill, setClickedSkill] = useState<string | null>(null)
+
   const cardRefs = useRef<(HTMLDivElement | null)[]>([])
 
   useEffect(() => {
@@ -51,12 +54,30 @@ export function Experience() {
     setPull({ x: 0, y: 0 })
   }, [])
 
+  const handleSkillClick = (skill: string) => (e: React.MouseEvent) => {
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
+    // Using viewport-relative coordinates for the 'fixed' SkillPop
+    const x = rect.left + rect.width / 2
+    const y = rect.top + rect.height / 2
+    
+    const colors = ['#ff5c8a', '#93C572', '#38bdf8', '#a855f7', '#facc15']
+    const color = colors[Math.floor(Math.random() * colors.length)]
+    
+    setPopPos({ x, y, color })
+    setClickedSkill(skill)
+    // Clear pop position after a delay to allow re-triggering
+    setTimeout(() => {
+      setPopPos(null)
+      setClickedSkill(null)
+    }, 1000)
+  }
+
   return (
     <section id="experience" className="section experience">
+      {popPos && <SkillPop x={popPos.x} y={popPos.y} color={popPos.color} />}
       <div className="section-inner" style={{ position: 'relative' }}>
         <h2 className="section-title">
           Experience
-
         </h2>
 
         {resume.selectedImpact && resume.selectedImpact.length > 0 && (
@@ -105,7 +126,7 @@ export function Experience() {
             {resume.skills.map((s) => (
               <li
                 key={s}
-                className={`skills-item ${hoveredSkill === s ? 'skills-item-hovered' : ''}`}
+                className={`skills-item ${hoveredSkill === s ? 'skills-item-hovered' : ''} ${clickedSkill === s ? 'skill-ping' : ''}`}
                 style={
                   hoveredSkill === s
                     ? { transform: `translate(${pull.x}px, ${pull.y}px)` }
@@ -113,6 +134,7 @@ export function Experience() {
                 }
                 onMouseMove={handleSkillMouseMove(s)}
                 onMouseLeave={handleSkillMouseLeave}
+                onClick={handleSkillClick(s)}
               >
                 {s}
               </li>
