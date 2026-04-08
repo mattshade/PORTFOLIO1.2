@@ -21,6 +21,7 @@ export interface Project {
   /** Span two columns on large grids */
   wide?: boolean
   /** Subtle brand color identifier for the card */
+  stats?: { label: string; value: string }[]
   accent?: string
   // New capability-focused fields
   role?: string
@@ -29,6 +30,36 @@ export interface Project {
 }
 
 export const projects: Project[] = [
+  {
+    id: 'nbc-ai-enablement',
+    title: 'AI Enablement Program',
+    subtitle: 'Enterprise AI & Training',
+    role: 'Director of AI Engineering',
+    contribution:
+      'I owned executive-facing AI enablement for NBC News Group: a weekly discipline that translated complex programs into clear progress narratives for Data AI & Emerging Tech. I partnered across editorial, standards, legal, audiences, on-air production, product, and engineering to align OKRs, structure AI initiatives as execution-ready Jira work, and advance a portfolio of custom Copilot agents, hands-on ChatGPT office hours, and partner-led training (Microsoft, Google, Adobe). I also helped stand up platform thinking around a unified Data Hub and responsible license and tooling coordination so teams could adopt generative AI safely at enterprise scale.',
+    outcome:
+      'Established a repeatable operating rhythm of transparent reporting, governed delivery, and scaled training. This structure reduced ambiguity for leadership and accelerated time-to-value for newsroom and engineering teams adopting AI in production workflows.',
+    description:
+      'Weekly leadership reporting, Copilot agents, and hands-on enablement across the News Group.',
+    tech: ['Microsoft Copilot', 'ChatGPT Enterprise', 'GCP', 'Change leadership', 'Agent design'],
+    href: '/projects/nbc-ai-enablement/',
+    accent: '#312e81',
+  },
+  {
+    id: 'nbc-agent-platform-validation',
+    title: 'AI Platform Validation',
+    subtitle: 'Agent stack evaluation',
+    role: 'Director of AI Engineering',
+    contribution:
+      'I partnered with platform and product engineering to validate agentic technologies for NBC News Group—not as a one-off bake-off, but as a disciplined comparison of AWS Bedrock AgentCore, Google Vertex AI (Agent Engine + ADK), LangChain/LangGraph, and adjacent options. We pressure-tested each stack against enterprise requirements (security, observability, memory/RAG, long-running agents, cost) and against real org personas: technical builders shipping agents versus citizen users who need guided, governed experiences. I helped the team translate vendor marketing into concrete tradeoffs so we could rank priorities for leadership and set a realistic adoption path.',
+    outcome:
+      'Delivered a defensible priority view of which agent platforms to invest in first versus pilot or revisit later—reducing thrash, aligning stakeholders on tradeoffs (managed vs flexible, AWS-native vs hybrid), and giving teams a clearer runway for production agent work.',
+    description:
+      'Cross-team validation of agent platforms to choose NBC News Group’s enterprise direction.',
+    tech: ['AWS Bedrock', 'Vertex AI', 'LangGraph', 'Evaluation', 'Governance'],
+    href: '/projects/nbc-agent-platform-validation/',
+    accent: '#0369a1',
+  },
   {
     id: 'cnbc-quote-page',
     title: 'CNBC Quote Page',
