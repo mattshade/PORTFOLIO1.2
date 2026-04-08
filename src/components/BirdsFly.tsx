@@ -51,10 +51,10 @@ class Boid {
     this.landTargetT = Math.random()
     this.landPadL = 0.04 + Math.random() * 0.07
     this.landPadR = 0.04 + Math.random() * 0.07
-    this.vx = (Math.random() * 2 - 1) * 2
-    this.vy = (Math.random() * 2 - 1) * 2
-    this.maxSpeed = 2.0
-    this.maxForce = 0.04
+    this.vx = (Math.random() * 2 - 1) * 3
+    this.vy = (Math.random() * 2 - 1) * 3
+    this.maxSpeed = 3.5
+    this.maxForce = 0.12
     this.index = index
   }
 
@@ -178,7 +178,7 @@ class Boid {
     let alignment = this.align(boids)
     let cohesion = this.cohesion(boids)
     let separation = this.separation(boids)
-    const flockWeight = 0.12
+    const flockWeight = 0.15
     this.vx += (alignment.x + cohesion.x + separation.x) * flockWeight
     this.vy += (alignment.y + cohesion.y + separation.y) * flockWeight
   }
@@ -235,11 +235,18 @@ class Boid {
 
   update() {
     // Tiny random jitter to break circular vortex patterns
-    this.vx += (Math.random() - 0.5) * 0.06
-    this.vy += (Math.random() - 0.5) * 0.06
+    this.vx += (Math.random() - 0.5) * 0.04
+    this.vy += (Math.random() - 0.5) * 0.04
     
+    // Apply velocity to position
     this.x += this.vx
     this.y += this.vy
+
+    // Dampen velocity slightly (friction) for smoother feel
+    // Using 0.993 for snappier open flight
+    this.vx *= 0.993
+    this.vy *= 0.993
+    
     let speed = Math.hypot(this.vx, this.vy)
     if (speed > this.maxSpeed) {
       this.vx = (this.vx / speed) * this.maxSpeed
@@ -328,6 +335,8 @@ export function BirdsFly({
     const ctx = canvas.getContext('2d')
     if (!ctx) return
 
+    let width = canvas.offsetWidth || 300
+    let height = canvas.offsetHeight || 300
     const setSize = () => {
       const w = canvas.offsetWidth || canvas.parentElement?.clientWidth || 300
       const h = canvas.offsetHeight || canvas.parentElement?.clientHeight || 300
@@ -338,8 +347,6 @@ export function BirdsFly({
         canvas.height = h
       }
     }
-    let width = 0
-    let height = 0
     setSize()
 
     const handleResize = () => {
@@ -369,11 +376,6 @@ export function BirdsFly({
     const render = () => {
       try {
         frame++
-        const w = canvas.offsetWidth || 1
-        const h = canvas.offsetHeight || 1
-        if (w !== width || h !== height) {
-          setSize()
-        }
         if (width <= 0 || height <= 0) {
           animationId = requestAnimationFrame(render)
           return
@@ -499,16 +501,28 @@ export function BirdsFly({
               const dx = landingX - b.x
               const dy = landingY - b.y
               const d = Math.hypot(dx, dy)
-              if (d < 10) {
+              
+              if (d < 1) {
+                // Total lock - very tight threshold for smoothness
                 b.isLanded = true
                 b.isLandedOnNav = wire.isNav
                 b.landedElement = wireEl
                 b.landX = landingX
                 b.landY = landingY
+                b.vx = 0
+                b.vy = 0
               } else {
-                const steer = 0.12 * Math.min(1, 80 / d)
+                // High-force seek pull for snappy "intent"
+                const steer = 0.35 * Math.min(1, 150 / d)
                 b.vx += (dx / d) * steer
                 b.vy += (dy / d) * steer
+                
+                // Only dampen when we're practically on top of it (last 10px)
+                if (d < 10) {
+                  const dampen = 0.8 + (d / 10) * 0.18
+                  b.vx *= dampen
+                  b.vy *= dampen
+                }
               }
             }
           }
