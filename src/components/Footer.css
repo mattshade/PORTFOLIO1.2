@@ -1,5 +1,6 @@
 .footer {
   padding: 3rem 1.5rem;
+  position: relative;
 }
 
 .footer-inner {
@@ -13,20 +14,100 @@
   flex-wrap: wrap;
   justify-content: center;
   gap: 1rem 1.5rem;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 .footer-link {
   font-size: 0.9375rem;
   color: var(--text-muted);
+  position: relative;
+  padding: 0.25rem 0;
+  transition: color 0.3s ease, transform 0.3s ease;
+  text-decoration: none;
+}
+
+/* Underline that draws in from center */
+.footer-link::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  right: 50%;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    hsl(var(--logo-hue, 142), 50%, 60%),
+    hsl(var(--logo-hue, 142), 50%, 60%),
+    transparent
+  );
+  transition: left 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+              right 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+              opacity 0.4s ease;
+  opacity: 0;
 }
 
 .footer-link:hover {
-  color: var(--hover);
+  color: var(--text);
+  transform: translateY(-2px);
+}
+
+.footer-link:hover::after {
+  left: 0;
+  right: 0;
+  opacity: 1;
+}
+
+/* Tiny orbiting dot — same design language as nav */
+.footer-link::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 3px;
+  height: 3px;
+  background: hsl(var(--logo-hue, 142), 70%, 65%);
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+  box-shadow: 0 0 8px hsl(var(--logo-hue, 142), 70%, 65%);
+  transform: translate(-50%, -50%);
+}
+
+.footer-link:hover::before {
+  opacity: 1;
+  animation: footerOrbit 3s linear infinite;
+}
+
+@keyframes footerOrbit {
+  0% {
+    transform: translate(-50%, -50%) rotate(0deg) translateX(30px) rotate(0deg);
+  }
+  25% {
+    transform: translate(-50%, -50%) rotate(90deg) translateX(10px) rotate(-90deg);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translate(-50%, -50%) rotate(180deg) translateX(30px) rotate(-180deg);
+  }
+  75% {
+    transform: translate(-50%, -50%) rotate(270deg) translateX(10px) rotate(-270deg);
+    opacity: 0.7;
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(360deg) translateX(30px) rotate(-360deg);
+  }
 }
 
 .footer-copy {
   margin: 0;
   font-size: 0.8125rem;
   color: var(--text-muted);
+  opacity: 0.5;
+  transition: opacity 0.5s ease;
+}
+
+.footer:hover .footer-copy {
+  opacity: 0.8;
 }

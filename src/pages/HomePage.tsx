@@ -7,6 +7,7 @@ import { Experience } from '../components/Experience'
 import { Footer } from '../components/Footer'
 import { BirdsFly } from '../components/BirdsFly'
 
+
 export function HomePage() {
   const [scrollY, setScrollY] = useState(0)
   const [birdsReady, setBirdsReady] = useState(false)
