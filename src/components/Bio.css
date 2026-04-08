@@ -38,8 +38,6 @@
 
 /* Structural anchors to allow birds to perch on key phrases */
 .bird-perch {
-  color: var(--text);
-  font-weight: 600;
   display: inline-block;
   position: relative;
 }
@@ -47,6 +45,73 @@
 @media (max-width: 768px) {
   .bio {
     padding: 3.5rem 1.25rem;
+  }
+}
+
+.leadership-pillars {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin-top: 5rem;
+  animation: fadeUp 0.6s ease-out 0.2s backwards;
+}
+
+.leadership-pillar {
+  padding: 1.75rem;
+  border-radius: 16px;
+  background: var(--bg-glass);
+  border: 1px solid var(--border-strong);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.pillar-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1rem;
+}
+
+.leadership-pillar:hover {
+  transform: translateY(-5px);
+  border-color: var(--accent);
+}
+
+.pillar-icon {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  color: var(--accent);
+  border-radius: 10px;
+}
+
+.pillar-title {
+  font-size: 0.8125rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+  margin: 0;
+  font-weight: 700;
+}
+
+.pillar-text {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+@media (max-width: 860px) {
+  .leadership-pillars {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+    margin-top: 3.5rem;
   }
 }
 

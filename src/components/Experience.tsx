@@ -85,13 +85,23 @@ export function Experience() {
     <section id="experience" className="section experience">
       {popPos && <SkillPop x={popPos.x} y={popPos.y} color={popPos.color} />}
       <div className="section-inner" style={{ position: 'relative' }}>
-        <h2 className="section-title">
-          Experience
-        </h2>
+        <div className="section-header-flex">
+          <h2 className="section-title">Experience</h2>
+          {resume.resumePdf && (
+            <a href={resume.resumePdf} download className="experience-download-btn">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+              Download CV
+            </a>
+          )}
+        </div>
 
         {resume.selectedImpact && resume.selectedImpact.length > 0 && (
           <div className="experience-impact" style={{ marginTop: '2.5rem', marginBottom: '4rem' }}>
-            <h3 className="skills-title" style={{ marginBottom: '1rem' }}>Selected Impact</h3>
+            <h3 className="skills-title" style={{ marginBottom: '1.25rem' }}>Selected Impact</h3>
             <ul className="experience-highlights" style={{ margin: 0, paddingLeft: '1.25rem' }}>
               {resume.selectedImpact.map((item, i) => (
                 <li key={i} className="experience-highlight">{item}</li>
@@ -129,30 +139,47 @@ export function Experience() {
             </div>
           ))}
         </div>
-        <div className="skills-wrap">
-          <h3 className="skills-title">Skills</h3>
-          <ul className="skills-list">
-            {resume.skills.map((s) => {
-              const isHovered = hoveredSkill === s
-              const isClicked = clickedSkill === s
-              
-              return (
-                <li
-                  key={s}
-                  className={`skills-item ${isHovered ? 'skills-item-hovered' : ''} ${isClicked ? 'skill-clicked' : ''}`}
-                  style={{
-                    ...(isHovered ? { transform: `translate(${pull.x}px, ${pull.y}px)`, '--hover-color': hoverColor } as React.CSSProperties : {}),
-                    ...(isClicked ? { '--click-color': clickColor } as React.CSSProperties : {})
-                  } as React.CSSProperties}
-                  onMouseMove={handleSkillMouseMove(s)}
-                  onMouseLeave={handleSkillMouseLeave}
-                  onClick={handleSkillClick(s)}
-                >
-                  {s}
-                </li>
-              )
-            })}
-          </ul>
+
+        <div className="experience-footer-grid">
+          <div className="skills-wrap">
+            <h3 className="skills-title">Technical Proficiencies</h3>
+            <ul className="skills-list">
+              {resume.skills.map((s) => {
+                const isHovered = hoveredSkill === s
+                const isClicked = clickedSkill === s
+                
+                return (
+                  <li
+                    key={s}
+                    className={`skills-item ${isHovered ? 'skills-item-hovered' : ''} ${isClicked ? 'skill-clicked' : ''}`}
+                    style={{
+                      ...(isHovered ? { transform: `translate(${pull.x}px, ${pull.y}px)`, '--hover-color': hoverColor } as React.CSSProperties : {}),
+                      ...(isClicked ? { '--click-color': clickColor } as React.CSSProperties : {})
+                    } as React.CSSProperties}
+                    onMouseMove={handleSkillMouseMove(s)}
+                    onMouseLeave={handleSkillMouseLeave}
+                    onClick={handleSkillClick(s)}
+                  >
+                    {s}
+                  </li>
+                )
+              })}
+            </ul>
+          </div>
+
+          {resume.education && resume.education.length > 0 && (
+            <div className="education-wrap">
+              <h3 className="skills-title">Education</h3>
+              <div className="education-list">
+                {resume.education.map((edu, i) => (
+                  <div key={i} className="education-item">
+                    <h4 className="edu-school">{edu.school}</h4>
+                    <p className="edu-degree">{edu.degree}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </section>

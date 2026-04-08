@@ -18,9 +18,9 @@ export const resume = {
   name: 'Matt Shade',
   title: 'AI Engineering Director | Engineering Leadership | Design Engineering',
   tagline:
-    'Hands-on engineering and design leader with deep experience building consumer platforms, scaling teams, modernizing digital products, and applying AI to real workflow problems.',
+    'Engineering & design leader. I build consumer platforms, scale teams, and apply AI to solve real workflow problems.',
   summary:
-    'Hands-on engineering and design leader with deep experience building consumer platforms, scaling teams, modernizing digital products, and applying AI to real workflow problems. Combines leadership across engineering, product, design, and editorial with strong technical depth in web, mobile, cloud, and AI-enabled systems. Known for translating prototypes and experimentation into practical platform improvements, team growth, and measurable operational impact.',
+    'Hands-on engineering and design leader with experience building scale consumer platforms and technical teams. I bridge the gap between engineering, design, and product to move quickly from high-fidelity prototypes to scalable systems that drive real business impact.',
   /** Mirrored in index.html (noscript) for no-JS crawlers — keep in sync */
   email: 'hellomattshade@gmail.com',
   contactFormEndpoint: '',
@@ -33,11 +33,11 @@ export const resume = {
   resumePdf: '/Matt_Shade.pdf?v=2',
 
   selectedImpact: [
-    'Strategically scaled high-performance, multidisciplinary engineering organizations, recruiting top-tier talent and management to accelerate enterprise subscription growth and execute critical digital platform delivery.',
-    'Spearheaded a massive architectural consolidation of video infrastructure, synthesizing 8 disparate live and short-form video player integrations into 2 globally standardized systems, drastically reducing platform fragmentation and operational overhead.',
-    'Orchestrated the strategic sunsetting of a monolithic legacy application ecosystem, immediately capturing substantial cost savings and reclaiming extensive engineering bandwidth previously lost to technical debt and maintenance.',
-    'Architected and deployed specialized GenAI agents designed to optimize critical newsroom operations, significantly accelerating high-stakes newsgathering, streamlining on-air scheduling logistics, and bridging design-to-engineering execution.',
-    'Pioneered comprehensive AI-enablement initiatives (curating hands-on workshops and strategic office hours) that successfully fostered deep institutional adoption of agentic tools, driving measurable gains in cross-functional velocity and output quality.',
+    'Scaled high-performance engineering teams, hiring the managers and engineers needed to drive subscription growth and platform delivery.',
+    'Consolidated 8 disparate video players into 2 standardized systems, cutting down technical debt and years of operational overhead.',
+    'Led the retirement of a massive monolithic legacy application, saving significant costs and reclaiming thousands of engineering hours.',
+    'Built custom GenAI agents that solved real newsroom problems, from on-air scheduling to complex newsgathering logistics.',
+    'Launched AI-enablement programs (hands-on workshops and technical office hours) that helped teams actually adopt agentic tools into their daily work.',
   ],
 
   education: [
@@ -52,11 +52,11 @@ export const resume = {
       period: 'Jul 2025 - Present',
       location: 'New York, NY',
       highlights: [
-        'Direct comprehensive AI and agentic workflow strategies across the NBC News Group portfolio, establishing a unified vision for intelligent automation and GenAI adoption.',
-        'Partner extensively with cross-functional leadership, including editorial, product, design, and engineering directors, to dramatically accelerate experimentation velocity and resolve day-to-day execution bottlenecks.',
-        'Architect and deploy specialized custom agents designed to augment newsroom newsgathering capabilities, resulting in significantly enhanced scheduling efficiency for on-air producers and teams.',
-        'Establish and lead robust AI-enablement programs, including regular office hours and hands-on technical workshops, empowering teams to confidently integrate agentic tools (e.g., ChatGPT, Copilot, Cursor) into everyday production workflows.',
-        'Steer technical architecture and strategic direction for AI-enabled discovery tools, deep personalization engines, and hybrid workflow systems leveraging React, Node.js, Python, and scalable cloud-native infrastructure (AWS/GCP).',
+        'Lead AI and agentic workflow strategies across the NBC News Group, building a unified approach for intelligent automation.',
+        'Collaborate with editorial, product, and design directors to speed up experimentation and unblock development teams.',
+        'Built custom agents to automate newsroom tasks, helping on-air producers save hours on scheduling and logistics.',
+        'Established hands-on AI workshops and office hours, teaching teams how to use tools like Cursor and ChatGPT in their daily work.',
+        'Drive the architecture for AI discovery tools and personalization engines using React, Node.js, and AWS/GCP.',
       ],
     },
     {
@@ -65,11 +65,11 @@ export const resume = {
       period: 'Oct 2021 - Jul 2025',
       location: 'New York, NY',
       highlights: [
-        'Successfully built, mentored, and scaled high-performing engineering teams from the ground up, successfully hiring engineering managers and senior software engineers to drive the subscription business and broader digital portfolio.',
-        'Spearheaded a critical architectural consolidation of live and short-form video player implementations, migrating 8 disparate media players down to 2 globally supported systems, eliminating platform fragmentation and slashing operational complexity.',
-        'Orchestrated the sunsetting and secure retirement of a massive, monolithic legacy application, generating immediate overhead cost savings and reclaiming hundreds of engineering hours previously lost to routine maintenance.',
-        'Championed an aggressive modernization initiative targeting web and mobile application performance, systematically migrating legacy codebases to React and TypeScript while enforcing strict CI/CD practices.',
-        'Cultivated a healthy, inclusive engineering culture focused on psychological safety, resulting in exceptionally high retention rates, streamlined developer onboarding, and a culture of continuous learning.',
+        'Built and managed high-performing teams, hiring the engineering managers and senior staff needed to scale the subscription business.',
+        'Led the consolidation of video player tech, moving from 8 different implementations to 2 global systems to reduce complexity.',
+        'Retired a massive legacy monolith, saving overhead costs and freeing up hundreds of engineering hours for new features.',
+        'Modernized web and mobile apps by migrating legacy code to React and TypeScript with modern CI/CD pipelines.',
+        'Focused on building an inclusive engineering culture, resulting in high retention and a better environment for developer growth.',
       ],
     },
     {
@@ -78,11 +78,11 @@ export const resume = {
       period: 'Sep 2015 - Oct 2021',
       location: 'Englewood Cliffs, NJ',
       highlights: [
-        'Served as the primary technical lead for elite interactive and personalization initiatives across CNBC.com, delivering resilient, high-traffic features optimized for strict performance under intense market volatility.',
-        'Designed and constructed bespoke subscription workflows and deeply integrated dynamic market-data visualization engines, directly contributing to substantial increases in daily user engagement and subscription conversion metrics.',
-        'Collaborated tightly with product managers and UX/UI designers to develop rapid, high-fidelity coded prototypes that proved invaluable in shaping the long-term strategic direction of core editorial features.',
-        'Established experimentation frameworks that allowed the business to execute reliable A/B testing on pivotal user flows with statistical confidence.',
-        'Provided dedicated mentorship to junior and mid-level engineers, focusing heavily on scalable system architecture, creative problem-solving techniques, and rigorous front-end engineering standards.',
+        'Technical lead for interactive features on CNBC.com, building high-traffic tools that stayed stable during peak market volatility.',
+        'Designed subscription workflows and data visualization engines that directly increased user engagement and conversions.',
+        'Worked with product and design to build high-fidelity prototypes that shaped the direction of core editorial products.',
+        'Built experimentation frameworks for reliable A/B testing on multi-million user flows.',
+        'Mentored junior and mid-level engineers on system architecture and front-end engineering standards.',
       ],
     },
     {
@@ -91,10 +91,10 @@ export const resume = {
       period: 'Jan 2007 - Sep 2015',
       location: 'Englewood Cliffs, NJ',
       highlights: [
-        'Conceptualized, designed, and constructed award-winning interactive experiences, acting as a crucial hybrid bridge between visual design intent and rigorous technical implementation.',
-        'Pioneered prototype-driven product discovery at CNBC, delivering exploratory web and iOS application interfaces that dramatically reduced engineering rework and validated user needs early in the product lifecycle.',
-        'Solidified a deep, foundational expertise in advanced interaction design, CSS/JS animation, and rapid iterative development methodologies.',
-        'Created design systems and UI component libraries that ensured visual consistency, accessibility compliance, and accelerated time-to-market for digital campaigns and news interactive features.',
+        'Designed and built award-winning interactive experiences, serving as the bridge between visual design and technical execution.',
+        'Introduced prototype-driven discovery at CNBC, creating web and iOS interfaces that saved months of engineering rework.',
+        'Developed deep expertise in interaction design, animation, and iterative product development.',
+        'Created the design systems and UI libraries that ensured consistency across CNBC’s digital news features.',
       ],
     },
   ] as ExperienceItem[],

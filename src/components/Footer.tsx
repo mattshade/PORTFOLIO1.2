@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom'
 import { resume } from '../data/resume'
 import './Footer.css'
 
@@ -13,12 +12,12 @@ export function Footer() {
               <a href={`mailto:${resume.email}`} className="footer-link">{resume.email}</a>
             )}
             {resume.linkedin && (
-              <a href={resume.linkedin} target="_blank" rel="noopener noreferrer" className="footer-link">LinkedIn (Matt Shade)</a>
+              <a href={resume.linkedin} target="_blank" rel="noopener noreferrer" className="footer-link">LinkedIn</a>
             )}
             {resume.github && (
               <a href={resume.github} target="_blank" rel="noopener noreferrer" className="footer-link">GitHub</a>
             )}
-            <Link to="/resume" className="footer-link">Resume</Link>
+            <a href="#experience" className="footer-link">Experience</a>
           </div>
           <p className="footer-copy">© {new Date().getFullYear()} {resume.name}</p>
         </div>

@@ -92,7 +92,7 @@ export function SayHiBubble() {
           aria-haspopup="dialog"
           aria-label="Open contact form"
         >
-          Say hi
+          Contact
         </button>
       </div>
       {isOpen && (

@@ -178,16 +178,6 @@
   margin-right: auto;
 }
 
-.hero-tagline-highlight {
-  color: var(--accent);
-  font-weight: 500;
-  transition: color 0.4s ease;
-}
-
-.hero-tagline:hover .hero-tagline-highlight {
-  color: var(--hover);
-}
-
 .hero-ctas {
   display: flex;
   flex-wrap: wrap;
@@ -222,7 +212,7 @@
 
 .hero-cta-primary:hover {
   background: var(--hover);
-  color: #0a0a0a;
+  color: #0a0a0b;
   transform: translateY(-4px) scale(1.02);
   box-shadow: var(--shadow-md);
 }
@@ -233,14 +223,15 @@
   border: 1px solid var(--border-strong);
   backdrop-filter: blur(12px);
   box-shadow: var(--shadow-sm);
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease, color 0.3s ease, background 0.3s ease, border-color 0.3s ease;
 }
 
 .hero-cta-secondary:hover {
   border-color: var(--hover);
-  color: var(--hover);
-  background: var(--bg-elevated);
-  box-shadow: var(--shadow-md);
-  transform: translateY(-2px);
+  color: #0c0d0e;
+  background: var(--hover);
+  box-shadow: 0 10px 30px -5px rgba(173, 235, 179, 0.5), 0 0 40px rgba(173, 235, 179, 0.2);
+  transform: translateY(-5px) scale(1.04);
 }
 
 /* Talk bubble — same rounded rect as other buttons, with speech tail */
@@ -250,6 +241,7 @@
   color: var(--text);
   border: 1px solid var(--border-strong);
   backdrop-filter: blur(12px);
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease, color 0.3s ease, background 0.3s ease, border-color 0.3s ease;
 }
 
 .hero-cta-bubble::after {
@@ -267,10 +259,10 @@
 
 .hero-cta-bubble:hover {
   border-color: var(--hover);
-  color: var(--hover);
-  background: var(--accent-dim);
-  box-shadow: 0 0 32px rgba(173, 235, 179, 0.4);
-  transform: translateY(-2px);
+  color: #0a0a0a;
+  background: var(--hover);
+  box-shadow: 0 10px 30px -5px rgba(173, 235, 179, 0.5), 0 0 40px rgba(173, 235, 179, 0.2);
+  transform: translateY(-5px) scale(1.04);
 }
 
 .hero-cta-bubble:hover::after {

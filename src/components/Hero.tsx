@@ -25,15 +25,11 @@ export function Hero() {
           <span className="hero-name" style={{ animationDelay: '80ms' }}>{resume.name}</span>
         </h1>
         <p className="hero-tagline" style={{ animationDelay: '160ms' }}>
-          Technology and design leader with 18+ years at{' '}
-          <span className="hero-tagline-highlight">NBCUniversal</span> and{' '}
-          <span className="hero-tagline-highlight">CNBC</span>, building and scaling{' '}
-          <span className="hero-tagline-highlight">AI-powered</span> products and teams
-          that turn complexity into clarity.
+          Engineering and design leader at NBCUniversal and CNBC. I build large-scale platforms, grow teams, and turn complex technical challenges into clean, high-impact experiences.
         </p>
         <div className="hero-ctas" style={{ animationDelay: '240ms' }}>
           <a href="#projects" className="hero-cta hero-cta-primary">
-            View projects
+            Work
           </a>
           <a href="#experience" className="hero-cta hero-cta-secondary">
             Experience

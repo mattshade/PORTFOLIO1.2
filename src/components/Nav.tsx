@@ -30,26 +30,19 @@ export function Nav() {
         <div className="nav-links">
           {isHome ? (
             <>
-              <a href="#projects" className="nav-link bird-perch">Projects</a>
-              <a href="#experience" className="nav-link bird-perch">Experience</a>
+              <a href="#projects" className="nav-link bird-perch">Work</a>
             </>
           ) : (
             <>
-              <Link to="/#projects" className="nav-link bird-perch">Projects</Link>
-              <Link to="/#experience" className="nav-link bird-perch">Experience</Link>
+              <Link to="/#projects" className="nav-link bird-perch">Work</Link>
             </>
           )}
-          <Link
-            to="/resume"
-            className={`nav-link bird-perch ${location.pathname === '/resume' ? 'nav-link-active' : ''}`}
-            onClick={() => {
-              if (location.pathname === '/resume') {
-                window.scrollTo({ top: 0, behavior: 'smooth' })
-              }
-            }}
+          <a
+            href="#experience"
+            className="nav-link bird-perch"
           >
-            Resume
-          </Link>
+            Experience
+          </a>
         </div>
       </div>
     </nav>
