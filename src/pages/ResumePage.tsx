@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { Nav } from '../components/Nav'
 import { Resume } from '../components/Resume'
 import { Footer } from '../components/Footer'
+import { BackToTop } from '../components/BackToTop'
 
 export function ResumePage() {
   useEffect(() => {
@@ -19,6 +20,7 @@ export function ResumePage() {
         <Resume />
       </main>
       <Footer />
+      <BackToTop />
     </div>
   )
 }

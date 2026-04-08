@@ -6,6 +6,7 @@ import { Projects } from '../components/Projects'
 import { Experience } from '../components/Experience'
 import { Footer } from '../components/Footer'
 import { BirdsFly } from '../components/BirdsFly'
+import { BackToTop } from '../components/BackToTop'
 
 
 export function HomePage() {
@@ -41,6 +42,7 @@ export function HomePage() {
           <Experience />
         </main>
         <Footer />
+        <BackToTop />
       </div>
     </>
   )
