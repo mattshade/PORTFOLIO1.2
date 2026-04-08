@@ -13,6 +13,12 @@ export function Nav() {
         <Link 
           to="/" 
           className="nav-home"
+          onClick={(e) => {
+            if (location.pathname === '/') {
+              e.preventDefault()
+              window.scrollTo({ top: 0, behavior: 'smooth' })
+            }
+          }}
         >
           <svg className="nav-logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18">
             <path fill="hsl(var(--logo-hue, 142), 45%, 60%)" d="M 12 1 L 20 14 L 23 21 L 16 16 L 12 23 L 8 16 L 1 21 L 4 14 Z"/>
