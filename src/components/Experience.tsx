@@ -7,10 +7,12 @@ const PULL_STRENGTH = 2.5
 
 export function Experience() {
   const [hoveredSkill, setHoveredSkill] = useState<string | null>(null)
+  const [hoverColor, setHoverColor] = useState<string>('#93C572')
   const [pull, setPull] = useState({ x: 0, y: 0 })
   const [popPos, setPopPos] = useState<{ x: number; y: number; color: string } | null>(null)
   const [visibleCards, setVisibleCards] = useState<Set<number>>(new Set())
   const [clickedSkill, setClickedSkill] = useState<string | null>(null)
+  const [clickColor, setClickColor] = useState<string>('#93C572')
 
   const cardRefs = useRef<(HTMLDivElement | null)[]>([])
 
@@ -43,10 +45,16 @@ export function Experience() {
       const dy = (e.clientY - cy) / rect.height
       const len = Math.hypot(dx, dy) || 1
       const scale = Math.min(1, len) * PULL_STRENGTH
+      
+      if (skill !== hoveredSkill) {
+        const colors = ['#ff5c8a', '#93C572', '#38bdf8', '#a855f7', '#facc15']
+        setHoverColor(colors[Math.floor(Math.random() * colors.length)])
+      }
+      
       setHoveredSkill(skill)
       setPull({ x: (dx / len) * scale, y: (dy / len) * scale })
     },
-    []
+    [hoveredSkill]
   )
 
   const handleSkillMouseLeave = useCallback(() => {
@@ -60,10 +68,11 @@ export function Experience() {
     const x = rect.left + rect.width / 2
     const y = rect.top + rect.height / 2
     
-    const colors = ['#ff5c8a', '#93C572', '#38bdf8', '#a855f7', '#facc15']
-    const color = colors[Math.floor(Math.random() * colors.length)]
+    // Use the color already established by the hover
+    const color = hoverColor
     
     setPopPos({ x, y, color })
+    setClickColor(color)
     setClickedSkill(skill)
     // Clear pop position after a delay to allow re-triggering
     setTimeout(() => {
@@ -123,22 +132,26 @@ export function Experience() {
         <div className="skills-wrap">
           <h3 className="skills-title">Skills</h3>
           <ul className="skills-list">
-            {resume.skills.map((s) => (
-              <li
-                key={s}
-                className={`skills-item ${hoveredSkill === s ? 'skills-item-hovered' : ''} ${clickedSkill === s ? 'skill-ping' : ''}`}
-                style={
-                  hoveredSkill === s
-                    ? { transform: `translate(${pull.x}px, ${pull.y}px)` }
-                    : undefined
-                }
-                onMouseMove={handleSkillMouseMove(s)}
-                onMouseLeave={handleSkillMouseLeave}
-                onClick={handleSkillClick(s)}
-              >
-                {s}
-              </li>
-            ))}
+            {resume.skills.map((s) => {
+              const isHovered = hoveredSkill === s
+              const isClicked = clickedSkill === s
+              
+              return (
+                <li
+                  key={s}
+                  className={`skills-item ${isHovered ? 'skills-item-hovered' : ''} ${isClicked ? 'skill-clicked' : ''}`}
+                  style={{
+                    ...(isHovered ? { transform: `translate(${pull.x}px, ${pull.y}px)`, '--hover-color': hoverColor } as React.CSSProperties : {}),
+                    ...(isClicked ? { '--click-color': clickColor } as React.CSSProperties : {})
+                  } as React.CSSProperties}
+                  onMouseMove={handleSkillMouseMove(s)}
+                  onMouseLeave={handleSkillMouseLeave}
+                  onClick={handleSkillClick(s)}
+                >
+                  {s}
+                </li>
+              )
+            })}
           </ul>
         </div>
       </div>
