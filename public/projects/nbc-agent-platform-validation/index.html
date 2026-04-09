@@ -63,27 +63,27 @@
       <section class="cs-section">
         <h2>Situation &amp; context</h2>
         <p>
-          Agent frameworks, managed runtimes, and “bring your own stack” OSS options were all viable—but <strong>not interchangeable</strong> under our security, data, and operational constraints. Platform engineering, product, and architecture partners needed a single, repeatable way to compare candidates without every team running a one-off bake-off.
+          Agent frameworks, managed runtimes, and “bring your own stack” OSS options were all viable—but not interchangeable under our security, data, and operational constraints. Platform engineering, product, and architecture partners needed a single, repeatable way to compare candidates without every team running a one-off bake-off.
         </p>
         <p>
-          The audience split mattered: <strong>builders</strong> (SDKs, observability, long-running agents) versus <strong>citizen users</strong> (guided experiences, guardrails, support model). Any recommendation had to speak to both—plus a path to defend spend and roadmap to leadership.
+          The audience split mattered: builders (SDKs, observability, long-running agents) versus citizen users (guided experiences, guardrails, support model). Any recommendation had to speak to both—plus a path to defend spend and roadmap to leadership.
         </p>
       </section>
 
       <section class="cs-section">
         <h2>What we set out to do</h2>
         <p>
-          Agent frameworks and managed runtimes were moving faster than any single team could adopt blindly. I worked with engineering, product, and platform partners to <strong>validate competing agentic technologies</strong> against NBC News Group needs: security and compliance, observability, developer experience, memory and retrieval patterns, cost trajectory, and fit for <strong>technical users</strong> (building and operating agents) versus <strong>citizen users</strong> (consuming guided experiences with guardrails).
+          Agent frameworks and managed runtimes were moving faster than any single team could adopt blindly. I worked with engineering, product, and platform partners to validate competing agentic technologies against NBC News Group needs: security and compliance, observability, developer experience, memory and retrieval patterns, cost trajectory, and fit for technical users (building and operating agents) versus citizen users (consuming guided experiences with guardrails).
         </p>
         <p>
-          The goal was not a single “winner” in the abstract—it was a <strong>priority stack</strong> we could defend to leadership: what to invest in first, what to pilot on the side, and what to revisit when the market matured.
+          The goal was not a single “winner” in the abstract—it was a priority stack we could defend to leadership: what to invest in first, what to pilot on the side, and what to revisit when the market matured.
         </p>
       </section>
 
       <section class="cs-section">
         <h2>How we evaluated platforms</h2>
         <p>
-          We anchored discussions in an <strong>eight-dimension enterprise framework</strong>—covering product experience, AI capabilities, analytics, governance, infrastructure, security, and commercial terms—so we weren’t scoring vendors only on “model playground” features. The list below is the full lens; in working sessions we still had to make trade-offs explicit and measurable.
+          We anchored discussions in an eight-dimension enterprise framework—covering product experience, AI capabilities, analytics, governance, infrastructure, security, and commercial terms—so we weren’t scoring vendors only on “model playground” features. The list below is the full lens; in working sessions we still had to make trade-offs explicit and measurable.
         </p>
         <ol class="cs-dimension-list">
           <li>
@@ -121,7 +121,7 @@
         </ol>
         <h3 class="cs-subhead">Stack comparison lens</h3>
         <p>
-          For comparing managed stacks versus OSS paths, we <strong>distilled</strong> that framework into five scoring dimensions—enough to drive debate without a hundred-row spreadsheet:
+          For comparing managed stacks versus OSS paths, we distilled that framework into five scoring dimensions—enough to drive debate without a hundred-row spreadsheet:
         </p>
         <ul>
           <li><strong>Enterprise fit:</strong> IAM, encryption, audit trails, logging/monitoring, and operational maturity.</li>
@@ -135,7 +135,7 @@
       <section class="cs-section cs-section--viz" aria-labelledby="viz-heading">
         <h2 id="viz-heading">Comparison scorecard</h2>
         <p>
-          This is a <strong>synthetic decision view</strong>, not production telemetry. It encodes the <strong>stack comparison lens</strong> above (five dimensions); the fuller eight-dimension framework also informed UI, multimodal reach, analytics, governance depth, and commercial posture outside this chart.
+          This is a synthetic decision view, not production telemetry. It encodes the stack comparison lens above (five dimensions); the fuller eight-dimension framework also informed UI, multimodal reach, analytics, governance depth, and commercial posture outside this chart.
         </p>
         <div class="cs-stat-row" aria-label="Evaluation summary">
           <div class="cs-stat">
@@ -214,32 +214,88 @@
 
       <section class="cs-section">
         <h2>Platforms in scope</h2>
-        <div class="cs-platform-grid">
-          <article class="cs-platform">
-            <h3>AWS Bedrock AgentCore</h3>
-            <p>
-              Strong story for <strong>governed, low-ops agents inside AWS</strong>: enterprise integrations (e.g. IAM, CloudWatch, KMS), managed runtime for long-running agents, and Bedrock Knowledge Bases for retrieval. Best when we wanted opinionated security and observability with less bespoke infrastructure. Tradeoff: surface area still evolving in places; cost scales with heavy tool and model usage.
-            </p>
+        <p>
+          Prioritization mirrored how we presented to leadership: near-term enterprise paths (clouds, managed copilots, strategic model providers) versus agentic frameworks and adjacent tools we tracked but parked for a later cycle. The grid below follows that same split, including agentic technologies called out on our internal validation slide (LangChain, crewai) alongside enterprise search and dev-tools plays (Glean, DevRev).
+        </p>
+
+        <h3 class="cs-subhead">Priority platforms</h3>
+        <p class="cs-av-intro">Green = priority 1, orange = priority 2. “Builders” and “Citizens” map to technical vs newsroom-style users.</p>
+        <div class="cs-av-board" aria-label="Priority AI platforms">
+          <article class="cs-av-tile">
+            <span class="cs-av-badge cs-av-badge--p1">P1</span>
+            <img class="cs-av-logo" src="/projects/nbc-agent-platform-validation/logos/Amazon_Web_Services-Logo.wine.svg" alt="Amazon Web Services" width="120" height="36" loading="lazy" decoding="async" />
+            <h4 class="cs-av-name">AWS</h4>
+            <p class="cs-av-audience">Builders: yes · Citizens: no</p>
+            <p class="cs-av-note">Strategic News Group cloud provider; Bedrock / AgentCore and related services for governed agent runtimes.</p>
           </article>
-          <article class="cs-platform">
-            <h3>Google Vertex AI (Agent Engine + ADK)</h3>
-            <p>
-              Compelling for <strong>hybrid deployment and evaluation discipline</strong>: portable deployment options, monitoring and evaluation hooks, multi-agent orchestration via ADK, and standards such as A2A for agent-to-agent patterns. Strong compliance posture for teams already aligned with Google Cloud. Tradeoff: ecosystem depth can vary outside Google’s core stack.
-            </p>
+          <article class="cs-av-tile">
+            <span class="cs-av-badge cs-av-badge--p2">P2</span>
+            <img class="cs-av-logo" src="/projects/nbc-agent-platform-validation/logos/databricks.png" alt="Databricks" width="120" height="36" loading="lazy" decoding="async" />
+            <h4 class="cs-av-name">Databricks</h4>
+            <p class="cs-av-audience">Builders: yes · Citizens: no</p>
+            <p class="cs-av-note">Data + AI platform; promising but not yet mature enough for broad citizen rollout.</p>
           </article>
-          <article class="cs-platform">
-            <h3>LangChain / LangGraph</h3>
-            <p>
-              Maximum <strong>flexibility and control</strong>: open-source foundation, rich connectors, code-first workflows, and optional managed LangGraph hosting—ideal for bespoke or multi-cloud designs and for minimizing vendor lock-in. Tradeoff: more ownership of infrastructure, reliability, and security hardening on us.
-            </p>
+          <article class="cs-av-tile">
+            <span class="cs-av-badge cs-av-badge--p1">P1</span>
+            <img class="cs-av-logo" src="/projects/nbc-agent-platform-validation/logos/google-cloud.png" alt="Google Cloud" width="120" height="36" loading="lazy" decoding="async" />
+            <h4 class="cs-av-name">Google Cloud</h4>
+            <p class="cs-av-audience">Builders: yes · Citizens: partial</p>
+            <p class="cs-av-note">Strong managed and Vertex / agent patterns; citizen experience depended on product packaging and guardrails.</p>
+          </article>
+          <article class="cs-av-tile">
+            <span class="cs-av-badge cs-av-badge--p2">P2</span>
+            <img class="cs-av-logo" src="/projects/nbc-agent-platform-validation/logos/microsoft-copilot.png" alt="Microsoft Copilot" width="120" height="36" loading="lazy" decoding="async" />
+            <h4 class="cs-av-name">Microsoft Copilot</h4>
+            <p class="cs-av-audience">Builders: yes · Citizens: yes</p>
+            <p class="cs-av-note">Strategic enterprise copilot surface across M365; strong fit for mixed audiences.</p>
+          </article>
+          <article class="cs-av-tile">
+            <span class="cs-av-badge cs-av-badge--p1">P1</span>
+            <img class="cs-av-logo" src="/projects/nbc-agent-platform-validation/logos/openai.png" alt="OpenAI" width="120" height="36" loading="lazy" decoding="async" />
+            <h4 class="cs-av-name">OpenAI</h4>
+            <p class="cs-av-audience">Builders: yes · Citizens: yes</p>
+            <p class="cs-av-note">Strategic News Group provider for ChatGPT and API-style agent patterns where policy allowed.</p>
           </article>
         </div>
+
+        <h3 class="cs-subhead">Revisit later · agentic &amp; adjacent</h3>
+        <p class="cs-av-intro">Lower priority for standardization in this cycle; still tracked for experiments, partnerships, and differentiation.</p>
+        <div class="cs-av-board cs-av-board--revisit" aria-label="Platforms to revisit including agentic frameworks">
+          <article class="cs-av-tile cs-av-tile--revisit">
+            <img class="cs-av-logo" src="/projects/nbc-agent-platform-validation/logos/glean.png" alt="Glean" width="120" height="36" loading="lazy" decoding="async" />
+            <h4 class="cs-av-name">Glean</h4>
+            <p class="cs-av-audience">Builders: no · Citizens: yes</p>
+            <p class="cs-av-note">Enterprise search; limited differentiation vs Microsoft Copilot for our stack.</p>
+          </article>
+          <article class="cs-av-tile cs-av-tile--revisit">
+            <img class="cs-av-logo" src="/projects/nbc-agent-platform-validation/logos/langchain.svg" alt="LangChain" width="120" height="36" loading="lazy" decoding="async" />
+            <h4 class="cs-av-name">LangChain</h4>
+            <p class="cs-av-audience">Builders: yes · Citizens: no</p>
+            <p class="cs-av-note">Lift Labs accelerator and engineering spikes; OSS flexibility with ops overhead.</p>
+          </article>
+          <article class="cs-av-tile cs-av-tile--revisit">
+            <img class="cs-av-logo" src="/projects/nbc-agent-platform-validation/logos/crewai.png" alt="crewai" width="120" height="36" loading="lazy" decoding="async" />
+            <h4 class="cs-av-name">crewai</h4>
+            <p class="cs-av-audience">Builders: yes · Citizens: no</p>
+            <p class="cs-av-note">Multi-agent orchestration; interesting but not yet mature for enterprise-wide rollout.</p>
+          </article>
+          <article class="cs-av-tile cs-av-tile--revisit">
+            <img class="cs-av-logo" src="/projects/nbc-agent-platform-validation/logos/devrev.png" alt="DevRev" width="120" height="36" loading="lazy" decoding="async" />
+            <h4 class="cs-av-name">DevRev</h4>
+            <p class="cs-av-audience">Builders: yes · Citizens: yes</p>
+            <p class="cs-av-note">Dev-centric workflows; lacked clear differentiation for our priorities vs incumbents.</p>
+          </article>
+        </div>
+
+        <p class="cs-av-deepdive">
+          Deep dives in workshops still used <strong>AWS Bedrock / AgentCore</strong>, <strong>Google Vertex (Agent Engine + ADK)</strong>, and <strong>LangChain / LangGraph</strong> as reference stacks for comparing managed runtimes vs OSS agent graphs—aligned with the priority row above, with LangGraph-style patterns feeding the “revisit later” agentic track.
+        </p>
       </section>
 
       <section class="cs-section">
         <h2>Validation lifecycle</h2>
         <p>
-          Platform selection was one thread; <strong>agentic systems</strong> also need proof under realistic load, human oversight, and guardrails. The phases below mirror how we structured validation beyond vendor demos—blending ML-style metrics, system stress tests, safety checks, and continuous oversight.
+          Platform selection was one thread; agentic systems also need proof under realistic load, human oversight, and guardrails. The phases below mirror how we structured validation beyond vendor demos, blending ML-style metrics, system stress tests, safety checks, and continuous oversight.
         </p>
         <ol class="cs-phase-list">
           <li>
@@ -300,15 +356,15 @@
       <section class="cs-section">
         <h2>Outcome</h2>
         <p class="cs-callout">
-          The work produced a shared vocabulary and a <strong>clearer prioritization</strong> for NBC News Group: which platforms matched our enterprise bar first, which served as strategic complements, and which were better parked for a later revisit—so engineering could move from debate to <strong>repeatable delivery</strong> on agents without betting the org on hype.
+          The work produced a shared vocabulary and a clearer prioritization for NBC News Group: which platforms matched our enterprise bar first, which served as strategic complements, and which were better parked for a later revisit—so engineering could move from debate to repeatable delivery on agents without betting the org on hype.
         </p>
         <p>
-          Practically, teams could point to <strong>named criteria</strong> when pushing back on a vendor or green-lighting a pilot—reducing “favorite framework” debates and making spend and risk legible to people who would never read a SDK diff.
+          Practically, teams could point to named criteria when pushing back on a vendor or green-lighting a pilot—reducing “favorite framework” debates and making spend and risk legible to people who would never read a SDK diff.
         </p>
       </section>
 
       <p class="cs-note">
-        This page summarizes the type of platform validation and criteria used internally; it is not an official NBCUniversal communication. Vendor and product names are used descriptively for identification.
+        This page summarizes the type of platform validation and criteria used internally; it is not an official NBCUniversal communication. Vendor and product names and logos are trademarks of their respective owners and are used descriptively for identification.
       </p>
     </div>
   </main>
