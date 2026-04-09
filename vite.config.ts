@@ -38,6 +38,12 @@ function serveProjectsPlugin() {
       }
 
       function resolveProjectFile(slug: string, rest: string): string | null {
+        // Shared files under public/projects/ named like `foo.css` (slug `foo.css`) — not a project folder
+        const directUnderProjects = path.join(cwd, 'public', 'projects', slug)
+        if (fs.existsSync(directUnderProjects) && fs.statSync(directUnderProjects).isFile()) {
+          return directUnderProjects
+        }
+
         const requestFile = rest || 'index.html'
         const publicProjectRoot = path.join(cwd, 'public', 'projects', slug)
         const publicFile = path.join(publicProjectRoot, requestFile)
@@ -85,11 +91,22 @@ function serveProjectsPlugin() {
         return null
       }
 
+      /** True when `rest` is a client-side route (e.g. executive) not a static asset path */
+      function restLooksLikeSpaRoute(rest: string): boolean {
+        if (!rest) return false
+        const last = rest.split('/').filter(Boolean).pop() || ''
+        return path.extname(last) === ''
+      }
+
       server.middlewares.use((req, res, next) => {
         const m = req.url?.split('?')[0]?.match(/^\/projects\/([^/]+)\/?(.*)$/)
         if (!m) return next()
         const [, slug, rest = ''] = m
-        const toServe = resolveProjectFile(slug, rest)
+        let toServe = resolveProjectFile(slug, rest)
+        // SPA fallback: /projects/foo/executive has no physical file; serve project's index.html (matches Netlify redirects)
+        if (!toServe && restLooksLikeSpaRoute(rest)) {
+          toServe = resolveProjectFile(slug, '')
+        }
         if (!toServe) return next()
         const ext = path.extname(toServe)
         res.setHeader('Content-Type', types[ext] || 'application/octet-stream')
