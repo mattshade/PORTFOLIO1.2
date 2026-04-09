@@ -96,8 +96,8 @@ function ProjectDetail({ p, onClose }: { p: Project; onClose: () => void }) {
               <div className="detail-sidebar-actions">
                 <a 
                   href={p.href} 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
+                  target={p.external ? "_blank" : undefined}
+                  rel={p.external ? "noopener noreferrer" : undefined}
                   className="detail-link-btn"
                 >
                   View Live Site {p.external && '↗'}
