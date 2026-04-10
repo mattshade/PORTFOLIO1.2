@@ -142,7 +142,7 @@ export function Projects() {
   return (
     <section id="projects" className="section projects">
       <div className="section-inner" style={{ position: 'relative' }}>
-        <h2 className="section-title">Work</h2>
+        <h2 className="section-title">Case Studies and Projects</h2>
         <div className="projects-grid">
           {projects.map((p, i) => (
             <ProjectCard 

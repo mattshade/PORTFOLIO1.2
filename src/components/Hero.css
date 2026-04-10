@@ -190,6 +190,10 @@
   flex-shrink: 0;
 }
 
+.hero-ctas .hero-cta-primary {
+  flex-shrink: 1;
+}
+
 .hero-cta {
   display: inline-flex;
   align-items: center;
@@ -208,6 +212,9 @@
   color: #ffffff;
   border: none;
   box-shadow: var(--shadow-sm);
+  white-space: normal;
+  text-align: center;
+  max-width: min(100%, 26rem);
 }
 
 .hero-cta-primary:hover {

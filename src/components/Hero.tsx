@@ -29,14 +29,14 @@ export function Hero() {
         </p>
         <div className="hero-ctas" style={{ animationDelay: '240ms' }}>
           <a href="#projects" className="hero-cta hero-cta-primary">
-            Work
+            Case Studies and Projects
           </a>
           <a href="#experience" className="hero-cta hero-cta-secondary">
             Experience
           </a>
           {resume.email && <SayHiBubble />}
         </div>
-        <a href="#projects" className="hero-scroll" aria-label="Scroll to projects">
+        <a href="#projects" className="hero-scroll" aria-label="Scroll to case studies and projects">
           <span className="hero-scroll-line" />
           <span className="hero-scroll-dot" />
         </a>

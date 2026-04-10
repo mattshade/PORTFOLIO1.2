@@ -30,11 +30,11 @@ export function Nav() {
         <div className="nav-links">
           {isHome ? (
             <>
-              <a href="#projects" className="nav-link bird-perch">Work</a>
+              <a href="#projects" className="nav-link bird-perch">Case Studies and Projects</a>
             </>
           ) : (
             <>
-              <Link to="/#projects" className="nav-link bird-perch">Work</Link>
+              <Link to="/#projects" className="nav-link bird-perch">Case Studies and Projects</Link>
             </>
           )}
           <a

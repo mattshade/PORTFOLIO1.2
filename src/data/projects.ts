@@ -73,6 +73,22 @@ export const projects: Project[] = [
     accent: '#00629b',
   },
   {
+    id: 'mongodb-dx-copilot',
+    title: 'MongoDB DX Copilot',
+    subtitle: 'Design review for MongoDB',
+    role: 'Creator',
+    contribution:
+      'I designed and built this app so teams can stress-test a MongoDB data model before they commit serious engineering time. You paste representative sample documents and describe how the product reads and writes the data in plain language—the tool returns a structured report: what to watch, which indexes line up with those patterns, and how risky a migration or schema change might be. The review runs from samples alone; no production cluster connection is required to generate the checklist.',
+    outcome:
+      'Turns fuzzy “is this shape right?” conversations into a repeatable design review—warnings, index ideas, and rollout notes teams can act on before they lock in code and data paths.',
+    description:
+      'Paste sample documents and query patterns; get warnings, index ideas, and migration notes for your MongoDB model.',
+    tech: ['Next.js', 'TypeScript', 'Tailwind', 'MongoDB'],
+    href: 'https://mongodbcopilot.netlify.app/',
+    external: true,
+    accent: '#00ed64',
+  },
+  {
     id: 'nbc-news-homepage',
     title: 'NBC News Homepage',
     subtitle: 'Scale Media Platform',

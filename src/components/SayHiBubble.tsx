@@ -80,7 +80,7 @@ export function SayHiBubble() {
   if (!resume.email) return null
 
   // Expandable bubble with form (works with Formspree or mailto fallback)
-  // Form uses fixed positioning so it never shifts View projects / Experience
+  // Form uses fixed positioning so it never shifts Case Studies and Projects / Experience
   return (
     <>
       <div className="sayhi-bubble">
