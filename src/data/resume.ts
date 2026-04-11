@@ -30,7 +30,7 @@ export const resume = {
   portfolioUrl: 'https://www.mattshade.com/',
   github: '',
   /** Download link — served from `public/Matt_Shade.pdf`. Bump `v=` when you replace the file so prod CDNs/browsers fetch the new PDF. */
-  resumePdf: '/Matt_Shade.pdf?v=3',
+  resumePdf: '/Matt_Shade.pdf?v=4',
 
   selectedImpact: [
     'Scaled high-performance engineering teams, hiring the managers and engineers needed to drive subscription growth and platform delivery.',
