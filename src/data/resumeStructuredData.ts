@@ -15,7 +15,7 @@ const MONTHS: Record<string, string> = {
   Dec: '12',
 }
 
-/** Parse "Jul 2025 - Present" / "Oct 2021 - Jul 2025" into ISO month strings */
+/** Parse "Jul 2025 - Apr 2026" / "Oct 2021 - Jul 2025" into ISO month strings */
 function parseExperiencePeriod(period: string): { startDate?: string; endDate?: string } {
   const dash = /\s+-\s+/
   const parts = period.split(dash)

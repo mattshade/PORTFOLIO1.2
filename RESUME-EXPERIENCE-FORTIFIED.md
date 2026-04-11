@@ -7,7 +7,7 @@ Copy this into your resume to replace the current Experience section. Designed t
 ## Experience
 
 **NBCUniversal — Director of AI Engineering**  
-*Jul 2025 to Present | New York NY*
+*Jul 2025 to Apr 2026 | New York NY*
 
 - **Ship real tools that executives use.** Lead teams building AI-powered discovery, personalization, and internal dashboards that turn data into decisions—from the ChatGPT Enablement Dashboard (adoption, feature depth, Office Hours intelligence) to the Executive AI Usage Dashboard (licensing, utilization, multi-tool analytics).
 - **Turn data catalogs into strategy.** Designed and shipped the **AI Data Hub**—an interactive data catalog showcasing 8 AI/analytics datasets (audience, commerce, content performance, editorial, social, streaming, podcast, ad performance) with search, filters, Chart.js visualizations, and SharePoint-deployable architecture. Built to help product and editorial teams discover what data exists and how to use it.

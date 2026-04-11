@@ -30,7 +30,7 @@ export const resume = {
   portfolioUrl: 'https://www.mattshade.com/',
   github: '',
   /** Download link — served from `public/Matt_Shade.pdf`. Bump `v=` when you replace the file so prod CDNs/browsers fetch the new PDF. */
-  resumePdf: '/Matt_Shade.pdf?v=2',
+  resumePdf: '/Matt_Shade.pdf?v=3',
 
   selectedImpact: [
     'Scaled high-performance engineering teams, hiring the managers and engineers needed to drive subscription growth and platform delivery.',
@@ -49,7 +49,7 @@ export const resume = {
     {
       role: 'Director of AI Engineering',
       company: 'NBCUniversal',
-      period: 'Jul 2025 - Present',
+      period: 'Jul 2025 - Apr 2026',
       location: 'New York, NY',
       highlights: [
         'Lead AI and agentic workflow strategies across the NBC News Group, building a unified approach for intelligent automation.',
