@@ -13,9 +13,9 @@
   position: fixed;
   inset: 0;
   z-index: 90;
-  background: rgba(0, 0, 0, 0.35);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   animation: sayhiBackdropIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
@@ -27,16 +27,16 @@
   z-index: 100;
   background: var(--bg-glass);
   border: 1px solid var(--border-strong);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-radius: 16px;
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-radius: 12px;
   padding: 1.5rem 1.5rem 1.75rem;
   min-width: 300px;
-  max-width: 360px;
+  max-width: 380px;
   box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.03),
-    0 24px 48px -12px rgba(0, 0, 0, 0.5),
-    0 0 80px -20px rgba(34, 211, 238, 0.15);
+    0 0 0 1px rgba(255, 255, 255, 0.05),
+    0 24px 60px -12px rgba(0, 0, 0, 0.8),
+    0 0 80px -20px color-mix(in srgb, var(--accent) 25%, transparent);
   animation: sayhiFormIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
@@ -60,18 +60,14 @@
   }
   to {
     opacity: 1;
-    backdrop-filter: blur(4px);
+    backdrop-filter: blur(8px);
   }
 }
 
 @keyframes sayhiFormIn {
   0% {
     opacity: 0;
-    transform: translate(-50%, -45%) scale(0.9);
-  }
-  70% {
-    opacity: 1;
-    transform: translate(-50%, -51%) scale(1.02);
+    transform: translate(-50%, -45%) scale(0.95);
   }
   100% {
     opacity: 1;
@@ -88,25 +84,17 @@
 }
 
 .sayhi-form .sayhi-label:nth-of-type(1),
-.sayhi-form .sayhi-input:nth-of-type(1) { animation-delay: 0.08s; }
+.sayhi-form .sayhi-input:nth-of-type(1) { animation-delay: 0.1s; }
 .sayhi-form .sayhi-label:nth-of-type(2),
-.sayhi-form .sayhi-input:nth-of-type(2) { animation-delay: 0.14s; }
+.sayhi-form .sayhi-input:nth-of-type(2) { animation-delay: 0.18s; }
 .sayhi-form .sayhi-label:nth-of-type(3),
-.sayhi-form .sayhi-textarea { animation-delay: 0.2s; }
-.sayhi-form .sayhi-actions { animation-delay: 0.28s; }
-
-.sayhi-form .sayhi-success,
-.sayhi-form .sayhi-success .sayhi-cta {
-  animation: sayhiFieldIn 0.35s cubic-bezier(0.22, 1, 0.36, 1) backwards;
-}
-
-.sayhi-form .sayhi-success p { animation-delay: 0.06s; }
-.sayhi-form .sayhi-success .sayhi-cta { animation-delay: 0.12s; }
+.sayhi-form .sayhi-textarea { animation-delay: 0.26s; }
+.sayhi-form .sayhi-actions { animation-delay: 0.34s; }
 
 @keyframes sayhiFieldIn {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(10px);
   }
   to {
     opacity: 1;
@@ -117,37 +105,39 @@
 .sayhi-form {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 1rem;
 }
 
 .sayhi-close {
   position: absolute;
-  top: 0.75rem;
-  right: 0.75rem;
+  top: 1rem;
+  right: 1rem;
   width: 28px;
   height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.25rem;
+  font-size: 1.5rem;
   font-weight: 300;
-  line-height: 1;
   color: var(--text-muted);
   background: none;
   border: none;
   cursor: pointer;
-  border-radius: 6px;
-  transition: color 0.2s ease, background 0.2s ease;
+  border-radius: 50%;
+  transition: all 0.2s ease;
 }
 
 .sayhi-close:hover {
-  color: var(--hover);
-  background: rgba(255, 255, 255, 0.06);
+  color: var(--accent);
+  background: var(--accent-dim);
+  transform: rotate(90deg);
 }
 
 .sayhi-label {
-  font-size: 0.8125rem;
-  font-weight: 500;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
   color: var(--text-muted);
 }
 
@@ -156,73 +146,74 @@
   font-family: var(--font-sans);
   font-size: 0.9375rem;
   color: var(--text);
-  background: var(--bg-elevated);
+  background: rgba(255, 255, 255, 0.03);
   border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 0.5rem 0.75rem;
-  transition: border-color 0.2s ease;
+  border-radius: 6px;
+  padding: 0.75rem 1rem;
+  transition: all 0.2s ease;
 }
 
 .sayhi-input:focus,
 .sayhi-textarea:focus {
   outline: none;
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.15);
+  background: rgba(190, 242, 100, 0.05);
+  box-shadow: 0 0 15px var(--accent-dim);
 }
 
 .sayhi-input::placeholder,
 .sayhi-textarea::placeholder {
   color: var(--text-muted);
-  opacity: 0.7;
+  opacity: 0.4;
 }
 
 .sayhi-textarea {
   resize: vertical;
-  min-height: 80px;
+  min-height: 100px;
 }
 
 .sayhi-error {
   margin: 0;
-  font-size: 0.875rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
   color: #f87171;
 }
 
 .sayhi-actions {
   display: flex;
-  gap: 0.75rem;
+  gap: 1rem;
   justify-content: flex-end;
-  margin-top: 0.25rem;
+  margin-top: 0.5rem;
 }
 
 .sayhi-cta {
-  font-family: var(--font-sans);
-  font-size: 0.8125rem;
-  font-weight: 700;
-  padding: 0.65rem 1.25rem;
-  border-radius: 10px;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
   cursor: pointer;
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.1em;
 }
 
 .sayhi-cta:disabled {
-  opacity: 0.6;
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
 .sayhi-cta-primary {
-  background: var(--text);
-  color: #fff;
-  border: 1px solid var(--text);
+  background: var(--accent);
+  color: #0c0d0e;
+  border: 1px solid var(--accent);
 }
 
 .sayhi-cta-primary:hover:not(:disabled) {
-  background: var(--accent);
-  color: #0c0d0e;
-  border-color: var(--accent);
-  transform: translateY(-3px) scale(1.05);
-  box-shadow: 0 8px 20px -5px rgba(173, 235, 179, 0.4);
+  background: transparent;
+  color: var(--accent);
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 10px 25px -10px var(--accent-dim);
 }
 
 .sayhi-cta-ghost {
@@ -233,7 +224,8 @@
 
 .sayhi-cta-ghost:hover:not(:disabled) {
   color: var(--text);
-  border-color: var(--text);
+  border-color: var(--border-strong);
+  background: rgba(255, 255, 255, 0.05);
   transform: translateY(-2px);
 }
 

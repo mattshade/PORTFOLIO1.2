@@ -10,6 +10,7 @@ class Boid {
   index: number
   drawSeed: number
   color: string
+  accentColor: string
   isLanded: boolean
   isLandedOnNav: boolean
   landedElement: Element | null
@@ -17,9 +18,7 @@ class Boid {
   landX: number
   landY: number
   hopTimer: number
-  /** Which wire (0..1 maps to wire index) — rerolled when taking off */
   wirePreference: number
-  /** Horizontal slot along the wire (0..1 within padded span) — rerolled when taking off */
   landTargetT: number
   landPadL: number
   landPadR: number
@@ -28,18 +27,11 @@ class Boid {
     this.x = x
     this.y = y
     this.drawSeed = Math.random()
-    const boidPalette = [
-      '#ff5c8a', // pink
-      '#ef4444', // red
-      '#f97316', // orange
-      '#facc15', // yellow
-      '#93C572', // green (site accent)
-      '#22c55e', // vivid green
-      '#38bdf8', // blue
-      '#6366f1', // indigo
-      '#a855f7', // purple
-    ]
-    this.color = boidPalette[Math.floor(Math.random() * boidPalette.length)]
+    // Technical palette: Yellow Green (Lime) and Amber accents
+    const isAmber = Math.random() > 0.85
+    this.color = isAmber ? 'rgba(226, 179, 90, 0.4)' : 'rgba(190, 242, 100, 0.4)'
+    this.accentColor = isAmber ? '#e2b35a' : '#bef264'
+    
     this.isLanded = false
     this.isLandedOnNav = false
     this.landedElement = null
@@ -53,20 +45,20 @@ class Boid {
     this.landPadR = 0.04 + Math.random() * 0.07
     this.vx = (Math.random() * 2 - 1) * 3
     this.vy = (Math.random() * 2 - 1) * 3
-    this.maxSpeed = 3.5
-    this.maxForce = 0.12
+    this.maxSpeed = 3.2
+    this.maxForce = 0.1
     this.index = index
   }
 
   edges(width: number, height: number) {
-    if (this.x > width + 20) this.x = -20
-    if (this.x < -20) this.x = width + 20
-    if (this.y > height + 20) this.y = -20
-    if (this.y < -20) this.y = height + 20
+    if (this.x > width + 40) this.x = -40
+    if (this.x < -40) this.x = width + 40
+    if (this.y > height + 40) this.y = -40
+    if (this.y < -40) this.y = height + 40
   }
 
   align(boids: Boid[]) {
-    let perceptionRadius = 28
+    let perceptionRadius = 35
     let steeringX = 0
     let steeringY = 0
     let total = 0
@@ -100,7 +92,7 @@ class Boid {
   }
 
   cohesion(boids: Boid[]) {
-    let perceptionRadius = 28
+    let perceptionRadius = 35
     let steeringX = 0
     let steeringY = 0
     let total = 0
@@ -132,12 +124,11 @@ class Boid {
         steeringY = (steeringY / steerMag) * this.maxForce
       }
     }
-    // Weaker cohesion (0.6) — prevents tight clustering; birds spread out more
-    return { x: steeringX * 0.6, y: steeringY * 0.6 }
+    return { x: steeringX * 0.5, y: steeringY * 0.5 }
   }
 
   separation(boids: Boid[]) {
-    let perceptionRadius = 18
+    let perceptionRadius = 24
     let steeringX = 0
     let steeringY = 0
     let total = 0
@@ -171,43 +162,36 @@ class Boid {
         steeringY = (steeringY / steerMag) * this.maxForce
       }
     }
-    return { x: steeringX * 1.5, y: steeringY * 1.5 } // stronger separation
+    return { x: steeringX * 1.8, y: steeringY * 1.8 }
   }
 
   flock(boids: Boid[]) {
     let alignment = this.align(boids)
     let cohesion = this.cohesion(boids)
     let separation = this.separation(boids)
-    const flockWeight = 0.15
+    const flockWeight = 0.2
     this.vx += (alignment.x + cohesion.x + separation.x) * flockWeight
     this.vy += (alignment.y + cohesion.y + separation.y) * flockWeight
   }
 
-  /**
-   * When many birds are close together, gently nudge toward a loose V.
-   * Kept weak and spread out so birds don't get stuck — they can easily break free.
-   */
   formationSteer(boids: Boid[]): { x: number; y: number } | null {
-    if (boids.length < 20) return null
-
+    if (boids.length < 15) return null
     const cx = boids.reduce((s, b) => s + b.x, 0) / boids.length
     const cy = boids.reduce((s, b) => s + b.y, 0) / boids.length
     const avgVx = boids.reduce((s, b) => s + b.vx, 0) / boids.length
     const avgVy = boids.reduce((s, b) => s + b.vy, 0) / boids.length
     const angle = Math.atan2(avgVy, avgVx)
 
-    // Stricter threshold — only form when flock is naturally very dense
-    const densityRadius = 70
+    const densityRadius = 80
     const nearCount = boids.filter((b) => Math.hypot(b.x - cx, b.y - cy) < densityRadius).length
-    if (nearCount < 25) return null
+    if (nearCount < 20) return null
 
-    // Wider spacing so birds don't cluster — spread the V out
-    const scale = 22
+    const scale = 25
     const formationSlots: { x: number; y: number }[] = []
     formationSlots.push({ x: 0, y: 0 })
-    for (let i = 1; i <= 8; i++) {
-      formationSlots.push({ x: -i * scale * 0.6, y: -i * scale * 0.45 })
-      formationSlots.push({ x: i * scale * 0.6, y: -i * scale * 0.45 })
+    for (let i = 1; i <= 6; i++) {
+        formationSlots.push({ x: -i * scale * 0.7, y: -i * scale * 0.5 })
+        formationSlots.push({ x: -i * scale * 0.7, y: i * scale * 0.5 })
     }
 
     const slotIdx = this.index % formationSlots.length
@@ -220,32 +204,25 @@ class Boid {
     const dx = targetX - this.x
     const dy = targetY - this.y
     const dist = Math.hypot(dx, dy)
-    if (dist < 8) return null
+    if (dist < 10) return null
 
-    // Much weaker force — gentle nudge, not a lock (maxForce * 0.8)
-    const desiredSpeed = Math.min(dist * 0.03, this.maxSpeed * 0.5)
+    const desiredSpeed = Math.min(dist * 0.04, this.maxSpeed * 0.6)
     const steerX = (dx / dist) * desiredSpeed - this.vx
     const steerY = (dy / dist) * desiredSpeed - this.vy
     const steerMag = Math.hypot(steerX, steerY)
-    const capped = Math.min(steerMag, this.maxForce * 0.8)
+    const capped = Math.min(steerMag, this.maxForce * 0.5)
     if (steerMag === 0) return null
     return { x: (steerX / steerMag) * capped, y: (steerY / steerMag) * capped }
   }
 
 
   update() {
-    // Tiny random jitter to break circular vortex patterns
-    this.vx += (Math.random() - 0.5) * 0.04
-    this.vy += (Math.random() - 0.5) * 0.04
-    
-    // Apply velocity to position
+    this.vx += (Math.random() - 0.5) * 0.05
+    this.vy += (Math.random() - 0.5) * 0.05
     this.x += this.vx
     this.y += this.vy
-
-    // Dampen velocity slightly (friction) for smoother feel
-    // Using 0.993 for snappier open flight
-    this.vx *= 0.993
-    this.vy *= 0.993
+    this.vx *= 0.99
+    this.vy *= 0.99
     
     let speed = Math.hypot(this.vx, this.vy)
     if (speed > this.maxSpeed) {
@@ -254,23 +231,18 @@ class Boid {
     }
   }
 
-  /** Random impulse to break up clusters — called periodically */
   scatter() {
     const angle = Math.random() * Math.PI * 2
-    const mag = 0.8 + Math.random() * 1.2
+    const mag = 1.2 + Math.random() * 1.5
     this.vx += Math.cos(angle) * mag
     this.vy += Math.sin(angle) * mag
     this.wirePreference = Math.random()
     this.landTargetT = Math.random()
-    this.landPadL = 0.04 + Math.random() * 0.07
-    this.landPadR = 0.04 + Math.random() * 0.07
   }
 
   rerollLandingTargets() {
     this.wirePreference = Math.random()
     this.landTargetT = Math.random()
-    this.landPadL = 0.04 + Math.random() * 0.07
-    this.landPadR = 0.04 + Math.random() * 0.07
   }
 
   draw(ctx: CanvasRenderingContext2D) {
@@ -278,7 +250,7 @@ class Boid {
     let jumpOffset = 0
     if (this.hopTimer > 0) {
       const p = 1 - (this.hopTimer / 30)
-      jumpOffset = -Math.sin(p * Math.PI) * 12
+      jumpOffset = -Math.sin(p * Math.PI) * 10
       this.hopTimer--
     }
 
@@ -288,38 +260,59 @@ class Boid {
     ctx.translate(drawX, drawY)
     ctx.rotate(angle)
 
-    // Boid: logo shape rotated so apex points in flight direction (right = +X)
+    // Architectural Low-Poly Bird
+    const scale = 3.5
+    const points = [
+      { x: scale * 1.2, y: 0 },         // 0: Apex (Front)
+      { x: -scale * 0.6, y: -scale * 0.8 }, // 1: Upper Wing Tip
+      { x: -scale * 0.3, y: -scale * 0.3 }, // 2: Upper Notch
+      { x: -scale * 1, y: 0 },         // 3: Tail
+      { x: -scale * 0.3, y: scale * 0.3 },  // 4: Lower Notch
+      { x: -scale * 0.6, y: scale * 0.8 }  // 5: Lower Wing Tip
+    ]
+
+    // Draw Wireframe Lines
     ctx.beginPath()
-    ctx.moveTo(2.5, 0)         // Apex (front, direction of travel)
-    ctx.lineTo(-0.8, -1.5)     // Upper shoulder
-    ctx.lineTo(-2, -2.3)       // Upper outer spike
-    ctx.lineTo(-0.6, -0.8)     // Upper V-notch
-    ctx.lineTo(-2.5, 0)        // Center spike (back)
-    ctx.lineTo(-0.6, 0.8)      // Lower V-notch
-    ctx.lineTo(-2, 2.3)        // Lower outer spike
-    ctx.lineTo(-0.8, 1.5)      // Lower shoulder
+    ctx.moveTo(points[0].x, points[0].y)
+    ctx.lineTo(points[1].x, points[1].y)
+    ctx.lineTo(points[2].x, points[2].y)
+    ctx.lineTo(points[3].x, points[3].y)
+    ctx.lineTo(points[4].x, points[4].y)
+    ctx.lineTo(points[5].x, points[5].y)
     ctx.closePath()
 
+    // Internal blueprint lines
+    ctx.moveTo(points[0].x, points[0].y)
+    ctx.lineTo(points[2].x, points[2].y)
+    ctx.moveTo(points[0].x, points[0].y)
+    ctx.lineTo(points[4].x, points[4].y)
+    ctx.moveTo(points[2].x, points[2].y)
+    ctx.lineTo(points[4].x, points[4].y)
+
+    ctx.strokeStyle = this.accentColor
+    ctx.lineWidth = 0.65
+    ctx.lineJoin = 'round'
+    ctx.stroke()
+
+    // Shaded facets (subtle)
     ctx.fillStyle = this.color
-    ctx.shadowBlur = 2
-    ctx.shadowColor = 'rgba(0, 0, 0, 0.1)'
     ctx.fill()
 
-    // Bullseye eye: white ring + black pupil
-    ctx.beginPath()
-    ctx.arc(0.4, 0, 0.85, 0, Math.PI * 2)
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.95)'
-    ctx.fill()
-    ctx.beginPath()
-    ctx.arc(0.4, 0, 0.35, 0, Math.PI * 2)
-    ctx.fillStyle = 'rgba(10, 10, 11, 0.95)'
-    ctx.fill()
+    // Glowing Nodes at Vertices
+    points.forEach((p) => {
+      ctx.beginPath()
+      ctx.arc(p.x, p.y, 0.85, 0, Math.PI * 2)
+      ctx.fillStyle = this.accentColor
+      ctx.shadowBlur = 4
+      ctx.shadowColor = this.accentColor
+      ctx.fill()
+    })
 
     ctx.restore()
   }
 }
 
-export function BirdsFly({
+export function SystemBoids({
   scrollY = 0,
 }: {
   scrollY?: number

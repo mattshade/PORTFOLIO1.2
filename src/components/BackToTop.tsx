@@ -52,31 +52,36 @@ export function BackToTop() {
       <div className="boid-container">
         <svg 
           className="boid-flyer" 
-          viewBox="0 0 24 23" 
+          viewBox="0 0 24 24" 
           xmlns="http://www.w3.org/2000/svg"
         >
-          {/* Main Body */}
+          {/* Architectural wireframe boid */}
           <path 
-            className="boid-body"
-            fill="hsl(var(--logo-hue, 142), 45%, 60%)" 
-            d="M 12 1 L 20 14 L 23 21 L 16 16 L 12 23 L 8 16 L 1 21 L 4 14 Z"
+            className="boid-wire"
+            d="M 12 2 L 20 18 L 12 14 L 4 18 Z"
+            fill="var(--accent-dim)"
+            stroke="var(--accent)"
+            strokeWidth="1.2"
+            strokeLinejoin="round"
           />
-          
-          {/* Eye Group */}
-          <g className="boid-eye">
-            <circle className="eye-white" cx="12" cy="10.5" r="3.2" fill="#ffffff"/>
-            <circle className="eye-pupil" cx="12" cy="10.5" r="1.3" fill="#0a0a0b"/>
-          </g>
+          <path 
+            d="M 12 2 L 12 14"
+            stroke="var(--accent)"
+            strokeWidth="0.8"
+            opacity="0.6"
+          />
+          <circle cx="12" cy="2" r="1" fill="var(--accent)" />
+          <circle cx="20" cy="18" r="0.8" fill="var(--accent)" />
+          <circle cx="4" cy="18" r="0.8" fill="var(--accent)" />
+          <circle cx="12" cy="14" r="0.8" fill="var(--accent)" />
         </svg>
         
-        {/* Subtle trail effects for flight */}
-        {isAnimating && (
-          <div className="boid-trails">
-            <div className="trail-line" />
-            <div className="trail-line" />
-            <div className="trail-line" />
-          </div>
-        )}
+        {/* Trail effects for flight */}
+        <div className="boid-trails">
+          <div className="trail-line" />
+          <div className="trail-line" />
+          <div className="trail-line" />
+        </div>
       </div>
     </button>
   )

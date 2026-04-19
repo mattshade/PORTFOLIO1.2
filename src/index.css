@@ -1,33 +1,24 @@
 :root {
-  --bg: #FFFFFF;
-  --bg-elevated: #FFFFFF;
-  --bg-glass: #FFFFFF;
-  --border: #EBEBEB;
-  --border-strong: #DDDDDD;
-  --text: #171717;
-  --text-muted: #6b7280;
-  --brand: #93C572;
-  --accent: #93C572;
-  /* Interactive hover — links, borders, and hover text */
-  --hover: #adebb3;
-  --accent-hover: #adebb3;
-  --hover-pink-1: #adebb3;
-  --hover-pink-2: #adebb3;
-  --hover-pink-3: #adebb3;
-  --hover-pink-4: #adebb3;
-  --hover-pink-5: #adebb3;
-  --hover-pink-6: #adebb3;
-  --hover-pink-7: #adebb3;
-  --hover-pink-8: #adebb3;
-  --accent-dim: rgba(147, 197, 114, 0.18);
-  --shadow-sm: 0 6px 16px rgba(0, 0, 0, 0.12);
-  --shadow-md: 0 10px 24px rgba(0, 0, 0, 0.15);
-  --shadow-glass: 0 6px 16px rgba(0, 0, 0, 0.12);
-  /* Geist* loaded in index.html — matches intended marketing / UI face */
-  --font-sans: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif,
-    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-  --font-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New",
-    monospace;
+  --bg: #0a0a0b;
+  --bg-elevated: #111113;
+  --bg-glass: rgba(16, 16, 19, 0.7);
+  --border: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.15);
+  --text: #f3f4f6;
+  --text-muted: #9ca3af;
+  /* Architectural Palette */
+  --brand: #bef264; /* Yellow Green / Lime */
+  --accent: #bef264;
+  --accent-secondary: #e2b35a; /* Technical Amber */
+  --hover: #d9f99d;
+  --accent-hover: #d9f99d;
+  --accent-dim: rgba(190, 242, 100, 0.12);
+  --grid-color: rgba(190, 242, 100, 0.05);
+  --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.5);
+  --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.3);
+  --font-sans: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
 * {
@@ -43,6 +34,11 @@ body {
   margin: 0;
   min-height: 100vh;
   background: var(--bg);
+  background-image: 
+    radial-gradient(rgba(190, 242, 100, 0.2) 1.5px, transparent 1.5px),
+    linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+  background-size: 40px 40px;
+  background-attachment: fixed;
   overflow-x: hidden;
   color: var(--text);
   font-family: var(--font-sans);
@@ -54,6 +50,8 @@ body {
 
 #root {
   min-height: 100vh;
+  background: radial-gradient(circle, rgba(190, 242, 100, 0.15) 0%, rgba(190, 242, 100, 0.08) 40%, transparent 70%);
+  background-attachment: fixed;
 }
 
 main {
@@ -68,11 +66,12 @@ main {
 a {
   color: var(--accent);
   text-decoration: none;
-  transition: color 0.2s ease, opacity 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 a:hover {
   color: var(--hover);
+  text-shadow: 0 0 12px var(--accent-dim);
 }
 
 /* Subtle entrance animations */
@@ -103,22 +102,25 @@ a:hover {
   66% { transform: translate(-1px, 1px) scale(0.98); }
 }
 
-@keyframes gradientShift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+@keyframes glow {
+  0%, 100% { filter: drop-shadow(0 0 4px var(--accent)); }
+  50% { filter: drop-shadow(0 0 8px var(--accent)); }
 }
 
 .glass {
-  background: #FFFFFF;
+  background: var(--bg-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--border);
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.08); /* Standard Airbnb card shadow */
-  border-radius: 12px; /* Standard Airbnb card radius */
+  box-shadow: var(--shadow-md);
+  border-radius: 12px;
 }
 
 .glass-strong {
-  background: #FFFFFF;
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-sm);
-  border-radius: 16px; /* Pill/popup radius */
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-strong);
+  box-shadow: var(--shadow-md);
+  border-radius: 16px;
 }
+
+

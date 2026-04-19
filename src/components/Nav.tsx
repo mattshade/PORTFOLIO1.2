@@ -21,7 +21,7 @@ export function Nav() {
           }}
         >
           <svg className="nav-logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18">
-            <path fill="hsl(var(--logo-hue, 142), 45%, 60%)" d="M 12 1 L 20 14 L 23 21 L 16 16 L 12 23 L 8 16 L 1 21 L 4 14 Z"/>
+            <path fill="var(--accent)" d="M 12 1 L 20 14 L 23 21 L 16 16 L 12 23 L 8 16 L 1 21 L 4 14 Z"/>
             <circle cx="12" cy="10.5" r="3.2" fill="#ffffff"/>
             <circle cx="12" cy="10.5" r="1.3" fill="#0a0a0b"/>
           </svg>

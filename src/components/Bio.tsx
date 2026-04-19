@@ -5,7 +5,6 @@ export function Bio() {
   return (
     <section id="bio" className="bio" aria-label="About">
       <div className="bio-inner">
-        <h2 className="section-title bio-section-title">Summary</h2>
         <div className="bio-block">
           <p className="bio-typography-wall">
             <span className="bird-perch">{resume.summary}</span>

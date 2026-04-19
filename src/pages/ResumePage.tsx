@@ -3,7 +3,7 @@ import { Nav } from '../components/Nav'
 import { Resume } from '../components/Resume'
 import { Footer } from '../components/Footer'
 import { BackToTop } from '../components/BackToTop'
-import { BirdsFly } from '../components/BirdsFly'
+import { SystemBoids } from '../components/SystemBoids'
 
 export function ResumePage() {
   const [scrollY, setScrollY] = useState(0)
@@ -33,7 +33,7 @@ export function ResumePage() {
   return (
     <>
       <div className="birds-bg" aria-hidden>
-        {birdsReady && <BirdsFly scrollY={scrollY} />}
+        {birdsReady && <SystemBoids scrollY={scrollY} />}
       </div>
       <div className="app-content">
         <Nav />
