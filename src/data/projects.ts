@@ -52,26 +52,6 @@ export const projects: Project[] = [
     ]
   },
   {
-    id: 'cnbc-design-system',
-    title: 'CNBC Design System',
-    subtitle: 'Product Design Systems Architecture',
-    description: 'Transforming scattered interface patterns into a scalable, data-driven design language and component ecosystem for CNBC’s digital product experience.',
-    tech: ['Design Systems', 'Figma', 'Storybook', 'React', 'Taxonomy'],
-    href: 'https://cnbcdesignsystem.shadyworldwide.com/', // Update with your actual deployment URL
-    external: true,
-    icon: 'layers',
-    modalHero: '/images/cnbc-ds-hero.png',
-    role: 'Senior Interactive Designer',
-    contribution: 'I led the evolution of the CNBC Design System from a collection of scattered patterns into a rigorous, production-ready ecosystem. I conducted exhaustive UI audits, established a semantic component taxonomy, and architected the "Foundation to Module" hierarchy. By bridging the gap between Figma libraries and Storybook documentation, I created a shared language for designers and engineers, reducing design debt and accelerating product delivery across editorial and market data teams.',
-    outcome: 'Established a centralized source of truth with over 1,000+ elements and components. Successfully integrated Storybook for 1:1 design-to-code parity and implemented Figma Analytics to drive governance, resulting in higher consistency and significantly reduced design-to-engineering friction across multiple product pods.',
-    highlights: [
-      'Architected "Inventory before Invention" audit',
-      'Defined semantic tonal color & spatial systems',
-      '1:1 Figma-to-Storybook component parity',
-      'Data-led governance via Figma Analytics'
-    ]
-  },
-  {
     id: 'ai-adoption-crm',
     title: 'AI Tool Adoption CRM',
     subtitle: 'AI Operating System',
