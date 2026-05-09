@@ -42,7 +42,7 @@ export const projects: Project[] = [
     icon: 'credit-card',
     modalHero: '/images/cnbc-pro-hero.png',
     role: 'Senior Interactive Designer',
-    contribution: 'Collaborated with the CX team to map the existing user journey, surveyed 16.5k users to define core profiles, and designed A/B tested subscription flows to resolve high drop-off rates and visual inconsistencies. Developed a cohesive "PRO" design system differentiating premium content with a unique magenta/green palette.',
+    contribution: 'Collaborated with the CX team to map the existing user journey, surveyed 16.5k users to define core profiles, and designed A/B tested subscription flows to resolve high drop-off rates and visual inconsistencies. Developed a cohesive "PRO" design system differentiating premium content with a unique blue/green palette.',
     outcome: 'The redesigned "Single View" application was successfully launched, accompanied by the integration of scalable payment solutions. Initial Q1 analytics indicated a 12% increase in immediate conversions, laying the groundwork to hit the 100k subscriber goal.',
     highlights: [
       'Mapped journey & conducted heuristic analysis',

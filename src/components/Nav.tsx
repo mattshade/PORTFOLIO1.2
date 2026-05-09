@@ -70,13 +70,26 @@ export function Nav() {
               <Link to="/#projects" className="nav-link bird-perch" onClick={() => setIsMenuOpen(false)}>Case Studies and Projects</Link>
             </>
           )}
-          <a
-            href="#experience"
-            className="nav-link bird-perch"
-            onClick={() => setIsMenuOpen(false)}
-          >
-            Experience
-          </a>
+          {isHome ? (
+            <a
+              href="#experience"
+              className="nav-link bird-perch"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Experience
+            </a>
+          ) : (
+            <Link
+              to="/#experience"
+              className="nav-link bird-perch"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Experience
+            </Link>
+          )}
+          <Link to="/contact" className="nav-link bird-perch" onClick={() => setIsMenuOpen(false)}>
+            Contact
+          </Link>
         </div>
       </div>
     </nav>
