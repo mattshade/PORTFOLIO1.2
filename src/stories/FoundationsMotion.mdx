@@ -1,0 +1,28 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Foundations/Motion" />
+
+# Motion
+
+Motion is **functional**: it orients attention, confirms interaction, and preserves performance. There are no decorative page-wide animations in the baseline system.
+
+## Timing & easing
+
+| Pattern | Notes |
+| --- | --- |
+| **Entrance** | `fadeUp` — short translate + opacity; used for hero and section reveals. |
+| **Hover (links)** | `0.2s` with `cubic-bezier(0.16, 1, 0.3, 1)` — snappy, not bouncy. |
+| **Grid pulse** | Slow ambient pulse on the fixed background grid — low amplitude so it never competes with content. |
+
+Easing tokens are defined alongside `@keyframes` in `src/index.css` (e.g. `fadeUp`, `gridPulse`, `float`, `glow`).
+
+## Principles
+
+- **Prefer opacity and transform** — avoid animating `box-shadow` or `filter` on large layers during scroll.
+- **Respect `prefers-reduced-motion`:** critical paths should still work when motion is reduced (portfolio boids and decorative loops should not block comprehension).
+- **Modal & overlay:** project detail uses backdrop + dialog; focus trap is handled in the component—keep durations under **300ms** for open/close.
+
+## What not to do
+
+- No autoplaying parallax on primary reading columns.
+- No staggered list animations that delay access to resume or contact actions.

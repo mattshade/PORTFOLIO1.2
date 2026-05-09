@@ -1,0 +1,103 @@
+.aura-grid-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background-color: var(--bg);
+  overflow: hidden;
+  pointer-events: none;
+  transition: opacity 0.5s ease, filter 0.5s ease;
+}
+
+.auras-container {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.aura {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  animation: floatAura 20s ease-in-out infinite alternate;
+}
+
+/* Primary lemon-yellow accent glow */
+.aura-1 {
+  width: 65vw;
+  height: 55vh;
+  top: -10vh;
+  left: -10vw;
+  background: var(--accent);
+  opacity: 0.12;
+  animation-delay: 0s;
+}
+
+/* Deeper, wider secondary glow */
+.aura-2 {
+  width: 75vw;
+  height: 65vh;
+  bottom: -20vh;
+  right: -10vw;
+  background: rgba(190, 242, 100, 0.4);
+  opacity: 0.08;
+  animation-duration: 25s;
+  animation-direction: alternate-reverse;
+}
+
+/* Core white/bright highlight */
+.aura-3 {
+  width: 45vw;
+  height: 45vh;
+  top: 25vh;
+  left: 25vw;
+  background: rgba(255, 255, 255, 0.6);
+  opacity: 0.05;
+  filter: blur(130px);
+  animation-duration: 18s;
+  animation-delay: -5s;
+}
+
+@keyframes floatAura {
+  0% { transform: translate(0, 0) scale(1) rotate(0deg); }
+  33% { transform: translate(6vw, 8vh) scale(1.1) rotate(5deg); }
+  66% { transform: translate(-4vw, 6vh) scale(0.9) rotate(-5deg); }
+  100% { transform: translate(3vw, -4vh) scale(1.05) rotate(0deg); }
+}
+
+.aura-grid-wrapper {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  perspective: 1000px;
+  overflow: hidden;
+  /* Dark gradient to fade out grid edges completely into the void */
+  background: radial-gradient(circle at center, transparent 20%, var(--bg) 95%);
+}
+
+.aura-grid {
+  position: absolute;
+  width: 200vw;
+  height: 200vh;
+  left: -50vw;
+  top: -20vh;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 60px 60px;
+  transform-origin: center top;
+  transform: rotateX(65deg) translateY(0) translateZ(-200px);
+  animation: gridPan 15s linear infinite;
+  mask-image: linear-gradient(to bottom, transparent 0%, black 30%, black 70%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 30%, black 70%, transparent 100%);
+}
+
+@keyframes gridPan {
+  0% { transform: rotateX(65deg) translateY(0) translateZ(-200px); }
+  100% { transform: rotateX(65deg) translateY(60px) translateZ(-200px); }
+}
+
+/* Adjust overlay interactions */
+body.modal-open .aura-grid-bg {
+  opacity: 0.2;
+  filter: blur(10px);
+}

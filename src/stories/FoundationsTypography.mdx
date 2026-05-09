@@ -1,0 +1,47 @@
+import { Meta, Typeset } from '@storybook/addon-docs/blocks';
+
+<Meta title="Foundations/Typography" />
+
+# Typography
+
+## Font stacks (tokens)
+
+| Token | Use |
+| --- | --- |
+| `--font-sans` | **Geist** — UI, headings, body, marketing copy. |
+| `--font-mono` | **Geist Mono** — technical labels, code-adjacent UI, metrics. |
+
+Fallbacks include system UI and `ui-monospace` so the UI stays readable before webfonts load.
+
+## Scale (reference)
+
+Product sections use a **modular scale** anchored at **16px** body. Display sizes lean on `clamp()` in section CSS where needed; stories below show static reference sizes.
+
+### Sans — Geist
+
+<Typeset
+  fontFamily='"Geist", system-ui, sans-serif'
+  fontSizes={['12px', '14px', '16px', '18px', '24px', '32px', '40px', '48px']}
+  fontWeight={600}
+  sampleText="Matt Shade — Engineering & Design"
+/>
+
+### Mono — Geist Mono
+
+<Typeset
+  fontFamily='"Geist Mono", ui-monospace, monospace'
+  fontSizes={['12px', '13px', '14px', '16px']}
+  fontWeight={500}
+  sampleText="const token = '--accent'"
+/>
+
+## Usage guidelines
+
+- **Sentence case** for UI labels and most headings; reserve **all-caps** for eyebrow / overline patterns only.
+- **Line length:** prefer ~60–75 characters for reading comfort in wide layouts; section `max-width` in CSS enforces this where it matters.
+- **Contrast:** primary text uses `--text` on `--bg`; secondary uses `--text-muted`. Do not place lime (`--accent`) body copy on lime backgrounds without a darker companion token.
+
+## Pairing
+
+- **Hero & resume:** sans only; mono optional for small metadata lines.
+- **Projects & cards:** title + subtitle + description hierarchy uses weight and `--text-muted`, not a third font.

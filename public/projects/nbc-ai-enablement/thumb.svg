@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="400" viewBox="0 0 640 400" role="img" aria-label="NBC News Group AI Enablement">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e1b4b"/>
+      <stop offset="55%" stop-color="#312e81"/>
+      <stop offset="100%" stop-color="#4338ca"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="400" fill="url(#bg)"/>
+  <text x="320" y="168" text-anchor="middle" fill="#c7d2fe" font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif" font-size="18" font-weight="600" letter-spacing="0.04em">NBC NEWS GROUP</text>
+  <text x="320" y="218" text-anchor="middle" fill="#eef2ff" font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif" font-size="28" font-weight="700" letter-spacing="-0.02em">AI Enablement</text>
+  <text x="320" y="252" text-anchor="middle" fill="#a5b4fc" font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif" font-size="14" font-weight="500">Data AI &amp; Emerging Tech</text>
+</svg>

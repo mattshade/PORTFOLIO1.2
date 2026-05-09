@@ -1,0 +1,97 @@
+import { Meta, ColorPalette, ColorItem, Typeset } from '@storybook/addon-docs/blocks';
+
+<Meta title="Introduction/Visual language" />
+
+# Visual language
+
+**Architectural blueprint identity** — technical precision, high-contrast type, and a single lime accent system shared across the portfolio and this Storybook.
+
+## Design tokens
+
+**Source of truth:** all tokens live on `:root` in `src/index.css` (imported by the app and Storybook preview). Components and stories should read these **CSS variables**—not one-off hex values—so color, type, elevation, and glass treatments stay consistent.
+
+| Token | Role |
+| --- | --- |
+| `--bg` | Page background |
+| `--bg-elevated` | Raised surfaces |
+| `--bg-glass` | Glass panels (`backdrop-filter` companions) |
+| `--border` | Default hairline dividers |
+| `--border-strong` | Emphasized edges / inputs |
+| `--text` | Primary copy |
+| `--text-muted` | Secondary / meta text |
+| `--brand` | Brand mark (same hue family as accent) |
+| `--accent` | Links, focus, primary CTAs |
+| `--accent-secondary` | Secondary emphasis (amber) |
+| `--hover` / `--accent-hover` | Hover / pressed link & control states |
+| `--accent-dim` | Soft glows and text-shadow on hover |
+| `--grid-color` | Blueprint grid lines (with `--bg`) |
+| `--shadow-sm` | Small elevation |
+| `--shadow-md` | Deeper elevation |
+| `--shadow-glass` | Floating glass cards |
+| `--font-sans` | UI and body (Geist stack) |
+| `--font-mono` | Code and technical labels (Geist Mono stack) |
+
+Structural spacing (e.g. `main` offset for the fixed nav, `scroll-margin` on section anchors) is also defined in that stylesheet so scroll and layout behave the same in production and in Storybook.
+
+## Primary colors
+
+<ColorPalette>
+  <ColorItem
+    title="Brand Lime"
+    subtitle="--brand, --accent"
+    colors={{ Lime: '#bef264' }}
+  />
+  <ColorItem
+    title="Technical Amber"
+    subtitle="--accent-secondary"
+    colors={{ Amber: '#e2b35a' }}
+  />
+  <ColorItem
+    title="Background Deep"
+    subtitle="--bg"
+    colors={{ Dark: '#0a0a0b' }}
+  />
+  <ColorItem
+    title="Elevated"
+    subtitle="--bg-elevated"
+    colors={{ Surface: '#111113' }}
+  />
+  <ColorItem
+    title="Text"
+    subtitle="--text"
+    colors={{ Primary: '#f3f4f6' }}
+  />
+  <ColorItem
+    title="Text muted"
+    subtitle="--text-muted"
+    colors={{ Muted: '#9ca3af' }}
+  />
+  <ColorItem
+    title="Glass Base"
+    subtitle="--bg-glass"
+    colors={{ Glass: 'rgba(16, 16, 19, 0.7)' }}
+  />
+</ColorPalette>
+
+## Typography (summary)
+
+**Primary stack:** Geist — see **Foundations → Typography** for scale and pairing.
+
+<Typeset
+  fontFamily='"Geist", sans-serif'
+  fontSizes={['12px', '14px', '16px', '24px', '32px', '48px']}
+  fontWeight={700}
+  sampleText="ARCHITECTURAL SYSTEMS"
+/>
+
+## Structural principles
+
+- **Grid-first:** content aligns to a **40px** blueprint grid (see **Foundations → Layout & grid**).
+- **Micro-interactions:** hover uses `cubic-bezier` easing and restrained scale—not novelty for its own sake.
+- **Glass:** `.glass` / `.glass-strong` compose tokens with shared blur and radii—see `src/index.css`.
+
+## Storybook setup
+
+- **Router:** `.storybook/preview.ts` wraps every story in `MemoryRouter` so `Link` / `useLocation` work (`Resume`, `Nav`, etc.).
+- **Static assets:** `.storybook/main.ts` maps `public/` so `/images/…` and other static files resolve in stories.
+- **Where to go next:** **Pages → Resume** for the resume shell; **Components → Projects section** for the full grid and modal.

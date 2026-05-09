@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
   "name": "cnbc-design-system",
   "private": true,
   "version": "0.0.0",
@@ -33,5 +34,45 @@
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.58.2",
     "vite": "^8.0.10"
+=======
+  "name": "matt-shade-portfolio",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "node scripts/build-projects.cjs && vite build && npm run build-storybook && mkdir -p dist/storybook && cp -r storybook-static/* dist/storybook/ && node scripts/copy-projects.cjs",
+    "build:portfolio": "vite build && node scripts/copy-projects.cjs",
+    "preview": "vite preview",
+    "generate:resume-ats": "tsx scripts/generate-ats-resume.ts",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "STORYBOOK_BASE_PATH=/storybook/ storybook build && STORYBOOK_BASE_PATH=/storybook/ node scripts/inject-storybook-base.cjs"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^7.13.1"
+  },
+  "devDependencies": {
+    "@chromatic-com/storybook": "^5.1.2",
+    "@storybook/addon-a11y": "^10.3.5",
+    "@storybook/addon-docs": "^10.3.5",
+    "@storybook/addon-onboarding": "^10.3.5",
+    "@storybook/addon-vitest": "^10.3.5",
+    "@storybook/react-vite": "^10.3.5",
+    "@types/pdfkit": "^0.17.5",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "@vitest/browser-playwright": "^4.1.4",
+    "@vitest/coverage-v8": "^4.1.4",
+    "pdfkit": "^0.18.0",
+    "playwright": "^1.59.1",
+    "storybook": "^10.3.5",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3",
+    "vite": "^6.0.1",
+    "vitest": "^4.1.4"
+>>>>>>> f4e90a3 (initial commit: architecting the future)
   }
 }

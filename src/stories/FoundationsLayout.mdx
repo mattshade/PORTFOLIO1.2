@@ -1,0 +1,26 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Foundations/Layout & grid" />
+
+# Layout & grid
+
+## Global structure
+
+- **Fixed navigation** — `main` uses **72px** top padding so content clears the bar (`src/index.css`).
+- **Scroll targets** — sections with `id="projects"` and `id="experience"` use **`scroll-margin-top: 80px`** so in-page anchors land comfortably below the nav.
+- **Max content width** — section wrappers use `.section-inner` patterns (see `App.css` / component CSS) to keep line length and alignment consistent.
+
+## Blueprint grid
+
+The page background exposes a **40×40px** technical grid (radial + linear strokes) using `--grid-color` on `--bg`. Components sit **on** this grid, not necessarily with 40px padding everywhere—use multiples of **8px** for internal spacing unless a token says otherwise.
+
+## Responsive review
+
+Storybook ships **viewport presets** in the toolbar (mobile / tablet / desktop / ultrawide). Review **Components** stories at **375px** minimum before sign-off.
+
+## Glass surfaces
+
+- **`.glass`** — blur + `--bg-glass` + `--border` + `--shadow-md` — default cards and panels.
+- **`.glass-strong`** — elevated fill + stronger border — emphasis without a second accent color.
+
+Radii are **12px** (glass) and **16px** (glass-strong) in the current system—keep new surfaces aligned unless a tokenized radius is introduced.

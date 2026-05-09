@@ -1,0 +1,631 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Digital Content Performance - AI Data Hub</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+        background-color: #f9fafb;
+        color: #333;
+        line-height: 1.6;
+      }
+      
+      .header {
+        background: white;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        border-bottom: 1px solid #e5e7eb;
+      }
+      
+      .header-content {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 24px 16px;
+      }
+      
+      .back-btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #2563eb;
+        text-decoration: none;
+        font-weight: 500;
+        margin-bottom: 16px;
+        transition: color 0.3s;
+      }
+      
+      .back-btn:hover {
+        color: #1d4ed8;
+      }
+      
+      .dataset-header {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+      }
+      
+      .dataset-header-main {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+      }
+      
+      .dataset-image {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        border-radius: 8px;
+      }
+      
+      .dataset-info {
+        flex: 1;
+      }
+      
+      .dataset-category {
+        display: inline-block;
+        background: #d1fae5;
+        color: #065f46;
+        padding: 4px 12px;
+        border-radius: 9999px;
+        font-size: 14px;
+        font-weight: 500;
+        margin-bottom: 8px;
+      }
+      
+      .dataset-title {
+        font-size: 24px;
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 8px;
+        line-height: 1.2;
+      }
+      
+      .dataset-description {
+        font-size: 16px;
+        color: #6b7280;
+        margin-bottom: 16px;
+        line-height: 1.5;
+      }
+      
+      .dataset-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        font-size: 14px;
+        color: #6b7280;
+      }
+      
+      .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+      
+      .tab-navigation {
+        background: white;
+        border-bottom: 1px solid #e5e7eb;
+      }
+      
+      .tab-nav-content {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 0 16px;
+      }
+      
+      .tab-nav {
+        display: flex;
+        gap: 32px;
+      }
+      
+      .tab-btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 16px 4px;
+        border-bottom: 2px solid transparent;
+        background: none;
+        border: none;
+        font-weight: 500;
+        font-size: 14px;
+        color: #6b7280;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+      
+      .tab-btn:hover {
+        color: #374151;
+        border-bottom-color: #d1d5db;
+      }
+      
+      .tab-btn.active {
+        color: #2563eb;
+        border-bottom-color: #2563eb;
+      }
+      
+      .tab-content {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 32px 16px;
+      }
+      
+      .content-section {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        border: 1px solid #e5e7eb;
+        padding: 24px;
+        margin-bottom: 24px;
+      }
+      
+      .section-title {
+        font-size: 20px;
+        font-weight: 600;
+        color: #111827;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      
+      .section-icon {
+        width: 24px;
+        height: 24px;
+        color: #2563eb;
+      }
+      
+      .overview-text {
+        color: #374151;
+        line-height: 1.6;
+        margin-bottom: 20px;
+      }
+      
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+        margin-bottom: 20px;
+      }
+      
+      .stat-card {
+        background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+        border: 1px solid #10b981;
+        border-radius: 8px;
+        padding: 16px;
+      }
+      
+      .stat-card.blue {
+        background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+        border-color: #3b82f6;
+      }
+      
+      .stat-card.purple {
+        background: linear-gradient(135deg, #e9d5ff 0%, #ddd6fe 100%);
+        border-color: #8b5cf6;
+      }
+      
+      .stat-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 8px;
+      }
+      
+      .stat-icon {
+        width: 24px;
+        height: 24px;
+        color: #10b981;
+      }
+      
+      .stat-icon.blue {
+        color: #3b82f6;
+      }
+      
+      .stat-icon.purple {
+        color: #8b5cf6;
+      }
+      
+      .stat-label {
+        font-size: 14px;
+        font-weight: 500;
+        color: #374151;
+      }
+      
+      .stat-value {
+        font-size: 20px;
+        font-weight: 700;
+        color: #065f46;
+      }
+      
+      .stat-value.blue {
+        color: #1e40af;
+      }
+      
+      .stat-value.purple {
+        color: #6b21a8;
+      }
+      
+      .sample-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 16px;
+      }
+      
+      .sample-table th {
+        background: #f9fafb;
+        padding: 12px;
+        text-align: left;
+        font-weight: 600;
+        color: #374151;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        border-bottom: 1px solid #e5e7eb;
+      }
+      
+      .sample-table td {
+        padding: 12px;
+        border-bottom: 1px solid #e5e7eb;
+        font-size: 14px;
+        color: #111827;
+        font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+      }
+      
+      .dictionary-list {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+      
+      .dictionary-item {
+        border-left: 4px solid #10b981;
+        padding-left: 16px;
+      }
+      
+      .dictionary-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 4px;
+      }
+      
+      .dictionary-field {
+        font-weight: 500;
+        color: #111827;
+      }
+      
+      .dictionary-type {
+        background: #f3f4f6;
+        color: #374151;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+      }
+      
+      .dictionary-description {
+        color: #6b7280;
+        font-size: 14px;
+      }
+      
+      @media (min-width: 1024px) {
+        .dataset-header-main {
+          flex-direction: row;
+        }
+        
+        .dataset-image {
+          width: 256px;
+          height: 128px;
+        }
+      }
+      
+      @media (max-width: 768px) {
+        .tab-nav {
+          gap: 16px;
+        }
+        
+        .stats-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="header">
+      <div class="header-content">
+        <a href="index.html" class="back-btn">
+          <span>←</span>
+          <span>Back to Datasets</span>
+        </a>
+        
+        <div class="dataset-header">
+          <div class="dataset-header-main">
+            <img src="assets/thumbnails/editorial-data.png" alt="Digital Content Performance" class="dataset-image" />
+            <div class="dataset-info">
+              <div class="dataset-category">Content</div>
+              <h1 class="dataset-title">Digital Content Performance</h1>
+              <p class="dataset-description">Cross-platform content performance metrics including engagement rates, reach, and conversion analytics.</p>
+              <div class="dataset-meta">
+                <div class="meta-item">
+                  <span>📅</span>
+                  <span>Updated 2024-12-08</span>
+                </div>
+                <div class="meta-item">
+                  <span>🗄️</span>
+                  <span>1,250,000 records</span>
+                </div>
+                <div class="meta-item">
+                  <span>💾</span>
+                  <span>890 MB</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <nav class="tab-navigation">
+      <div class="tab-nav-content">
+        <div class="tab-nav">
+          <button class="tab-btn active" data-tab="overview">
+            <span>👁️</span>
+            <span>Overview</span>
+          </button>
+          <button class="tab-btn" data-tab="sample">
+            <span>📊</span>
+            <span>Sample Data</span>
+          </button>
+          <button class="tab-btn" data-tab="analytics">
+            <span>📈</span>
+            <span>Analytics</span>
+          </button>
+          <button class="tab-btn" data-tab="dictionary">
+            <span>📄</span>
+            <span>Data Dictionary</span>
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <main class="tab-content">
+      <div id="overviewContent" class="tab-panel active">
+        <div class="content-section">
+          <h2 class="section-title">
+            <span class="section-icon">👁️</span>
+            Dataset Overview
+          </h2>
+          <div class="overview-text">
+            <p>Comprehensive content performance data spanning blogs, videos, infographics, and interactive content. This dataset unifies engagement and conversion signals across all distribution channels to power content optimization, format benchmarking, and ROI attribution.</p>
+            <p><strong>Scope & coverage:</strong> Tracks time-on-page, scroll depth, video completion rates, and conversion attribution by content piece, format, channel, and audience segment. Supports cross-format comparison (e.g., video vs. article performance) and funnel analysis from impression to conversion.</p>
+            <p><strong>Data quality & freshness:</strong> Refreshed daily with 90-day retention. Full session-level detail with cookie and user-ID linkage for deduplication and attribution modeling.</p>
+            <p><strong>Best suited for:</strong> Content strategy, format mix optimization, channel performance comparison, engagement benchmarking, and conversion funnel analysis.</p>
+          </div>
+          
+          <div class="hero-kpi" style="display:grid;grid-template-columns:repeat(4,1fr);gap:20px;background:linear-gradient(135deg,#065f46 0%,#047857 100%);border-radius:16px;padding:28px 32px;margin-bottom:24px;color:white">
+            <div class="hero-kpi-item" style="text-align:center"><div class="hero-kpi-value" style="font-size:28px;font-weight:800;margin-bottom:4px">2.1M</div><div class="hero-kpi-label" style="font-size:12px;opacity:.9">Total Views</div></div>
+            <div class="hero-kpi-item" style="text-align:center"><div class="hero-kpi-value" style="font-size:28px;font-weight:800;margin-bottom:4px">3.2%</div><div class="hero-kpi-label" style="font-size:12px;opacity:.9">Avg CTR</div></div>
+            <div class="hero-kpi-item" style="text-align:center"><div class="hero-kpi-value" style="font-size:28px;font-weight:800;margin-bottom:4px">12.5%</div><div class="hero-kpi-label" style="font-size:12px;opacity:.9">Conversion</div></div>
+            <div class="hero-kpi-item" style="text-align:center"><div class="hero-kpi-value" style="font-size:28px;font-weight:800;margin-bottom:4px">Daily</div><div class="hero-kpi-label" style="font-size:12px;opacity:.9">Refresh</div></div>
+          </div>
+          
+          <div class="insight-callout" style="background:linear-gradient(135deg,#ecfdf5 0%,#d1fae5 100%);border-left:4px solid #10b981;border-radius:8px;padding:20px;margin-bottom:20px">
+            <strong style="color:#065f46">Key insight:</strong> <span style="color:#047857">Video content drives 3.2x higher engagement and 2.1x conversion vs blog posts. Average watch time is 6:45 with 68% completion for content under 3 minutes. Prioritize short-form video for top-of-funnel.</span>
+          </div>
+          
+          <h3 class="section-title" style="margin-top:24px">Use Cases</h3>
+          <div class="use-case-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-top:16px">
+            <div class="use-case-card" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:20px">
+              <h4 style="font-size:15px;color:#1e293b;margin-bottom:8px">📈 Performance Attribution</h4>
+              <p style="font-size:13px;color:#64748b;line-height:1.5">Track which content drives conversions. Build journeys from first-touch to conversion with full path attribution.</p>
+            </div>
+            <div class="use-case-card" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:20px">
+              <h4 style="font-size:15px;color:#1e293b;margin-bottom:8px">🎬 Content Mix Optimization</h4>
+              <p style="font-size:13px;color:#64748b;line-height:1.5">Compare performance across types and formats. Identify winning formats by audience segment and intent.</p>
+            </div>
+            <div class="use-case-card" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:20px">
+              <h4 style="font-size:15px;color:#1e293b;margin-bottom:8px">⏱️ Engagement Benchmarking</h4>
+              <p style="font-size:13px;color:#64748b;line-height:1.5">Benchmark time-on-page, scroll depth, and completion rates against industry and historical norms.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-section">
+          <h2 class="section-title">
+            <span class="section-icon">📊</span>
+            Performance Metrics
+          </h2>
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-header">
+                <span class="stat-icon">📈</span>
+                <span class="stat-label">Avg CTR</span>
+              </div>
+              <div class="stat-value">3.2%</div>
+            </div>
+            
+            <div class="stat-card blue">
+              <div class="stat-header">
+                <span class="stat-icon blue">👀</span>
+                <span class="stat-label">Total Views</span>
+              </div>
+              <div class="stat-value blue">2.1M</div>
+            </div>
+            
+            <div class="stat-card purple">
+              <div class="stat-header">
+                <span class="stat-icon purple">🎯</span>
+                <span class="stat-label">Conversion Rate</span>
+              </div>
+              <div class="stat-value purple">12.5%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div id="analyticsContent" class="tab-panel" style="display: none;">
+        <div class="content-section">
+          <h2 class="section-title"><span class="section-icon">📈</span>Key Visualizations</h2>
+          <div class="charts-grid">
+            <div class="chart-container"><h3>Engagement Over Time</h3><canvas id="contentChart1"></canvas></div>
+            <div class="chart-container"><h3>Content Type Performance</h3><canvas id="contentChart2"></canvas></div>
+          </div>
+        </div>
+      </div>
+      
+      <div id="sampleContent" class="tab-panel" style="display: none;">
+        <div class="content-section">
+          <h2 class="section-title">
+            <span class="section-icon">📊</span>
+            Sample Data
+          </h2>
+          <div class="overflow-x-auto">
+            <table class="sample-table">
+              <thead>
+                <tr>
+                  <th>Content ID</th>
+                  <th>Type</th>
+                  <th>Title</th>
+                  <th>Views</th>
+                  <th>Engagement Metric</th>
+                  <th>Conversions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>CNT_001</td>
+                  <td>Blog Post</td>
+                  <td>AI in Media Production</td>
+                  <td>45,000</td>
+                  <td>4:32 time on page</td>
+                  <td>90</td>
+                </tr>
+                <tr>
+                  <td>CNT_002</td>
+                  <td>Video</td>
+                  <td>Industry Trends 2024</td>
+                  <td>80,000</td>
+                  <td>6:45 avg watch time</td>
+                  <td>150</td>
+                </tr>
+                <tr>
+                  <td>CNT_003</td>
+                  <td>Infographic</td>
+                  <td>Social Media Stats</td>
+                  <td>25,000</td>
+                  <td>900 downloads</td>
+                  <td>50</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      
+      <div id="dictionaryContent" class="tab-panel" style="display: none;">
+        <div class="content-section">
+          <h2 class="section-title">
+            <span class="section-icon">📄</span>
+            Data Dictionary
+          </h2>
+          <div class="dictionary-list">
+            <div class="dictionary-item">
+              <div class="dictionary-header">
+                <h3 class="dictionary-field">content_id</h3>
+                <span class="dictionary-type">String</span>
+              </div>
+              <p class="dictionary-description">Unique identifier for each piece of content</p>
+            </div>
+            <div class="dictionary-item">
+              <div class="dictionary-header">
+                <h3 class="dictionary-field">type</h3>
+                <span class="dictionary-type">String</span>
+              </div>
+              <p class="dictionary-description">Content type (Blog Post, Video, Infographic, etc.)</p>
+            </div>
+            <div class="dictionary-item">
+              <div class="dictionary-header">
+                <h3 class="dictionary-field">title</h3>
+                <span class="dictionary-type">String</span>
+              </div>
+              <p class="dictionary-description">Content title or headline</p>
+            </div>
+            <div class="dictionary-item">
+              <div class="dictionary-header">
+                <h3 class="dictionary-field">views</h3>
+                <span class="dictionary-type">Integer</span>
+              </div>
+              <p class="dictionary-description">Total number of views/impressions</p>
+            </div>
+            <div class="dictionary-item">
+              <div class="dictionary-header">
+                <h3 class="dictionary-field">engagement_metric</h3>
+                <span class="dictionary-type">Mixed</span>
+              </div>
+              <p class="dictionary-description">Primary engagement metric (varies by content type)</p>
+            </div>
+            <div class="dictionary-item">
+              <div class="dictionary-header">
+                <h3 class="dictionary-field">conversions</h3>
+                <span class="dictionary-type">Integer</span>
+              </div>
+              <p class="dictionary-description">Number of conversions attributed to this content</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script>
+      function initTabs() {
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabPanels = document.querySelectorAll('.tab-panel');
+        
+        tabBtns.forEach(btn => {
+          btn.addEventListener('click', () => {
+            const targetTab = btn.getAttribute('data-tab');
+            
+            // Update active tab button
+            tabBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            // Show target panel
+            tabPanels.forEach(panel => panel.style.display = 'none');
+            document.getElementById(targetTab + 'Content').style.display = 'block';
+            if (targetTab === 'analytics' && typeof initContentCharts === 'function') initContentCharts();
+          });
+        });
+      }
+
+      function initContentCharts() {
+        if (window.contentChartsInit) return;
+        window.contentChartsInit = true;
+        new Chart(document.getElementById('contentChart1'), {
+          type: 'line',
+          data: {
+            labels: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+            datasets: [{ label: 'Engagement', data: [12,19,15,25,22,30,28,35,32,40,38,45], borderColor: '#2563eb', tension: 0.3 }]
+          },
+          options: { responsive: true, maintainAspectRatio: true }
+        });
+        new Chart(document.getElementById('contentChart2'), {
+          type: 'bar',
+          data: {
+            labels: ['Blog','Video','Infographic','Interactive','Podcast'],
+            datasets: [{ label: 'Views (K)', data: [400, 600, 250, 200, 100], backgroundColor: ['#3b82f6','#22c55e','#f59e0b','#8b5cf6','#ec4899'] }]
+          },
+          options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { display: false } } }
+        });
+      }
+
+      document.addEventListener('DOMContentLoaded', initTabs);
+    </script>
+  </body>
+</html>

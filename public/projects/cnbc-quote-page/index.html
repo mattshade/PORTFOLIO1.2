@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Case study: CNBC quote page. Engineering leadership, REST and GraphQL contracts, market data, and chart integration." />
+  <title>CNBC Quote Page · Matt Shade</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/case-study.css" />
+</head>
+<body class="cs-page">
+  <div class="cs-bg" aria-hidden="true">
+    <div class="cs-bg-gradient"></div>
+    <div class="cs-bg-glow cs-bg-glow-1"></div>
+    <div class="cs-bg-glow cs-bg-glow-2"></div>
+    <div class="cs-bg-grid"></div>
+  </div>
+
+  <div class="cs-boids" aria-hidden="true">
+    <canvas id="cs-boids-canvas" width="300" height="300"></canvas>
+  </div>
+
+  <a class="cs-skip-link" href="#main-content">Skip to main content</a>
+
+  <nav class="cs-nav" aria-label="Main">
+    <div class="cs-nav-inner">
+      <a href="/" class="cs-nav-home">
+        <svg class="cs-nav-logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+          <path fill="hsl(142, 45%, 60%)" d="M 12 1 L 20 14 L 23 21 L 16 16 L 12 23 L 8 16 L 1 21 L 4 14 Z"/>
+          <circle cx="12" cy="10.5" r="3.2" fill="#ffffff"/>
+          <circle cx="12" cy="10.5" r="1.3" fill="#0a0a0b"/>
+        </svg>
+        <span class="cs-nav-brand">Matt Shade</span>
+      </a>
+      <div class="cs-nav-links">
+        <a href="/#projects" class="cs-nav-link">Case Studies and Projects</a>
+        <a href="/#experience" class="cs-nav-link">Experience</a>
+      </div>
+    </div>
+  </nav>
+
+  <main id="main-content" class="cs-main" data-cs-boids-avoid>
+    <div class="cs-main-inner">
+      <div class="cs-intro">
+        <a class="cs-back" href="/#projects">← Back to portfolio</a>
+        <p class="cs-eyebrow">Case study</p>
+        <h1>CNBC Quote Page</h1>
+        <p class="cs-lede">
+          Production work leading engineering alongside product, internal market-data owners, and backend teams on a high-traffic quote experience, defining how financial data reached the UI through REST and GraphQL, and shipping a chart-centric layout users rely on throughout the trading day.
+        </p>
+      </div>
+
+      <div class="cs-bird-wire" aria-hidden="true"></div>
+
+      <figure class="cs-figure-hero">
+        <div class="cs-hero-image-wrap">
+          <div class="cs-browser-frame">
+            <div class="cs-browser-header">
+              <div class="cs-browser-dot close"></div>
+              <div class="cs-browser-dot minimize"></div>
+              <div class="cs-browser-dot maximize"></div>
+            </div>
+            <img
+              src="../cnbcQuotePage.png"
+              alt="Screenshot of the CNBC quote page showing price, chart, key stats, and news modules"
+              loading="lazy"
+            />
+          </div>
+        </div>
+        <figcaption>Representative quote surface: chart, key stats, and modular data blocks driven by typed market data.</figcaption>
+      </figure>
+
+      <section class="cs-section">
+        <h2>Role</h2>
+        <p>
+          Oversaw frontend development and partnered across disciplines to keep delivery aligned with product goals and platform realities, translating roadmap needs into feasible contracts, incremental releases, and stable operations.
+        </p>
+      </section>
+
+      <section class="cs-section">
+        <h2>Data contracts: REST and GraphQL</h2>
+        <p>
+          The page combined multiple data shapes: real-time and delayed fields, reference data, and aggregates suited to different consumers. We used REST where resource-style endpoints and caching patterns fit, and GraphQL where clients needed to compose fields, avoid over-fetching, or query graph-shaped relationships in one round trip. Aligning those choices with backend capacity and client performance was a core part of the work.
+        </p>
+      </section>
+
+      <section class="cs-section">
+        <h2>Market data depth</h2>
+        <p>
+          Quote UIs only work when engineers and partners share a precise vocabulary for market data asset types: equities, options, fundamentals, and related identifiers and conventions. Part of my job was helping the team reason about field meaning, edge cases, and how data behaves in production so API contracts and UI states did not drift from reality.
+        </p>
+      </section>
+
+      <section class="cs-section">
+        <h2>Chart integration</h2>
+        <p>
+          The interactive price chart was a centerpiece: time-range selection, historical and intraday series, and responsive rendering alongside the rest of the page. Integrating it end to end with data plumbing, loading and empty states, and performance was a major cross-team effort tied directly to user trust in the product.
+        </p>
+      </section>
+
+      <section class="cs-section">
+        <h2>Highlights</h2>
+        <ul>
+          <li>Coordinated contract changes with market-data and API owners as requirements evolved.</li>
+          <li>Balanced latency, payload size, and client complexity across REST and GraphQL usage.</li>
+          <li>Kept accessibility and layout resilience in mind as data density changed by symbol and asset class.</li>
+        </ul>
+      </section>
+
+      <p class="cs-note">
+        Screenshot reflects the type of experience shipped on CNBC; branding and layout are property of NBCUniversal / CNBC. This page is a personal case study and is not an official CNBC communication.
+      </p>
+
+      <div class="cs-cta-row">
+        <a href="https://www.cnbc.com/quotes/" rel="noopener noreferrer" class="cs-btn-primary">
+          View Live Project
+          <svg style="margin-left: 0.5rem" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+        </a>
+        <span class="cs-cta-hint">External CNBC link</span>
+      </div>
+    </div>
+  </main>
+  <div class="cs-footer-wire" aria-hidden="true"></div>
+  <footer class="cs-footer">
+    <div class="cs-footer-inner">
+      <div class="cs-footer-links">
+        <a href="mailto:hellomattshade@gmail.com" class="cs-footer-link">hellomattshade@gmail.com</a>
+        <a href="https://linkedin.com/in/matt-shade-66125515" class="cs-footer-link" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+        <a href="/#experience" class="cs-footer-link">Experience</a>
+      </div>
+      <p class="cs-footer-copy">© 2026 Matt Shade</p>
+    </div>
+  </footer>
+  <button type="button" class="cs-back-to-top" id="cs-back-to-top" aria-label="Back to top">
+    <svg viewBox="0 0 24 23" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path fill="hsl(142, 45%, 60%)" d="M 12 1 L 20 14 L 23 21 L 16 16 L 12 23 L 8 16 L 1 21 L 4 14 Z"/>
+      <circle cx="12" cy="10.5" r="3.2" fill="#ffffff"/>
+      <circle cx="12" cy="10.5" r="1.3" fill="#0a0a0b"/>
+    </svg>
+  </button>
+  <script src="/case-study-boids.js" defer></script>
+  <script src="/case-study-ui.js" defer></script>
+</body>
+</html>

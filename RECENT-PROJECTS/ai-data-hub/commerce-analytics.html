@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Commerce & E‑commerce Analytics - AI Data Hub</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif; background-color: #f9fafb; color: #333; line-height: 1.6; }
+      .header { background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-bottom: 1px solid #e5e7eb; }
+      .header-content { max-width: 1280px; margin: 0 auto; padding: 24px 16px; }
+      .back-btn { display: flex; align-items: center; gap: 8px; color: #2563eb; text-decoration: none; font-weight: 500; margin-bottom: 16px; transition: color 0.3s; }
+      .back-btn:hover { color: #1d4ed8; }
+      .dataset-header { display: flex; flex-direction: column; gap: 24px; }
+      .dataset-header-main { display: flex; flex-direction: column; gap: 24px; }
+      .dataset-image { width: 100%; height: 200px; object-fit: cover; border-radius: 8px; background: linear-gradient(135deg, #e8eaf6 0%, #c5cae9 100%); }
+      .dataset-info { flex: 1; }
+      .dataset-category { display: inline-block; background: #e8eaf6; color: #3949ab; padding: 4px 12px; border-radius: 9999px; font-size: 14px; font-weight: 500; margin-bottom: 8px; }
+      .dataset-title { font-size: 24px; font-weight: 700; color: #111827; margin-bottom: 8px; }
+      .dataset-description { font-size: 16px; color: #6b7280; margin-bottom: 16px; }
+      .dataset-meta { display: flex; flex-wrap: wrap; gap: 16px; font-size: 14px; color: #6b7280; }
+      .meta-item { display: flex; align-items: center; gap: 4px; }
+      .tab-navigation { background: white; border-bottom: 1px solid #e5e7eb; }
+      .tab-nav-content { max-width: 1280px; margin: 0 auto; padding: 0 16px; }
+      .tab-nav { display: flex; gap: 32px; }
+      .tab-btn { display: flex; align-items: center; gap: 8px; padding: 16px 4px; border-bottom: 2px solid transparent; background: none; border: none; font-weight: 500; font-size: 14px; color: #6b7280; cursor: pointer; transition: all 0.3s; }
+      .tab-btn:hover { color: #374151; border-bottom-color: #d1d5db; }
+      .tab-btn.active { color: #2563eb; border-bottom-color: #2563eb; }
+      .tab-content { max-width: 1280px; margin: 0 auto; padding: 32px 16px; }
+      .content-section { background: white; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e5e7eb; padding: 24px; margin-bottom: 24px; }
+      .section-title { font-size: 20px; font-weight: 600; color: #111827; margin-bottom: 16px; display: flex; align-items: center; gap: 12px; }
+      .overview-text { color: #374151; line-height: 1.6; margin-bottom: 20px; }
+      .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 20px; }
+      .stat-card { background: linear-gradient(135deg, #e8eaf6 0%, #c5cae9 100%); border: 1px solid #7986cb; border-radius: 8px; padding: 16px; }
+      .stat-card.blue { background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); border-color: #3b82f6; }
+      .stat-card.green { background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%); border-color: #22c55e; }
+      .stat-header { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+      .stat-label { font-size: 14px; font-weight: 500; color: #374151; }
+      .stat-value { font-size: 20px; font-weight: 700; color: #3949ab; }
+      .stat-value.blue { color: #1e40af; }
+      .stat-value.green { color: #15803d; }
+      .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px; margin-top: 16px; }
+      .chart-container { position: relative; height: 280px; }
+      .sample-table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+      .sample-table th { background: #f9fafb; padding: 12px; text-align: left; font-weight: 600; color: #374151; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #e5e7eb; }
+      .sample-table td { padding: 12px; border-bottom: 1px solid #e5e7eb; font-size: 14px; font-family: 'SF Mono', monospace; }
+      .dictionary-list { display: flex; flex-direction: column; gap: 16px; }
+      .dictionary-item { border-left: 4px solid #3949ab; padding-left: 16px; }
+      .dictionary-header { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
+      .dictionary-field { font-weight: 500; color: #111827; }
+      .dictionary-type { background: #f3f4f6; color: #374151; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-family: monospace; }
+      .dictionary-description { color: #6b7280; font-size: 14px; }
+      @media (min-width: 1024px) { .dataset-header-main { flex-direction: row; } .dataset-image { width: 256px; height: 128px; } }
+      @media (max-width: 768px) { .tab-nav { gap: 16px; } .stats-grid, .charts-grid { grid-template-columns: 1fr; } .chart-container { height: 240px; } }
+      .stat-card.purple { background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%); border-color: #d8b4fe; }
+      .stat-value.purple { color: #7c3aed; }
+      .hero-kpi { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; background: linear-gradient(135deg, #312e81 0%, #1e1b4b 100%); border-radius: 16px; padding: 28px 32px; margin-bottom: 24px; color: white; }
+      .hero-kpi-value { font-size: 28px; font-weight: 800; margin-bottom: 4px; }
+      .hero-kpi-label { font-size: 12px; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.05em; }
+      @media (max-width: 900px) { .hero-kpi { grid-template-columns: repeat(2, 1fr); } }
+      .insight-callout { background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%); border-left: 4px solid #6366f1; border-radius: 8px; padding: 20px; margin-bottom: 20px; }
+      .insight-callout strong { color: #3730a3; }
+      .use-case-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-top: 20px; }
+      .use-case-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px; transition: all 0.2s; }
+      .use-case-card:hover { border-color: #cbd5e1; box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+      .use-case-card h4 { font-size: 15px; color: #1e293b; margin-bottom: 8px; }
+      .use-case-card p { font-size: 13px; color: #64748b; line-height: 1.5; }
+      .chart-container h3 { font-size: 16px; font-weight: 600; color: #374151; margin-bottom: 16px; }
+      .chart-full { grid-column: 1 / -1; min-height: 320px; }
+    </style>
+  </head>
+  <body>
+    <header class="header">
+      <div class="header-content">
+        <a href="index.html" class="back-btn"><span>←</span><span>Back to Datasets</span></a>
+        <div class="dataset-header">
+          <div class="dataset-header-main">
+            <div class="dataset-image"></div>
+            <div class="dataset-info">
+              <div class="dataset-category">Commerce</div>
+              <h1 class="dataset-title">Commerce & E‑commerce Analytics</h1>
+              <p class="dataset-description">Transaction data, conversion funnels, cart analytics, and revenue metrics across product categories and customer segments.</p>
+              <div class="dataset-meta">
+                <div class="meta-item"><span>📅</span><span>Updated 2024-12-13</span></div>
+                <div class="meta-item"><span>🗄️</span><span>2,000,000 records</span></div>
+                <div class="meta-item"><span>💾</span><span>2 GB</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <nav class="tab-navigation">
+      <div class="tab-nav-content">
+        <div class="tab-nav">
+          <button class="tab-btn active" data-tab="overview"><span>👁️</span><span>Overview</span></button>
+          <button class="tab-btn" data-tab="analytics"><span>📈</span><span>Analytics</span></button>
+          <button class="tab-btn" data-tab="sample"><span>📊</span><span>Sample Data</span></button>
+          <button class="tab-btn" data-tab="dictionary"><span>📄</span><span>Data Dictionary</span></button>
+        </div>
+      </div>
+    </nav>
+
+    <main class="tab-content">
+      <div id="overviewContent" class="tab-panel active">
+        <div class="content-section">
+          <h2 class="section-title">👁️ Dataset Overview</h2>
+          <div class="overview-text">
+            <p>Comprehensive e-commerce and retail analytics including transactional data, cart abandonment metrics, conversion funnels, and revenue by product category. This dataset powers purchase analytics, merchandising optimization, and customer lifecycle modeling across the full path from browse to buy.</p>
+            <p><strong>Scope & coverage:</strong> Supports segmentation by customer lifecycle, geography, device, and product category. Includes AOV, LTV, cohort retention, cart abandonment rates, and multi-touch attribution. Session-level and order-level granularity with full product hierarchy.</p>
+            <p><strong>Data quality & freshness:</strong> Refreshed hourly with complete order and session data. Full attribution tracking and join keys to audience and campaign datasets for unified analytics.</p>
+            <p><strong>Best suited for:</strong> Revenue forecasting, merchandising and assortment planning, conversion optimization, LTV modeling, and cross-channel attribution.</p>
+          </div>
+          
+          <div class="hero-kpi">
+            <div class="hero-kpi-item"><div class="hero-kpi-value">$4M</div><div class="hero-kpi-label">30d Revenue</div></div>
+            <div class="hero-kpi-item"><div class="hero-kpi-value">4%</div><div class="hero-kpi-label">Conversion</div></div>
+            <div class="hero-kpi-item"><div class="hero-kpi-value">$90</div><div class="hero-kpi-label">Avg Order</div></div>
+            <div class="hero-kpi-item"><div class="hero-kpi-value">58%</div><div class="hero-kpi-label">Mobile Share</div></div>
+          </div>
+          
+          <div class="insight-callout">
+            <strong>Key insight:</strong> Mobile contributes 58% of transactions but conversion is 2.3x lower than desktop. Cart recovery emails capture 12% of abandoned carts; optimizing mobile checkout could unlock ~$500K incremental monthly revenue.
+          </div>
+          
+          <h3 class="section-title" style="margin-top: 24px;">Use Cases</h3>
+          <div class="use-case-grid">
+            <div class="use-case-card">
+              <h4>🛒 Conversion Optimization</h4>
+              <p>Identify funnel drop-off by device, category, and segment. A/B test checkout flows and recovery campaigns.</p>
+            </div>
+            <div class="use-case-card">
+              <h4>📊 Revenue Forecasting</h4>
+              <p>Model revenue by category and region. Build cohorts for LTV prediction and seasonal planning.</p>
+            </div>
+            <div class="use-case-card">
+              <h4>🎯 Segment Targeting</h4>
+              <p>Profile high-value vs churn-prone customers. Personalize offers and email sequences by behavior.</p>
+            </div>
+          </div>
+        </div>
+        <div class="content-section">
+          <h2 class="section-title">📊 Key Metrics</h2>
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-header"><span class="stat-label">Revenue (30d)</span></div>
+              <div class="stat-value">$4M</div>
+            </div>
+            <div class="stat-card blue">
+              <div class="stat-header"><span class="stat-label">Conversion Rate</span></div>
+              <div class="stat-value blue">4%</div>
+            </div>
+            <div class="stat-card green">
+              <div class="stat-header"><span class="stat-label">Avg Order Value</span></div>
+              <div class="stat-value green">$90</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-header"><span class="stat-label">Cart Abandonment</span></div>
+              <div class="stat-value">62%</div>
+            </div>
+            <div class="stat-card purple">
+              <div class="stat-header"><span class="stat-label">Categories</span></div>
+              <div class="stat-value purple">24</div>
+            </div>
+            <div class="stat-card blue">
+              <div class="stat-header"><span class="stat-label">LTV (Avg)</span></div>
+              <div class="stat-value blue">$300</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="analyticsContent" class="tab-panel" style="display: none;">
+        <div class="content-section">
+          <h2 class="section-title">📈 Key Visualizations</h2>
+          <div class="charts-grid">
+            <div class="chart-container chart-full">
+              <h3>Revenue by Category (Last 30 Days)</h3>
+              <canvas id="commerceChart1"></canvas>
+            </div>
+            <div class="chart-container">
+              <h3>Monthly Revenue Trend</h3>
+              <canvas id="commerceChart2"></canvas>
+            </div>
+            <div class="chart-container">
+              <h3>Transactions by Device</h3>
+              <canvas id="commerceChart3"></canvas>
+            </div>
+            <div class="chart-container">
+              <h3>Conversion Funnel by Stage</h3>
+              <canvas id="commerceChart4"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="sampleContent" class="tab-panel" style="display: none;">
+        <div class="content-section">
+          <h2 class="section-title">📊 Sample Data</h2>
+          <table class="sample-table">
+            <thead>
+              <tr><th>Transaction ID</th><th>Category</th><th>Amount</th><th>Region</th><th>Device</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>TXN_8842</td><td>Electronics</td><td>$234.99</td><td>West</td><td>Mobile</td><td>Completed</td></tr>
+              <tr><td>TXN_8843</td><td>Apparel</td><td>$89.50</td><td>East</td><td>Desktop</td><td>Completed</td></tr>
+              <tr><td>TXN_8844</td><td>Home</td><td>$156.00</td><td>South</td><td>Tablet</td><td>Pending</td></tr>
+              <tr><td>TXN_8845</td><td>Sports</td><td>$67.25</td><td>Midwest</td><td>Mobile</td><td>Completed</td></tr>
+              <tr><td>TXN_8846</td><td>Beauty</td><td>$42.80</td><td>East</td><td>Mobile</td><td>Completed</td></tr>
+              <tr><td>TXN_8847</td><td>Electronics</td><td>$189.00</td><td>West</td><td>Desktop</td><td>Completed</td></tr>
+              <tr><td>TXN_8848</td><td>Books</td><td>$24.99</td><td>Midwest</td><td>Mobile</td><td>Completed</td></tr>
+              <tr><td>TXN_8849</td><td>Home</td><td>$312.50</td><td>South</td><td>Desktop</td><td>Completed</td></tr>
+              <tr><td>TXN_8850</td><td>Apparel</td><td>$156.75</td><td>West</td><td>Mobile</td><td>Refunded</td></tr>
+              <tr><td>TXN_8851</td><td>Sports</td><td>$98.40</td><td>East</td><td>Tablet</td><td>Completed</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="dictionaryContent" class="tab-panel" style="display: none;">
+        <div class="content-section">
+          <h2 class="section-title">📄 Data Dictionary</h2>
+          <div class="dictionary-list">
+            <div class="dictionary-item">
+              <div class="dictionary-header"><h3 class="dictionary-field">transaction_id</h3><span class="dictionary-type">String</span></div>
+              <p class="dictionary-description">Unique transaction identifier</p>
+            </div>
+            <div class="dictionary-item">
+              <div class="dictionary-header"><h3 class="dictionary-field">category</h3><span class="dictionary-type">String</span></div>
+              <p class="dictionary-description">Product category</p>
+            </div>
+            <div class="dictionary-item">
+              <div class="dictionary-header"><h3 class="dictionary-field">amount</h3><span class="dictionary-type">Decimal</span></div>
+              <p class="dictionary-description">Transaction amount in USD</p>
+            </div>
+            <div class="dictionary-item">
+              <div class="dictionary-header"><h3 class="dictionary-field">region</h3><span class="dictionary-type">String</span></div>
+              <p class="dictionary-description">Geographic region</p>
+            </div>
+            <div class="dictionary-item">
+              <div class="dictionary-header"><h3 class="dictionary-field">device</h3><span class="dictionary-type">String</span></div>
+              <p class="dictionary-description">Device used for purchase</p>
+            </div>
+            <div class="dictionary-item">
+              <div class="dictionary-header"><h3 class="dictionary-field">status</h3><span class="dictionary-type">Enum</span></div>
+              <p class="dictionary-description">Transaction status: Completed, Pending, Refunded, Cancelled</p>
+            </div>
+            <div class="dictionary-item">
+              <div class="dictionary-header"><h3 class="dictionary-field">customer_id</h3><span class="dictionary-type">String</span></div>
+              <p class="dictionary-description">Anonymized customer identifier for cohort analysis</p>
+            </div>
+            <div class="dictionary-item">
+              <div class="dictionary-header"><h3 class="dictionary-field">session_id</h3><span class="dictionary-type">String</span></div>
+              <p class="dictionary-description">Session identifier for funnel and attribution analysis</p>
+            </div>
+            <div class="dictionary-item">
+              <div class="dictionary-header"><h3 class="dictionary-field">timestamp</h3><span class="dictionary-type">DateTime</span></div>
+              <p class="dictionary-description">UTC timestamp of transaction</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script>
+      function initTabs() {
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabPanels = document.querySelectorAll('.tab-panel');
+        tabBtns.forEach(btn => {
+          btn.addEventListener('click', () => {
+            const targetTab = btn.getAttribute('data-tab');
+            tabBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            tabPanels.forEach(panel => panel.style.display = 'none');
+            const target = document.getElementById(targetTab + 'Content');
+            if (target) target.style.display = 'block';
+            if (targetTab === 'analytics') initCommerceCharts();
+          });
+        });
+      }
+      let commerceChartsInitialized = false;
+      function initCommerceCharts() {
+        if (commerceChartsInitialized) return;
+        commerceChartsInitialized = true;
+        new Chart(document.getElementById('commerceChart1'), {
+          type: 'bar',
+          data: {
+            labels: ['Electronics', 'Apparel', 'Home', 'Sports', 'Beauty', 'Books'],
+            datasets: [{ label: 'Revenue ($K)', data: [420, 280, 195, 142, 98, 65], backgroundColor: ['#5c6bc0','#7986cb','#9fa8da','#c5cae9','#e8eaf6','#b39ddb'] }]
+          },
+          options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+        });
+        new Chart(document.getElementById('commerceChart2'), {
+          type: 'line',
+          data: {
+            labels: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+            datasets: [{ label: 'Monthly Revenue ($M)', data: [2.8, 3.1, 3.4, 3.2, 3.6, 3.9, 4.1, 3.8, 4.0, 4.2, 4.5, 4.2], borderColor: '#3949ab', fill: true, tension: 0.4 }]
+          },
+          options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+        });
+        new Chart(document.getElementById('commerceChart3'), {
+          type: 'doughnut',
+          data: {
+            labels: ['Mobile', 'Desktop', 'Tablet'],
+            datasets: [{ data: [58, 32, 10], backgroundColor: ['#5c6bc0', '#7986cb', '#9fa8da'] }]
+          },
+          options: { responsive: true, maintainAspectRatio: false }
+        });
+      }
+      document.addEventListener('DOMContentLoaded', initTabs);
+    </script>
+  </body>
+</html>

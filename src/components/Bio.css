@@ -1,0 +1,131 @@
+/* Bio: clean editorial block */
+.bio {
+  padding: 5rem 1.5rem;
+  background: transparent;
+}
+
+.bio-inner {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0;
+}
+
+.bio-section-title {
+  margin: 0 0 2.5rem;
+  text-align: left;
+}
+
+.bio-block {
+  position: relative;
+  animation: fadeUp 0.6s ease-out backwards;
+}
+
+.bio-typography-wall {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: clamp(1.125rem, 3vw, 1.75rem);
+  font-weight: 500;
+  line-height: 1.6;
+  color: var(--text-muted);
+  letter-spacing: -0.01em;
+}
+
+/* Subtle highlights - bolder text but NO color changing hover */
+.highlight-text {
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* Structural anchors to allow birds to perch on key phrases */
+.bio-typography-wall {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: clamp(1.25rem, 3.5vw, 2rem);
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+
+.leadership-pillars {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin-top: 6rem;
+  animation: fadeUp 0.6s ease-out 0.2s backwards;
+}
+
+.leadership-pillar {
+  padding: 2.25rem;
+  border-radius: 12px;
+  background: var(--bg-glass);
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.leadership-pillar:hover {
+  transform: translateY(-8px);
+  border-color: var(--accent);
+  background: rgba(255, 255, 255, 0.04);
+  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.6), 0 0 20px var(--accent-dim);
+}
+
+.pillar-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.25rem;
+}
+
+.pillar-icon {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent);
+  opacity: 0.9;
+}
+
+.pillar-title {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--accent);
+  margin: 0;
+  font-weight: 700;
+}
+
+.pillar-text {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--text-muted);
+  margin: 0;
+  opacity: 0.9;
+}
+
+@media (max-width: 860px) {
+  .leadership-pillars {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+    margin-top: 3.5rem;
+  }
+}
+
+.bio-blurb {
+  bottom: -40px;
+  right: -60px;
+  top: auto;
+}
+
+@media (max-width: 1024px) {
+  .bio-blurb {
+    right: 0;
+    bottom: -60px;
+  }
+}

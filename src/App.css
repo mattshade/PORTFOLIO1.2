@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 .counter {
   font-size: 16px;
   padding: 5px 10px;
@@ -182,3 +183,77 @@
     border-right-color: var(--border);
   }
 }
+=======
+.section {
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.section-inner {
+  padding: 0 0.5rem;
+}
+
+@media (max-width: 480px) {
+  .section-inner {
+    padding: 0 1rem;
+  }
+}
+
+.section-title {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+
+.section-desc {
+  margin: 1rem 0 0;
+  font-size: 1rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+  max-width: 560px;
+}
+
+/* Full-page birds background */
+.birds-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 150;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+  transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+body.modal-open .birds-bg {
+  opacity: 0;
+}
+
+.birds-bg canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.app-content {
+  position: relative;
+  z-index: 1;
+}
+
+body.modal-open .app-content {
+  z-index: 2000;
+}
+
+.bird-wire {
+  height: 1px;
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.05);
+  box-shadow: none;
+  margin: 4rem 0;
+}
+
+>>>>>>> f4e90a3 (initial commit: architecting the future)

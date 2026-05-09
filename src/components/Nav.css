@@ -1,0 +1,217 @@
+/* Keyboard / screen reader — first focusable in nav */
+.skip-link {
+  position: absolute;
+  left: 0;
+  top: 0;
+  padding: 0.65rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #ffffff;
+  background: var(--text);
+  text-decoration: none;
+  border-radius: 0 0 8px 0;
+  z-index: 200;
+  clip-path: inset(0 0 100% 0);
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.skip-link:focus {
+  clip-path: none;
+  clip: auto;
+  width: auto;
+  height: auto;
+  overflow: visible;
+  left: 1rem;
+  top: 100%;
+  margin-top: 0.35rem;
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  padding: 1rem 1.5rem;
+  background: var(--bg-glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+  transition: all 0.3s ease;
+}
+
+.nav-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nav-home {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  transition: transform 0.2s ease;
+}
+
+.nav-home:hover {
+  transform: scale(1.02);
+}
+
+.nav-logo {
+  flex-shrink: 0;
+}
+
+.nav-brand-text {
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: normal;
+}
+
+/* Hamburger button - Desktop hidden */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  z-index: 105;
+  transition: all 0.3s ease;
+}
+
+.hamburger-line {
+  width: 24px;
+  height: 2px;
+  background-color: var(--text);
+  border-radius: 2px;
+  transition: all 0.3s ease;
+  transform-origin: left center;
+}
+
+.nav-links {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.nav-link {
+  position: relative;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1px solid transparent;
+}
+
+.nav-link:hover {
+  color: var(--accent);
+  background: var(--accent-dim);
+  border-color: var(--border-strong);
+  box-shadow: 0 0 20px var(--accent-dim);
+}
+
+.nav-link-active {
+  color: var(--accent) !important;
+  border-color: var(--border-strong);
+}
+
+/* Mobile layout adjustments */
+@media (max-width: 768px) {
+  .hamburger {
+    display: flex;
+  }
+  
+  .hamburger.active .hamburger-line:nth-child(1) {
+    transform: rotate(45deg);
+    width: 24px;
+  }
+  
+  .hamburger.active .hamburger-line:nth-child(2) {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  
+  .hamburger.active .hamburger-line:nth-child(3) {
+    transform: rotate(-45deg);
+    width: 24px;
+  }
+
+  .nav {
+    padding: 0.75rem 1rem;
+  }
+  
+  .nav-open {
+    background: transparent;
+    border-bottom-color: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .nav-links {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 100vh;
+    background: var(--bg-glass);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    flex-direction: column;
+    justify-content: center;
+    gap: 2rem;
+    padding: 2rem;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-10px);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .nav-links.open {
+    opacity: 1;
+    pointer-events: all;
+    transform: translateY(0);
+  }
+
+  .nav-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    padding: 1rem 2rem;
+    width: 100%;
+    text-align: center;
+    border: 1px solid var(--border-strong);
+    background: var(--bg);
+  }
+
+  .nav-link:hover {
+    transform: translateY(-2px);
+  }
+
+  /* Optional: Keep brand text hidden on very small screens, or hide it fully when menu is toggled, matching previous specific style */
+  .nav-logo-architectural .nav-brand-text {
+    display: none;
+  }
+}
+
+/* Hide navigation entirely when modal is open to prevent overlapping */
+body.modal-open .nav {
+  display: none !important;
+}

@@ -1,0 +1,80 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background:
+    radial-gradient(circle at 12% 12%, rgba(10, 132, 255, 0.15), transparent 38%),
+    radial-gradient(circle at 85% 18%, rgba(100, 210, 255, 0.12), transparent 40%),
+    linear-gradient(180deg, #0b0f14 0%, #0f1520 100%);
+  color: #e6e9ef;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-family: "SF Pro Display", "SF Pro Text", -apple-system, BlinkMacSystemFont,
+    "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+}
+
+mark[data-finding-id],
+.finding-mark {
+  background-color: rgba(255, 204, 0, 0.3);
+  padding: 2px 4px;
+  border-radius: 3px;
+}
+
+.pane {
+  background: rgba(17, 24, 39, 0.85);
+  border: 1px solid rgba(55, 65, 81, 0.7);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+  transition: box-shadow 240ms ease, transform 240ms ease, border-color 240ms ease;
+}
+
+.pane-header {
+  background: rgba(17, 24, 39, 0.95);
+  border-bottom: 1px solid rgba(55, 65, 81, 0.6);
+}
+
+.card {
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(55, 65, 81, 0.7);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.3);
+  transition: box-shadow 200ms ease, transform 200ms ease, border-color 200ms ease;
+}
+
+.surface {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(55, 65, 81, 0.65);
+  transition: border-color 200ms ease, background-color 200ms ease;
+}
+
+.input {
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(55, 65, 81, 0.8);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  transition: border-color 200ms ease, box-shadow 200ms ease, background-color 200ms ease;
+}
+
+.button {
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(55, 65, 81, 0.8);
+  color: #e6e9ef;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.35);
+  transition: transform 150ms ease, box-shadow 150ms ease, border-color 150ms ease;
+}
+
+.button-primary {
+  background: linear-gradient(135deg, #0a84ff, #2c7ff7);
+  border: 1px solid rgba(10, 132, 255, 0.8);
+  color: #fff;
+  box-shadow: 0 10px 20px rgba(10, 132, 255, 0.35);
+}

@@ -1,0 +1,18 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model ValidationRun {
+  id             String   @id @default(cuid())
+  createdAt      DateTime @default(now())
+  score          Int
+  categoriesJson String
+  findingsJson   String
+  annotatedText  String
+  sourceTextHash String
+}

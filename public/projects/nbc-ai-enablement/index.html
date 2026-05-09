@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Case study: AI Enablement for NBC News Group—weekly executive reporting, custom Copilot agents, training, and platform programs." />
+  <title>AI Enablement · NBC News Group · Matt Shade</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/case-study.css" />
+</head>
+<body class="cs-page">
+  <div class="cs-bg" aria-hidden="true">
+    <div class="cs-bg-gradient"></div>
+    <div class="cs-bg-glow cs-bg-glow-1"></div>
+    <div class="cs-bg-glow cs-bg-glow-2"></div>
+    <div class="cs-bg-grid"></div>
+  </div>
+
+  <div class="cs-boids" aria-hidden="true">
+    <canvas id="cs-boids-canvas" width="300" height="300"></canvas>
+  </div>
+
+  <a class="cs-skip-link" href="#main-content">Skip to main content</a>
+
+  <nav class="cs-nav" aria-label="Main">
+    <div class="cs-nav-inner">
+      <a href="/" class="cs-nav-home">
+        <svg class="cs-nav-logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+          <path fill="hsl(142, 45%, 60%)" d="M 12 1 L 20 14 L 23 21 L 16 16 L 12 23 L 8 16 L 1 21 L 4 14 Z"/>
+          <circle cx="12" cy="10.5" r="3.2" fill="#ffffff"/>
+          <circle cx="12" cy="10.5" r="1.3" fill="#0a0a0b"/>
+        </svg>
+        <span class="cs-nav-brand">Matt Shade</span>
+      </a>
+
+      <button class="cs-hamburger" aria-expanded="false" aria-label="Toggle navigation menu">
+        <span class="cs-hamburger-line"></span>
+        <span class="cs-hamburger-line"></span>
+        <span class="cs-hamburger-line"></span>
+      </button>
+
+      <div class="cs-nav-links">
+        <a href="/#projects" class="cs-nav-link">Case Studies and Projects</a>
+        <a href="/#experience" class="cs-nav-link">Experience</a>
+      </div>
+    </div>
+  </nav>
+
+  <main id="main-content" class="cs-main" data-cs-boids-avoid>
+    <div class="cs-main-inner">
+      <div class="cs-intro">
+        <a class="cs-back" href="/#projects">← Back to portfolio</a>
+        <p class="cs-eyebrow">Case study</p>
+        <h1>AI Enablement · NBC News Group</h1>
+        <p class="cs-lede">
+          Executive-ready visibility and delivery for Data AI &amp; Emerging Tech: a weekly rhythm of progress, governance, and hands-on enablement across newsroom, product, and engineering.
+        </p>
+        <div class="cs-pills" aria-hidden="true">
+          <span class="cs-pill">Strategy</span>
+          <span class="cs-pill">Custom agents</span>
+          <span class="cs-pill">Training</span>
+          <span class="cs-pill">Platforms</span>
+        </div>
+      </div>
+
+      <div class="cs-bird-wire" aria-hidden="true"></div>
+
+      <section class="cs-section">
+        <h2>Operating model</h2>
+        <ul>
+          <li><strong>Weekly cadence:</strong> A consistent report format for leadership—what moved, what blocked, and what was next across agents, training, and platform initiatives.</li>
+          <li><strong>OKRs &amp; prioritization:</strong> Helped define outcome-driven OKRs for AI enablement and capabilities, connecting tool adoption and applied research to measurable newsroom and enterprise use cases.</li>
+          <li><strong>Execution hygiene:</strong> Drove translation of AI work into structured, scoped Jira stories—improving visibility, ownership, and prioritization across teams.</li>
+        </ul>
+      </section>
+
+      <section class="cs-section">
+        <h2>Portfolio highlights</h2>
+        <p><strong>Custom Copilot &amp; agent programs.</strong> Built and advanced domain-specific agents across editorial, standards, legal, audience, and production workflows—with clear ownership, usage guidance, and practical rollout support.</p>
+        <div class="cs-platform-grid">
+          <article class="cs-platform">
+            <h3>Standards &amp; policy assistant</h3>
+            <p>
+              Helped teams quickly reference newsroom standards, style guidance, and policy language in-context while drafting and reviewing content.
+            </p>
+          </article>
+          <article class="cs-platform">
+            <h3>Legal &amp; rights intake assistant</h3>
+            <p>
+              Structured first-pass legal support by routing common rights/questions to the right docs and teams, reducing ad hoc back-and-forth.
+            </p>
+          </article>
+          <article class="cs-platform">
+            <h3>Editorial discovery copilot</h3>
+            <p>
+              Supported pitch and research workflows by surfacing relevant source context, angle starters, and follow-up questions for producers and reporters.
+            </p>
+          </article>
+          <article class="cs-platform">
+            <h3>Booking &amp; scheduling workflow assistant</h3>
+            <p>
+              Improved production coordination by standardizing recurring booking/scheduling steps and reducing operational friction for teams.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section class="cs-section">
+        <h2>AI tools office hours</h2>
+        <p>
+          What started as <strong>ChatGPT office hours</strong> evolved into a broader <strong>AI tools office hours</strong> format covering creation, coding, meeting productivity, voice, and workflow automation. Sessions focused on live use cases and immediate application, not generic demos.
+        </p>
+        <div class="cs-logo-wall" aria-label="Tools covered in AI tools office hours">
+          <div class="cs-logo-tile"><img src="/projects/nbc-ai-enablement/logos/chatgpt-openai.png" alt="ChatGPT / OpenAI" loading="lazy" decoding="async" /><span>ChatGPT</span></div>
+          <div class="cs-logo-tile"><img src="/projects/nbc-ai-enablement/logos/microsoft-copilot.png" alt="Microsoft Copilot" loading="lazy" decoding="async" /><span>Microsoft Copilot</span></div>
+          <div class="cs-logo-tile"><img src="/projects/nbc-ai-enablement/logos/adobe-firefly.png" alt="Adobe Firefly" loading="lazy" decoding="async" /><span>Adobe Firefly</span></div>
+          <div class="cs-logo-tile"><img src="/projects/nbc-ai-enablement/logos/elevenlabs.png" alt="ElevenLabs" loading="lazy" decoding="async" /><span>ElevenLabs</span></div>
+          <div class="cs-logo-tile"><img src="/projects/nbc-ai-enablement/logos/m365.png" alt="Microsoft 365" loading="lazy" decoding="async" /><span>M365</span></div>
+          <div class="cs-logo-tile"><img src="/projects/nbc-ai-enablement/logos/figma.png" alt="Figma Make" loading="lazy" decoding="async" /><span>Figma Make</span></div>
+          <div class="cs-logo-tile cs-logo-tile--wide"><img src="/projects/nbc-ai-enablement/logos/runway.png" alt="Runway" loading="lazy" decoding="async" /><span>Runway AI</span></div>
+          <div class="cs-logo-tile cs-logo-tile--gateway" title="AI Gateway — internal routing &amp; policy layer">
+            <svg class="cs-gateway-mark" viewBox="0 0 96 32" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <defs>
+                <linearGradient id="cs-gw-grad" x1="0%" y1="50%" x2="100%" y2="50%">
+                  <stop offset="0%" stop-color="#0f766e" stop-opacity="0.45" />
+                  <stop offset="50%" stop-color="#14b8a6" stop-opacity="0.9" />
+                  <stop offset="100%" stop-color="#93c572" stop-opacity="0.85" />
+                </linearGradient>
+              </defs>
+              <circle cx="10" cy="16" r="3.5" fill="url(#cs-gw-grad)" />
+              <path d="M14 16h18" stroke="url(#cs-gw-grad)" stroke-width="2" stroke-linecap="round" />
+              <rect x="34" y="5" width="28" height="22" rx="7" fill="rgba(20, 184, 166, 0.08)" stroke="url(#cs-gw-grad)" stroke-width="2" />
+              <circle cx="48" cy="16" r="2.5" fill="url(#cs-gw-grad)" opacity="0.95" />
+              <path d="M64 16h18" stroke="url(#cs-gw-grad)" stroke-width="2" stroke-linecap="round" />
+              <circle cx="86" cy="16" r="3.5" fill="url(#cs-gw-grad)" />
+            </svg>
+            <span class="cs-gateway-name">AI Gateway</span>
+          </div>
+          <div class="cs-logo-tile"><img src="/projects/nbc-ai-enablement/logos/github-copilot.svg" alt="GitHub Copilot" loading="lazy" decoding="async" /><span>GitHub Copilot</span></div>
+        </div>
+        <p>
+          <strong>Training &amp; enablement.</strong> Office hours were paired with GitHub Copilot sessions with Microsoft, Google Cloud AI topics (Gemini, Vertex, agent patterns), and cohort-style learning so teams could bring real tasks and leave with repeatable workflows.
+        </p>
+        <p><strong>Platform &amp; data foundations.</strong> Progress toward a unified <strong>Data Hub</strong> mental model—helping teams discover and evaluate datasets with clearer documentation and tiers—alongside pragmatic license and tooling coordination across the generative AI stack.</p>
+      </section>
+
+      <section class="cs-section cs-section--viz" aria-labelledby="enablement-chart-heading">
+        <h2 id="enablement-chart-heading">Evidence from the enablement dashboard</h2>
+        <p>
+          The <a href="/projects/chatgpt-dashboard/executive">ChatGPT dashboard executive view</a> is the same demo I used to tell the enablement story with numbers. Figures below are taken from that build: the Enterprise AI portfolio strip is defined there, and the ChatGPT pulse / feature-adoption metrics are computed from its preloaded January&nbsp;2026 roster (simulated data, not live production telemetry).
+        </p>
+
+        <h3 class="cs-subhead">Enterprise AI portfolio</h3>
+        <p class="cs-dash-lede">License utilization across the four platforms shown on the executive view (licensed or allocated vs active).</p>
+        <div class="cs-viz-wrap cs-dash-portfolio" role="img" aria-label="Utilization: Adobe Firefly 64 percent, GitHub Copilot 70 percent, Microsoft Copilot 96 percent, ChatGPT 83 percent.">
+          <div class="cs-dash-port-row">
+            <span class="cs-dash-port-name">Adobe Firefly</span>
+            <div class="cs-dash-port-meta"><span>498 purchased</span><span>317 active</span></div>
+            <div class="cs-dash-port-barwrap" aria-hidden="true"><span class="cs-dash-port-bar" style="width:64%; background:#ea1111"></span></div>
+            <span class="cs-dash-port-pct" style="color:#ea1111">64%</span>
+          </div>
+          <div class="cs-dash-port-row">
+            <span class="cs-dash-port-name">GitHub Copilot</span>
+            <div class="cs-dash-port-meta"><span>176 seats</span><span>124 active</span></div>
+            <div class="cs-dash-port-barwrap" aria-hidden="true"><span class="cs-dash-port-bar" style="width:70%; background:#24292e"></span></div>
+            <span class="cs-dash-port-pct" style="color:#24292e">70%</span>
+          </div>
+          <div class="cs-dash-port-row">
+            <span class="cs-dash-port-name">Microsoft Copilot</span>
+            <div class="cs-dash-port-meta"><span>328 paid</span><span>315 active</span></div>
+            <div class="cs-dash-port-barwrap" aria-hidden="true"><span class="cs-dash-port-bar" style="width:96%; background:#0078d4"></span></div>
+            <span class="cs-dash-port-pct" style="color:#0078d4">96%</span>
+          </div>
+          <div class="cs-dash-port-row">
+            <span class="cs-dash-port-name">ChatGPT</span>
+            <div class="cs-dash-port-meta"><span>690 allocated</span><span>576 active</span></div>
+            <div class="cs-dash-port-barwrap" aria-hidden="true"><span class="cs-dash-port-bar" style="width:83%; background:#4f46e5"></span></div>
+            <span class="cs-dash-port-pct" style="color:#4f46e5">83%</span>
+          </div>
+        </div>
+
+        <h3 class="cs-subhead">ChatGPT pulse · demo cohort</h3>
+        <p class="cs-dash-lede">Aggregates from the dashboard’s preloaded enabled-user roster (same logic as the executive page).</p>
+        <div class="cs-stat-row cs-stat-row--dense" aria-label="ChatGPT demo cohort KPIs">
+          <div class="cs-stat"><div class="cs-stat-num">655</div><div class="cs-stat-label">enabled users</div></div>
+          <div class="cs-stat"><div class="cs-stat-num">547</div><div class="cs-stat-label">active (MAU)</div></div>
+          <div class="cs-stat"><div class="cs-stat-num">83.5%</div><div class="cs-stat-label">active rate</div></div>
+          <div class="cs-stat"><div class="cs-stat-num">52,050</div><div class="cs-stat-label">messages (period)</div></div>
+          <div class="cs-stat"><div class="cs-stat-num">95.2</div><div class="cs-stat-label">avg msgs / active user</div></div>
+        </div>
+
+        <h3 class="cs-subhead">Feature adoption (% of enabled users)</h3>
+        <div class="cs-viz-wrap cs-viz-enablement cs-dash-features" role="img" aria-label="Tools 73.3 percent, Custom GPTs 15.3 percent, Projects 14.5 percent, Project creators 7.6 percent of enabled users.">
+          <div class="cs-en-chart">
+            <div class="cs-en-row">
+              <span class="cs-en-label">Tools (File Search, Code Interpreter, DALL·E, browsing)</span>
+              <div class="cs-en-track" aria-hidden="true"><span class="cs-en-bar cs-dash-feat-bar" style="width:73.282%"></span></div>
+              <span class="cs-en-val">73.3%</span>
+            </div>
+            <div class="cs-en-row">
+              <span class="cs-en-label">Custom GPTs</span>
+              <div class="cs-en-track" aria-hidden="true"><span class="cs-en-bar cs-dash-feat-bar cs-dash-feat-bar--gpt" style="width:15.267%"></span></div>
+              <span class="cs-en-val">15.3%</span>
+            </div>
+            <div class="cs-en-row">
+              <span class="cs-en-label">Projects</span>
+              <div class="cs-en-track" aria-hidden="true"><span class="cs-en-bar cs-dash-feat-bar cs-dash-feat-bar--proj" style="width:14.504%"></span></div>
+              <span class="cs-en-val">14.5%</span>
+            </div>
+            <div class="cs-en-row">
+              <span class="cs-en-label">Project creators</span>
+              <div class="cs-en-track" aria-hidden="true"><span class="cs-en-bar cs-dash-feat-bar cs-dash-feat-bar--creator" style="width:7.634%"></span></div>
+              <span class="cs-en-val">7.6%</span>
+            </div>
+          </div>
+          <p class="cs-en-scale">Scale 0–100% · 480 / 655 with tools · 100 / 655 with GPTs · 95 / 655 with projects · 50 / 655 creators</p>
+        </div>
+
+        <h3 class="cs-subhead">Program footprint on this page</h3>
+        <div class="cs-stat-row" aria-label="Structure of this write-up">
+          <div class="cs-stat"><div class="cs-stat-num">3</div><div class="cs-stat-label">operating model pillars</div></div>
+          <div class="cs-stat"><div class="cs-stat-num">4</div><div class="cs-stat-label">agent programs described</div></div>
+          <div class="cs-stat"><div class="cs-stat-num">9</div><div class="cs-stat-label">tools in AI tools office hours</div></div>
+        </div>
+        <p class="cs-viz-caption cs-viz-caption--left">
+          Portfolio utilization matches the executive view UI; ChatGPT totals and feature-adoption rates match the dashboard’s preloaded demo roster. If that demo dataset changes, re-check the linked executive page and update this section to stay in sync.
+        </p>
+      </section>
+
+      <section class="cs-section">
+        <h2>Impact</h2>
+        <p class="cs-callout">
+          The work established a repeatable pattern: transparent progress, governed delivery, and scaled enablement, so newsroom and engineering teams could adopt generative AI faster, with clearer ownership and safer enterprise practices.
+        </p>
+      </section>
+
+      <p class="cs-note">
+        Content reflects the type of internal reporting and programs led for NBC News Group; specific figures and confidential details are omitted from this public page. NBCUniversal and NBC News are trademarks of their respective owners.
+      </p>
+    </div>
+  </main>
+  <div class="cs-footer-wire" aria-hidden="true"></div>
+  <footer class="cs-footer">
+    <div class="cs-footer-inner">
+      <div class="cs-footer-links">
+        <a href="mailto:hellomattshade@gmail.com" class="cs-footer-link">hellomattshade@gmail.com</a>
+        <a href="https://linkedin.com/in/matt-shade-66125515" class="cs-footer-link" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+        <a href="/#experience" class="cs-footer-link">Experience</a>
+      </div>
+      <p class="cs-footer-copy">© 2026 Matt Shade</p>
+    </div>
+  </footer>
+  <button type="button" class="cs-back-to-top" id="cs-back-to-top" aria-label="Back to top">
+    <svg viewBox="0 0 24 23" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path fill="hsl(142, 45%, 60%)" d="M 12 1 L 20 14 L 23 21 L 16 16 L 12 23 L 8 16 L 1 21 L 4 14 Z"/>
+      <circle cx="12" cy="10.5" r="3.2" fill="#ffffff"/>
+      <circle cx="12" cy="10.5" r="1.3" fill="#0a0a0b"/>
+    </svg>
+  </button>
+  <script src="/case-study-boids.js" defer></script>
+  <script src="/case-study-ui.js" defer></script>
+</body>
+</html>

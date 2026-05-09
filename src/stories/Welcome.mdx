@@ -1,0 +1,29 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Introduction/Welcome" />
+
+# Matt Shade — Portfolio design system
+
+Welcome to the **living documentation** for this site: the same React components, CSS tokens, and interaction patterns that ship to production—documented here for design critique, engineering handoff, and accessibility review.
+
+## What you’ll find
+
+| Area | Purpose |
+| --- | --- |
+| **Introduction** | Vision, token inventory, and how this Storybook maps to the product. |
+| **Foundations** | Typography, motion, layout, and grid—before you open a component. |
+| **Guides** | Accessibility expectations and how we use this library in review. |
+| **Components** | Isolated UI with **Controls**, **Accessibility** checks, and responsive **viewports**. |
+| **Pages** | Composed shells (e.g. resume) that mirror production routes. |
+
+## Principles
+
+- **One source of truth:** semantic tokens on `:root` in `src/index.css`—no ad hoc hex in components.
+- **Dark architectural UI:** deep neutrals, lime accent, glass surfaces—built for clarity under real content.
+- **Ship what you see:** stories run in **`MemoryRouter`** with **`public/`** assets so screenshots match deployment.
+
+## For design partners
+
+Use **viewport** presets and the **Accessibility** panel while reviewing. Figma—or any other spec—should name **token roles** (e.g. “primary text”, “accent”) so we can map them to `--text`, `--accent`, and friends.
+
+Start with **Visual language** under Introduction for the full token table and color swatches.

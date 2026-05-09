@@ -1,0 +1,28 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Guides/Handoff & QA" />
+
+# Handoff & QA
+
+## For designers
+
+1. **Name tokens, not hex** — reference `--accent`, `--text-muted`, etc. Specs that map to `src/index.css` merge faster.
+2. **Use this Storybook** as the review surface: same build pipeline as production (`vite` + React 18).
+3. **Annotate states** — default, hover, focus, loading, and error (where applicable). Stories can be duplicated per state when needed.
+
+## For engineers
+
+- **Styling:** prefer CSS variables and existing utilities (`.glass`, section classes) before new one-off classes.
+- **Routing:** anything using `Link` or `useLocation` is wrapped in **`MemoryRouter`** in `.storybook/preview.ts` — do not remove without updating stories.
+- **Assets:** static files live in `public/`; Storybook serves them via `staticDirs` in `.storybook/main.ts`.
+
+## QA checklist (before ship)
+
+- [ ] Key **Components** stories pass **Accessibility** at default viewport.
+- [ ] **Pages → Resume** matches resume layout in production (nav + footer + document).
+- [ ] **Components → Projects section** opens modal and closes via backdrop + button.
+- [ ] No console errors in Storybook or production build.
+
+## Chromatic
+
+Chromatic is wired via **`@chromatic-com/storybook`**. Use it for visual regression on critical stories when the pipeline is enabled.
