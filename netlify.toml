@@ -1,14 +1,9 @@
-<<<<<<< HEAD
-=======
 # Build the portfolio and optionally copy pre-built projects into dist/projects/
 # To include project demos: build each app in RECENT-PROJECTS (dist/ or out/), then run this build.
->>>>>>> f4e90a3 (initial commit: architecting the future)
 [build]
   command = "npm run build"
   publish = "dist"
 
-<<<<<<< HEAD
-=======
 [build.environment]
   NODE_VERSION = "20"
 
@@ -48,7 +43,6 @@
     Cache-Control = "public, max-age=0, must-revalidate"
 
 # Portfolio SPA fallback (catch-all)
->>>>>>> f4e90a3 (initial commit: architecting the future)
 [[redirects]]
   from = "/*"
   to = "/index.html"

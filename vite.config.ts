@@ -1,12 +1,3 @@
-<<<<<<< HEAD
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-
-// https://vite.dev/config/
-export default defineConfig({
-  plugins: [react()],
-})
-=======
 /// <reference types="vitest/config" />
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
@@ -191,4 +182,3 @@ export default defineConfig({
     }]
   }
 });
->>>>>>> f4e90a3 (initial commit: architecting the future)

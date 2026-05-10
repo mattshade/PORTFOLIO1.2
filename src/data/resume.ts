@@ -25,12 +25,12 @@ export const resume = {
   email: 'hellomattshade@gmail.com',
   contactFormEndpoint: '',
   contactFormName: 'contact',
-  linkedin: 'https://linkedin.com/in/matt-shade-66125515',
+  linkedin: 'https://www.linkedin.com/in/matt-shade-66125515/',
   /** Portfolio / personal site — shown on resume and in structured data */
   portfolioUrl: 'https://www.mattshade.com/',
   github: '',
   /** Download link — served from `public/Matt_Shade.pdf`. Bump `v=` when you replace the file so prod CDNs/browsers fetch the new PDF. */
-  resumePdf: '/Matt_Shade.pdf?v=4',
+  resumePdf: '/Matt_Shade.pdf?v=5',
 
   selectedImpact: [
     'Scaled high-performance engineering teams, hiring the managers and engineers needed to drive subscription growth and platform delivery.',
