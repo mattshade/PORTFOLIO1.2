@@ -1,7 +1,7 @@
 # Matt Shade — Engineering & Design Portfolio
 
 <div align="center">
-  <img src="public/images/cnbc-pro-hero.png" alt="Portfolio Architecture" width="100%" />
+  <img src="public/images/cnbc-ds-hero.png" alt="Portfolio Architecture" width="100%" />
   <p><em>A high-fidelity, architectural portfolio ecosystem built with React, Vite, and a signature "Blueprint" design system.</em></p>
 
   [![Vite](https://img.shields.io/badge/Vite-6.0-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
@@ -19,6 +19,23 @@ This portfolio is more than a list of links; it's a technical sandbox and a desi
 - **Aesthetic**: Liquid glass, blueprint grids, and "Architectural Lime" accents.
 - **Performance**: Sub-second transitions and optimized asset loading.
 - **Scale**: A modular structure that supports both internal case studies and complex external deployments.
+
+---
+
+## 🚀 Key Case Studies
+
+### 📺 CNBC Design System
+*Architecture • Systems Engineering • Product Design*
+- **The Challenge**: Transforming scattered interface patterns into a production-ready ecosystem.
+- **The Solution**: A "Foundation to Module" hierarchy bridging Figma and Storybook.
+- **Impact**: 1,000+ components synced with 1:1 parity, drastically reducing design debt.
+- **Standalone Site**: [Visit Site ↗](https://cnbcdesignsystem.shadyworldwide.com/)
+
+### 💳 CNBC PRO Subscription
+*UX Strategy • Growth • Conversion Optimization*
+- **The Challenge**: Reducing friction in the premium investor journey.
+- **The Solution**: A data-led redesign of the subscription funnel with a unique "PRO" visual identity.
+- **Impact**: Contributed to a 400% increase in subscription velocity.
 
 ---
 
