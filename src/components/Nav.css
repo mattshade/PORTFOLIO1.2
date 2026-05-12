@@ -132,6 +132,30 @@
   border-color: var(--border-strong);
 }
 
+.nav-contact-btn {
+  background: none;
+  border: 1px solid transparent;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  border-radius: 4px;
+}
+
+.nav-contact-btn:hover {
+  color: var(--accent);
+  background: var(--accent-dim);
+  border-color: var(--border-strong);
+  box-shadow: 0 0 20px var(--accent-dim);
+}
+
 /* Mobile layout adjustments */
 @media (max-width: 768px) {
   .hamburger {
@@ -211,7 +235,12 @@
   }
 }
 
-/* Hide navigation entirely when modal is open to prevent overlapping */
+/* Case-study modal: hide nav so it does not stack above the overlay */
 body.modal-open .nav {
   display: none !important;
+}
+
+/* Contact dialog: keep header visible; block clicks from passing through to nav links */
+body.contact-open .nav {
+  pointer-events: none;
 }

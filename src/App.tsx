@@ -4,6 +4,7 @@ import { ResumePage } from './pages/ResumePage'
 import { ContactPage } from './pages/ContactPage'
 import { ScrollToHash } from './components/ScrollToHash'
 import { AtsJsonLd } from './components/AtsJsonLd'
+import { SayHiBubble } from './components/SayHiBubble'
 import './App.css'
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
         <Route path="/resume" element={<ResumePage />} />
         <Route path="/contact" element={<ContactPage />} />
       </Routes>
+      <SayHiBubble standalone />
     </>
   )
 }

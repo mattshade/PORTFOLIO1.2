@@ -8,50 +8,40 @@
   cursor: pointer;
 }
 
-/* Fixed overlay — form floats above, no layout shift */
+/* Fixed overlay — portaled to document.body; z-index above fixed chrome (nav, birds canvas) */
 .sayhi-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 90;
+  z-index: 12000;
   background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  animation: sayhiBackdropIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
 }
 
 .sayhi-form-wrap {
-  position: fixed;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 100;
+  position: relative; /* Changed from fixed */
+  z-index: 12001;
   background: var(--bg-glass);
   border: 1px solid var(--border-strong);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
   border-radius: 12px;
-  padding: 1.5rem 1.5rem 1.75rem;
-  min-width: 300px;
-  max-width: 380px;
+  padding: 2.5rem 2rem;
+  width: 100%;
+  max-width: 420px;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
   box-shadow:
     0 0 0 1px rgba(255, 255, 255, 0.05),
     0 24px 60px -12px rgba(0, 0, 0, 0.8),
     0 0 80px -20px color-mix(in srgb, var(--accent) 25%, transparent);
-  animation: sayhiFormIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: sayhiFormIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* Talk bubble tail — left side */
-.sayhi-form-wrap::after {
-  content: '';
-  position: absolute;
-  bottom: -10px;
-  left: 1.75rem;
-  width: 0;
-  height: 0;
-  border-left: 10px solid transparent;
-  border-right: 10px solid transparent;
-  border-top: 10px solid var(--border-strong);
-}
 
 @keyframes sayhiBackdropIn {
   from {
@@ -67,57 +57,34 @@
 @keyframes sayhiFormIn {
   0% {
     opacity: 0;
-    transform: translate(-50%, -45%) scale(0.95);
+    transform: scale(0.95) translateY(10px);
   }
   100% {
     opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
+    transform: scale(1) translateY(0);
   }
 }
 
-/* Staggered field reveal */
-.sayhi-form .sayhi-label,
-.sayhi-form .sayhi-input,
-.sayhi-form .sayhi-textarea,
-.sayhi-form .sayhi-actions {
-  animation: sayhiFieldIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) backwards;
-}
 
-.sayhi-form .sayhi-label:nth-of-type(1),
-.sayhi-form .sayhi-input:nth-of-type(1) { animation-delay: 0.1s; }
-.sayhi-form .sayhi-label:nth-of-type(2),
-.sayhi-form .sayhi-input:nth-of-type(2) { animation-delay: 0.18s; }
-.sayhi-form .sayhi-label:nth-of-type(3),
-.sayhi-form .sayhi-textarea { animation-delay: 0.26s; }
-.sayhi-form .sayhi-actions { animation-delay: 0.34s; }
-
-@keyframes sayhiFieldIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
 
 .sayhi-form {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  text-align: left; /* Ensure all text is left-aligned */
 }
 
 .sayhi-close {
   position: absolute;
-  top: 1rem;
-  right: 1rem;
-  width: 28px;
-  height: 28px;
+  top: 0.5rem;
+  right: 0.5rem;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.5rem;
+  font-size: 2rem;
+  padding: 10px; /* Larger hit area */
   font-weight: 300;
   color: var(--text-muted);
   background: none;
@@ -130,7 +97,6 @@
 .sayhi-close:hover {
   color: var(--accent);
   background: var(--accent-dim);
-  transform: rotate(90deg);
 }
 
 .sayhi-label {
@@ -139,6 +105,8 @@
   text-transform: uppercase;
   letter-spacing: 0.15em;
   color: var(--text-muted);
+  text-align: left;
+  display: block;
 }
 
 .sayhi-input,

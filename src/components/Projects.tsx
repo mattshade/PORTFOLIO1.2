@@ -1,5 +1,5 @@
 import { projects, type Project } from '../data/projects'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import './Projects.css'
 
 function ProjectIcon({ type }: { type?: string }) {
@@ -166,31 +166,24 @@ export function ProjectCard({ p, i, onSelect }: { p: Project; i: number; onSelec
 }
 
 export function ProjectDetail({ p, onClose }: { p: Project; onClose: () => void }) {
-  useEffect(() => {
+  useLayoutEffect(() => {
     document.body.style.overflow = 'hidden'
     document.body.classList.add('modal-open')
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+    }
+    window.addEventListener('keydown', onKeyDown)
     return () => {
       document.body.style.overflow = ''
       document.body.classList.remove('modal-open')
+      window.removeEventListener('keydown', onKeyDown)
     }
-  }, [])
+  }, [onClose])
 
   return (
     <div className="project-detail-overlay">
       <div className="project-detail-backdrop" onClick={onClose} />
       <div className="project-detail-content glass" role="dialog" aria-label={p.title}>
-        {p.href && (
-          <a 
-            href={p.href} 
-            target={p.external ? "_blank" : undefined}
-            rel={p.external ? "noopener noreferrer" : undefined}
-            className="detail-top-cta"
-            aria-label="View Live Site"
-          >
-            Visit Site {p.external && '↗'}
-          </a>
-        )}
-        <button className="project-detail-close" onClick={onClose} aria-label="Close">×</button>
         <div className="detail-inner">
           
           {p.modalHero && (
@@ -253,6 +246,18 @@ export function ProjectDetail({ p, onClose }: { p: Project; onClose: () => void 
             </main>
           </div>
         </div>
+        {p.href && (
+          <a 
+            href={p.href} 
+            target={p.external ? "_blank" : undefined}
+            rel={p.external ? "noopener noreferrer" : undefined}
+            className="detail-top-cta"
+            aria-label="View Live Site"
+          >
+            Visit Site {p.external && '↗'}
+          </a>
+        )}
+        <button type="button" className="project-detail-close" onClick={onClose} aria-label="Close">×</button>
       </div>
     </div>
   )

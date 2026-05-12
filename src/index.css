@@ -139,3 +139,13 @@ a:hover {
   box-shadow: var(--shadow-md);
   border-radius: 16px;
 }
+
+/* Modal states — project/case-study overlay (birds, nav, grid adjust in other CSS files) */
+body.modal-open {
+  overflow: hidden !important;
+}
+
+/* Contact dialog only — scroll lock without hiding nav or retuning global backgrounds */
+body.contact-open {
+  overflow: hidden !important;
+}

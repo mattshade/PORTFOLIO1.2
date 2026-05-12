@@ -87,9 +87,12 @@ export function Nav() {
               Experience
             </Link>
           )}
-          <Link to="/contact" className="nav-link bird-perch" onClick={() => setIsMenuOpen(false)}>
+          <button 
+            className="nav-link bird-perch nav-contact-btn" 
+            onClick={() => window.dispatchEvent(new Event('open-contact'))}
+          >
             Contact
-          </Link>
+          </button>
         </div>
       </div>
     </nav>

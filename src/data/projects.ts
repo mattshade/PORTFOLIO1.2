@@ -52,6 +52,26 @@ export const projects: Project[] = [
     ]
   },
   {
+    id: 'shadcn-blocks',
+    title: 'shadcnBlocks',
+    subtitle: 'Design System Gallery',
+    description: 'A high-fidelity collection of original UI components built with a brutalist, monochrome aesthetic.',
+    tech: ['React', 'TypeScript', 'Framer Motion', 'Lucide React'],
+    href: 'https://shadcn.shadyworldwide.com/',
+    external: true,
+    icon: 'layout',
+    modalHero: '/images/shadcn-blocks-hero.png',
+    role: 'Lead Design Engineer',
+    contribution: 'I architected and built a custom gallery of original UI components following the shadcn/ui philosophy. I focused on creating a high-contrast, brutalist design system that prioritizes structural clarity and micro-animations. Each component includes a functional "Code" view with syntax highlighting, making it a true resource for other engineers.',
+    outcome: 'Launched a standalone component library that serves as a benchmark for high-fidelity interface design and documentation.',
+    highlights: [
+      'Designed 5 original high-fidelity blocks',
+      'Implemented working Code/Preview toggles',
+      'Built with a strict Zinc/Black monochrome theme',
+      'Integrated Framer Motion for premium micro-interactions'
+    ]
+  },
+  {
     id: 'cnbc-design-system',
     title: 'CNBC Design System',
     subtitle: 'Product Design Systems Architecture',
@@ -292,7 +312,6 @@ export const projects: Project[] = [
     tech: ['Next.js', 'Tailwind', 'Experimentation'],
     href: 'https://mattshadecooks.com',
     external: true,
-    wide: true,
   },
 ]
 

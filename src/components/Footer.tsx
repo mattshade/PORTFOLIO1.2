@@ -18,8 +18,6 @@ export function Footer() {
             {resume.github && (
               <a href={resume.github} target="_blank" rel="noopener noreferrer" className="footer-link">GitHub</a>
             )}
-            <a href="https://www.mattshade.com/contact" target="_blank" rel="noopener noreferrer" className="footer-link">Mattshade Contact</a>
-            <Link to="/contact" className="footer-link">Contact Page</Link>
             <a href="/#experience" className="footer-link">Experience</a>
             <a href="/storybook/" className="footer-link">Storybook</a>
           </div>
