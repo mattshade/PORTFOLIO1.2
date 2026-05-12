@@ -136,12 +136,17 @@ function serveProjectsPlugin() {
 }
 
 // Inject SITE_URL at build time (Netlify sets URL; fallback for local)
-const SITE_URL = process.env.URL || process.env.VITE_SITE_URL || 'https://mattshade.com';
+const SITE_URL = (process.env.URL || process.env.VITE_SITE_URL || 'https://www.mattshade.com').replace(/\/$/, '');
+
 function injectSiteUrlPlugin() {
   return {
     name: 'inject-site-url',
     transformIndexHtml(html: string) {
-      return html.replace(/__SITE_URL__/g, SITE_URL);
+      // Replace __SITE_URL__/ with SITE_URL/ (to avoid double slashes if the user wrote __SITE_URL__/)
+      // and replace __SITE_URL__ with SITE_URL
+      return html
+        .replace(/__SITE_URL__\//g, `${SITE_URL}/`)
+        .replace(/__SITE_URL__/g, SITE_URL);
     }
   };
 }
