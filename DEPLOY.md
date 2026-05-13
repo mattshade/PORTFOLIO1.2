@@ -5,7 +5,7 @@
 - [ ] `npm run build` completes successfully locally
 - [ ] All project demos build (chatgpt, github-copilot, dev-agents, executive-ai)
 - [ ] No secrets in repo (`.env` is gitignored in subprojects)
-- [ ] Resume PDF exists in `public/Matt_Shade.pdf` (or path in `resume.ts`)
+- [ ] Resume PDF exists in `public/Matt_Shade_Resume.pdf` (or path in `resume.ts`)
 
 ## Deploy
 

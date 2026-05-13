@@ -9,6 +9,7 @@
     "build:portfolio": "vite build && node scripts/copy-projects.cjs",
     "preview": "vite preview",
     "generate:resume-ats": "tsx scripts/generate-ats-resume.ts",
+    "generate:resume-designer": "tsx scripts/generate-designer-resume.ts",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "STORYBOOK_BASE_PATH=/storybook/ storybook build && STORYBOOK_BASE_PATH=/storybook/ node scripts/inject-storybook-base.cjs"
   },

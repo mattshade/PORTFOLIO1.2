@@ -1,4 +1,4 @@
-// Edit this file for the on-site resume page. The downloadable file is `public/Matt_Shade.pdf` (replace manually). Optional: `npm run generate:resume-ats` rebuilds ATS PDF/HTML from this data.
+// Edit this file for the on-site resume page. The downloadable file is `public/Matt_Shade_Resume.pdf` (replace manually). Optional: `npm run generate:resume-ats` rebuilds ATS PDF/HTML from this data.
 
 export interface ExperienceItem {
   role: string
@@ -29,8 +29,8 @@ export const resume = {
   /** Portfolio / personal site — shown on resume and in structured data */
   portfolioUrl: 'https://www.mattshade.com/',
   github: '',
-  /** Download link — served from `public/Matt_Shade.pdf`. Bump `v=` when you replace the file so prod CDNs/browsers fetch the new PDF. */
-  resumePdf: '/Matt_Shade.pdf?v=6',
+  /** Download link — served from `public/Matt_Shade_Resume.pdf`. Bump `v=` when you replace the file so prod CDNs/browsers fetch the new PDF. */
+  resumePdf: '/Matt_Shade_Resume.pdf?v=1',
 
   selectedImpact: [
     'Scaled high-performance engineering teams, hiring the managers and engineers needed to drive subscription growth and platform delivery.',
@@ -38,6 +38,11 @@ export const resume = {
     'Led the retirement of a massive monolithic legacy application, saving significant costs and reclaiming thousands of engineering hours.',
     'Built custom GenAI agents that solved real newsroom problems, from on-air scheduling to complex newsgathering logistics.',
     'Launched AI-enablement programs (hands-on workshops and technical office hours) that helped teams actually adopt agentic tools into their daily work.',
+    'Introduced prototype-driven discovery at CNBC, creating web and iOS interfaces that saved months of engineering rework.',
+    'Designed and built award-winning interactive experiences, serving as the bridge between visual design and technical execution.',
+    'Designed subscription workflows and data visualization engines that directly increased user engagement and conversions.',
+    'Built experimentation frameworks for reliable A/B testing on multi-million user flows.',
+    'Architected and established the CNBC Design System using Storybook, creating a unified component library that standardized the visual language across all digital products.',
   ],
 
   education: [
@@ -98,8 +103,6 @@ export const resume = {
   ] as ExperienceItem[],
 
   skills: [
-    'AI Engineering Leadership',
-    'Engineering Management',
     'Hiring & Team Building',
     'Mentorship',
     'Agentic AI & Custom Agents',
