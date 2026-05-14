@@ -52,7 +52,8 @@ body.modal-open .birds-bg {
 
 .app-content {
   position: relative;
-  z-index: 1;
+  /* Above OrigamiPerspectiveBackground (z-index 1) */
+  z-index: 2;
 }
 
 .bird-wire {

@@ -1,0 +1,43 @@
+.origami-perspective-background {
+  position: fixed;
+  inset: 0;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  /* Above body decorative layers (-2 / -1); below .app-content (z-index 2) */
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+  transition: opacity 0.5s ease, filter 0.5s ease;
+}
+
+.origami-perspective-background__canvas-host {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.origami-perspective-background__canvas-host canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* Keeps hero + sections readable; center stays calmer than the periphery */
+.origami-perspective-background__readability {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 92% 72% at 50% 32%, rgba(9, 9, 10, 0.1) 0%, rgba(9, 9, 10, 0.4) 52%, rgba(9, 9, 10, 0.88) 100%),
+    linear-gradient(to bottom, rgba(9, 9, 10, 0.44) 0%, rgba(9, 9, 10, 0.05) 26%, rgba(9, 9, 10, 0.04) 58%, rgba(9, 9, 10, 0.5) 100%);
+}
+
+body.modal-open .origami-perspective-background {
+  opacity: 0.2;
+  filter: blur(10px);
+  transition: opacity 0.5s ease, filter 0.5s ease;
+}
