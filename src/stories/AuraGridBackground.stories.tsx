@@ -2,14 +2,14 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { AuraGridBackground } from '../components/AuraGridBackground'
 
 const meta = {
-  title: 'Architecture/AuraGridBackground',
+  title: 'Architecture/Legacy — AuraGridBackground',
   component: AuraGridBackground,
   parameters: {
     layout: 'fullscreen',
     docs: {
       description: {
         component:
-          'A modern, hardware-accelerated animated background combining a 3D perspective grid with fluid glowing mesh-gradient auras. Designed to complement the Dark Architectural design system and visually anchor the system flock.',
+          '**Legacy.** CSS grid + aura layer formerly stacked behind the home hero. Production now uses **Architecture → Origami aviary** as the single site-wide background.',
       },
     },
   },

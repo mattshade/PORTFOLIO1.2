@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { SystemBoids } from '../components/SystemBoids';
 
 const meta: Meta<typeof SystemBoids> = {
-  title: 'Components/SystemBoids',
+  title: 'Architecture/Legacy — SystemBoids',
   component: SystemBoids,
   decorators: [
     (Story) => (
@@ -13,6 +13,12 @@ const meta: Meta<typeof SystemBoids> = {
   ],
   parameters: {
     layout: 'fullscreen',
+    docs: {
+      description: {
+        component:
+          '**Legacy.** Canvas boid swarm previously used on `HomePage` / `ResumePage`. Removed from production in favor of `OrigamiAviaryBackground`. Kept for reference only.',
+      },
+    },
   },
   tags: ['autodocs'],
 };

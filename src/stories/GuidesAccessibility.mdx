@@ -13,7 +13,7 @@ import { Meta } from '@storybook/addon-docs/blocks';
 
 - **Focus:** interactive elements must show visible focus; accent color is available for focus rings where components define them.
 - **Images:** project and hero imagery use `alt=""` when decorative; meaningful thumbnails include descriptive `alt` in data when added.
-- **Motion:** decorative animation (e.g. boids) is `aria-hidden` and must not convey unique information.
+- **Motion:** the global `OrigamiAviaryBackground` canvas is `aria-hidden` and must not convey unique information; respect `prefers-reduced-motion`.
 - **Modals:** project detail sets `role="dialog"`, locks body scroll, and exposes a close control.
 
 ## Color

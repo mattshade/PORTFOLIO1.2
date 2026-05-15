@@ -19,10 +19,10 @@ Easing tokens are defined alongside `@keyframes` in `src/index.css` (e.g. `fadeU
 ## Principles
 
 - **Prefer opacity and transform** — avoid animating `box-shadow` or `filter` on large layers during scroll.
-- **Respect `prefers-reduced-motion`:** critical paths should still work when motion is reduced (portfolio boids and decorative loops should not block comprehension).
+- **Respect `prefers-reduced-motion`:** critical paths should still work when motion is reduced (the origami aviary background and decorative loops should not block comprehension).
 - **Modal & overlay:** project detail uses backdrop + dialog; focus trap is handled in the component—keep durations under **300ms** for open/close.
 
 ## What not to do
 
-- No autoplaying parallax on primary reading columns.
+- No autoplaying parallax on primary reading columns (site-wide scroll perspective lives in `OrigamiAviaryBackground`, behind content).
 - No staggered list animations that delay access to resume or contact actions.

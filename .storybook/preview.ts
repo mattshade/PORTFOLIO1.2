@@ -51,6 +51,8 @@ export const parameters = {
         ['Design Tokens', 'Typography', 'Motion', 'Layout & grid'],
         'Guides',
         ['Accessibility', 'Handoff & QA'],
+        'Architecture',
+        ['Origami aviary', 'Legacy — AuraGridBackground', 'Legacy — SystemBoids'],
         'Components',
         'Pages',
       ],

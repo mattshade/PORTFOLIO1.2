@@ -16,6 +16,7 @@ const TokensTable = () => {
     { name: '--accent-secondary', value: '#e2b35a', role: 'Technical amber' },
     { name: '--font-sans', value: 'Geist, ...', role: 'Main font' },
     { name: '--font-mono', value: 'Geist Mono, ...', role: 'Monospace font' },
+    { name: '--text-shadow-standalone', value: 'horizontal blur', role: 'Hero/section copy over aviary (not glass)' },
   ];
 
   return (
