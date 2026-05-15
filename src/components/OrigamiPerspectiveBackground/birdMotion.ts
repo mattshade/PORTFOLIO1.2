@@ -30,22 +30,20 @@ export function populateOrigamiBirds(
   rng: Rng,
   tuning: OrigamiPerspectiveTuning,
 ): SpaceBird[] {
-  const birds: SpaceBird[] = []
-  const D = tuning.sceneDepth
-  const fill = ORIGAMI_PERSPECTIVE_BASE_COLORS.birdFill
   const accent = tuning.accentColor
 
   for (let i = 0; i < tuning.largeBirdCount; i++) {
     const side = i === 0 ? -1 : 1
-    const { group, edgeMat } = createOrigamiBirdMesh(fill, accent, 0.46, 0.12)
+    const { group, edgeMat } = createOrigamiBirdMesh(fill, accent, 0.82, 0.42)
     const anchor = new THREE.Vector3(
-      side * (2.35 + rng() * 0.5),
-      0.72 + rng() * 0.6,
-      -2.6 - rng() * 2.2,
+      side * (2.05 + rng() * 0.35),
+      1.05 + rng() * 0.55,
+      -2.05 - rng() * 1.25,
     )
     group.position.copy(anchor)
-    group.scale.setScalar(2.05 + rng() * 0.55)
+    group.scale.setScalar(2.85 + rng() * 0.65)
     group.rotation.set((rng() - 0.5) * 0.22, side * 0.45 + (rng() - 0.5) * 0.35, (rng() - 0.5) * 0.18)
+    group.renderOrder = 3
     scene.add(group)
     birds.push({
       mesh: group,
@@ -59,21 +57,22 @@ export function populateOrigamiBirds(
       glideTo: new THREE.Vector3(),
       nextGlideAt: Number.POSITIVE_INFINITY,
       edgeMat,
-      baseEdgeOpacity: 0.12,
+      baseEdgeOpacity: 0.38,
     })
   }
 
   for (let i = 0; i < tuning.smallBirdCount; i++) {
-    const { group, edgeMat } = createOrigamiBirdMesh(fill, accent, 0.5, 0.14)
-    const bx = (rng() - 0.5) * 5.2
+    const { group, edgeMat } = createOrigamiBirdMesh(fill, accent, 0.78, 0.4)
+    const bx = (rng() - 0.5) * 4.8
     const anchor = new THREE.Vector3(
-      Math.abs(bx) < 0.45 ? bx + (rng() > 0.5 ? 1.1 : -1.1) : bx,
-      0.42 + rng() * 1.85,
-      -3.8 - rng() * Math.max(2, D - 3),
+      Math.abs(bx) < 0.5 ? bx + (rng() > 0.5 ? 1.15 : -1.15) : bx,
+      0.88 + rng() * 1.35,
+      -2.35 - rng() * 3.2,
     )
     group.position.copy(anchor)
-    group.scale.setScalar(0.58 + rng() * 0.32)
+    group.scale.setScalar(0.92 + rng() * 0.42)
     group.rotation.set((rng() - 0.5) * 0.45, rng() * Math.PI, (rng() - 0.5) * 0.28)
+    group.renderOrder = 3
     scene.add(group)
     birds.push({
       mesh: group,
@@ -87,7 +86,7 @@ export function populateOrigamiBirds(
       glideTo: new THREE.Vector3(),
       nextGlideAt: 8 + rng() * 36,
       edgeMat,
-      baseEdgeOpacity: 0.14,
+      baseEdgeOpacity: 0.4,
     })
   }
 
@@ -111,8 +110,8 @@ export function updateOrigamiBirds(
   for (const b of birds) {
     const pulse =
       0.5 * Math.sin(elapsed * 0.072 + b.phases[0]) + 0.5 * Math.sin(elapsed * 0.031 + b.phases[3])
-    const edgeBoost = pulse * 0.045 * ai
-    b.edgeMat.opacity = THREE.MathUtils.clamp(b.baseEdgeOpacity + edgeBoost, 0.07, 0.26)
+    const edgeBoost = pulse * 0.06 * ai
+    b.edgeMat.opacity = THREE.MathUtils.clamp(b.baseEdgeOpacity + edgeBoost, 0.24, 0.58)
 
     if (reducedMotion) {
       b.mesh.position.copy(b.anchor)
@@ -159,8 +158,8 @@ export function updateOrigamiBirds(
         b.glideT = 0
         b.glideDur = 36 + rng() * 48
         b.glideFrom.copy(b.mesh.position)
-        const depth = -3.2 - rng() * Math.max(2.5, tuning.sceneDepth - 2.5)
-        b.glideTo.set((rng() - 0.5) * 5.8, 0.32 + rng() * 2.05, depth)
+        const depth = -2.5 - rng() * 3.2
+        b.glideTo.set((rng() - 0.5) * 5.8, 0.72 + rng() * 1.25, depth)
       }
     } else {
       b.glideT += delta / b.glideDur

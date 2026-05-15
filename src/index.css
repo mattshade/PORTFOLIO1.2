@@ -19,6 +19,34 @@
   --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.3);
   --font-sans: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --font-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  /* Horizontal-only blur — no vertical offset */
+  --text-shadow-standalone: 2px 0 12px rgba(0, 0, 0, 0.44), -2px 0 12px rgba(0, 0, 0, 0.44);
+}
+
+/* Free-standing page text (not inside cards / glass panels) */
+.app-content :is(
+  .hero-eyebrow,
+  .hero-eyebrow-segment,
+  .hero-name,
+  .hero-tagline,
+  .section-title,
+  .section-desc,
+  .bio-typography-wall,
+  .skills-title,
+  .skills-item,
+  .experience-impact .experience-highlight,
+  .education-item :is(h4, p),
+  .footer-link,
+  .footer-copy,
+  .resume-doc :is(h1, h2, h3, h4, p, li),
+  .resume-back
+) {
+  text-shadow: var(--text-shadow-standalone);
+}
+
+:where(.glass, .glass-strong, .project-card, .project-detail-content, .nav, .hero-cta, .leadership-pillar)
+  :is(h1, h2, h3, h4, p, li, a, span) {
+  text-shadow: none;
 }
 
 * {
@@ -57,13 +85,12 @@ body::before {
   position: fixed;
   inset: 0;
   z-index: -2;
-  background-image: 
-    radial-gradient(rgba(190, 242, 100, 0.2) 1.5px, transparent 1.5px),
+  background-image:
+    radial-gradient(rgba(190, 242, 100, 0.11) 1px, transparent 1px),
     linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
   background-size: 40px 40px;
   pointer-events: none;
-  transform: translateZ(0); /* Hardware acceleration */
-  will-change: transform;
+  transform: translateZ(0);
 }
 
 body::after {
@@ -71,10 +98,20 @@ body::after {
   position: fixed;
   inset: 0;
   z-index: -1;
-  background: radial-gradient(circle at 50% 30%, rgba(190, 242, 100, 0.15) 0%, rgba(190, 242, 100, 0.08) 40%, transparent 70%);
+  background: radial-gradient(circle at 50% 30%, rgba(190, 242, 100, 0.09) 0%, rgba(190, 242, 100, 0.04) 40%, transparent 70%);
   pointer-events: none;
   transform: translateZ(0);
-  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  body::before,
+  body::after {
+    opacity: 0.65;
+  }
 }
 
 main {

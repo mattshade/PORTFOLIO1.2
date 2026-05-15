@@ -5,13 +5,13 @@ import { ContactPage } from './pages/ContactPage'
 import { ScrollToHash } from './components/ScrollToHash'
 import { AtsJsonLd } from './components/AtsJsonLd'
 import { SayHiBubble } from './components/SayHiBubble'
-import { OrigamiPerspectiveBackground } from './components/OrigamiPerspectiveBackground/OrigamiPerspectiveBackground'
+import { OrigamiAviaryBackground } from './components/OrigamiAviaryBackground/OrigamiAviaryBackground'
 import './App.css'
 
 function App() {
   return (
     <>
-      <OrigamiPerspectiveBackground />
+      <OrigamiAviaryBackground />
       <AtsJsonLd />
       <ScrollToHash />
       <Routes>

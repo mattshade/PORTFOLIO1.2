@@ -5,7 +5,7 @@ import { Bio } from '../components/Bio'
 import '../App.css'
 
 /**
- * Top-of-fold slice of the home page: fixed nav + hero + bio — without AuraGridBackground, boids, or lower sections.
+ * Top-of-fold slice of the home page: fixed nav + hero + bio — without the site-wide Three background or lower sections.
  * Use for marketing / typographic review without canvas/CSS animation cost.
  */
 const meta = {
@@ -15,7 +15,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Composition of **Nav**, **Hero**, and **Bio** inside `.app-content`. Matches production structure above the fold (minus `AuraGridBackground`, `SystemBoids`, and sections below Bio).',
+          'Composition of **Nav**, **Hero**, and **Bio** inside `.app-content`. Matches production structure above the fold (Storybook omits the global `OrigamiPerspectiveBackground` from `App.tsx` and sections below Bio).',
       },
     },
   },

@@ -21,6 +21,7 @@ function wireframeBox(
     transparent: true,
     opacity,
     depthWrite: false,
+    toneMapped: false,
   })
   return new THREE.LineSegments(edges, mat)
 }
@@ -55,6 +56,7 @@ function tickCross(rng: Rng, z: number, lineMuted: THREE.Color, opacity: number)
     transparent: true,
     opacity: opacity * 0.85,
     depthWrite: false,
+    toneMapped: false,
   })
   const line = new THREE.LineSegments(geo, mat)
   line.position.set((rng() - 0.5) * 7, 0.35 + rng() * 2.2, z)
@@ -84,11 +86,13 @@ export function buildDraftingSpace(
       m.transparent = true
       m.opacity = tuning.gridOpacity
       m.depthWrite = false
+      m.toneMapped = false
     })
   } else {
     gm.transparent = true
     gm.opacity = tuning.gridOpacity
     gm.depthWrite = false
+    gm.toneMapped = false
   }
   floorGrid.rotation.y = (rng() - 0.5) * 0.03
   scene.add(floorGrid)
@@ -101,8 +105,9 @@ export function buildDraftingSpace(
     color: lineMuted,
     wireframe: true,
     transparent: true,
-    opacity: tuning.gridOpacity * 0.38,
+    opacity: tuning.gridOpacity * 0.55,
     depthWrite: false,
+    toneMapped: false,
   })
   const backPlane = new THREE.Mesh(planeGeo, planeMat)
   backPlane.position.set((rng() - 0.5) * 0.6, 1.25, backZ)
@@ -116,7 +121,7 @@ export function buildDraftingSpace(
       0.85 + rng() * 1.6,
       1.0 + rng() * 1.9,
       accentSoft,
-      tuning.lineOpacity * (0.45 + rng() * 0.25),
+      tuning.lineOpacity * (0.72 + rng() * 0.22),
     )
     box.position.set((rng() - 0.5) * 8, 0.5 + rng() * 1.8, -3 - rng() * (tuning.sceneDepth - 3))
     box.rotation.set((rng() - 0.5) * 0.35, rng() * Math.PI * 2, (rng() - 0.5) * 0.25)

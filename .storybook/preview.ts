@@ -48,7 +48,7 @@ export const parameters = {
         'Introduction',
         ['Welcome', 'Visual language'],
         'Foundations',
-        ['Typography', 'Motion', 'Layout & grid'],
+        ['Design Tokens', 'Typography', 'Motion', 'Layout & grid'],
         'Guides',
         ['Accessibility', 'Handoff & QA'],
         'Components',

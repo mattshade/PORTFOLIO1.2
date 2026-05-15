@@ -36,11 +36,6 @@ export function Hero() {
           </a>
           {resume.email && <SayHiBubble />}
         </div>
-        <a href="#projects" className="hero-scroll" aria-label="Scroll to case studies and projects">
-          <span className="hero-scroll-line" />
-          <span className="hero-scroll-dot" />
-        </a>
-
       </div>
     </section>
   )

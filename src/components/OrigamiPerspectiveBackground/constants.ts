@@ -32,13 +32,14 @@ export const DEFAULT_ORIGAMI_PERSPECTIVE_TUNING: OrigamiPerspectiveTuning = {
   seed: 0x4f726967,
   smallBirdCount: 5,
   largeBirdCount: 2,
-  gridOpacity: 0.055,
-  lineOpacity: 0.068,
+  gridOpacity: 0.12,
+  lineOpacity: 0.14,
   animationIntensity: 1,
   parallaxIntensity: 1,
-  accentColor: 0x6d8a5e,
-  fogDensity: 0.048,
-  sceneDepth: 15,
+  accentColor: 0x8ab97a,
+  /** Light — Exp2 was washing birds / frames into the clear color */
+  fogDensity: 0.011,
+  sceneDepth: 12,
   maxPixelRatio: 1.35,
   pointerSmoothing: 5.5,
   groundGridDivisions: 26,
@@ -47,11 +48,12 @@ export const DEFAULT_ORIGAMI_PERSPECTIVE_TUNING: OrigamiPerspectiveTuning = {
 
 /** Base palette — restrained green-gray blueprint language */
 export const ORIGAMI_PERSPECTIVE_BASE_COLORS = {
-  background: 0x09090a,
-  fog: 0x09090a,
-  /** Primary construction / grid */
-  lineMuted: 0x3d4a38,
-  birdFill: 0x050806,
+  background: 0x0a0c0b,
+  fog: 0x0a0c0b,
+  /** Construction lines — must read over GL clear (screenshot showed grid-only) */
+  lineMuted: 0x5f7a58,
+  /** Facets slightly lighter than clear color so folded planes read */
+  birdFill: 0x162219,
 } as const
 
 export function getResponsivePerspectiveTuning(): OrigamiPerspectiveTuning {
@@ -70,10 +72,10 @@ export function getResponsivePerspectiveTuning(): OrigamiPerspectiveTuning {
     t.smallBirdCount = 3
     t.largeBirdCount = 1
     t.groundGridDivisions = 16
-    t.gridOpacity = 0.032
-    t.lineOpacity = 0.042
+    t.gridOpacity = 0.09
+    t.lineOpacity = 0.1
     t.constructionFrameCount = 2
-    t.fogDensity = Math.max(t.fogDensity, 0.055)
+    t.fogDensity = Math.min(t.fogDensity, 0.016)
     t.maxPixelRatio = 1
     t.parallaxIntensity = 0.65
     t.animationIntensity = Math.min(t.animationIntensity, 0.85)

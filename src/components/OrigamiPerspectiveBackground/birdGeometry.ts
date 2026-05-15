@@ -29,19 +29,14 @@ function createFoldedPaperBirdGeometry(): THREE.BufferGeometry {
   return geo
 }
 
-export type OrigamiBirdMaterials = {
-  edgeMat: THREE.LineBasicMaterial
-  dispose: () => void
-}
-
 /**
  * Graphite body + accent crease lines. Caller owns motion on `edgeMat.opacity` for faint sweeps.
  */
 export function createOrigamiBirdMesh(
   birdFill: number,
   accentColor: number,
-  fillOpacity = 0.52,
-  baseEdgeOpacity = 0.16,
+  fillOpacity = 0.58,
+  baseEdgeOpacity = 0.22,
 ): { group: THREE.Group; edgeMat: THREE.LineBasicMaterial } {
   const group = new THREE.Group()
   const bodyGeo = createFoldedPaperBirdGeometry()
@@ -52,6 +47,7 @@ export function createOrigamiBirdMesh(
     opacity: fillOpacity,
     side: THREE.DoubleSide,
     depthWrite: true,
+    toneMapped: false,
   })
   group.add(new THREE.Mesh(bodyGeo, fillMat))
 
@@ -61,6 +57,7 @@ export function createOrigamiBirdMesh(
     transparent: true,
     opacity: baseEdgeOpacity,
     depthTest: true,
+    toneMapped: false,
   })
   group.add(new THREE.LineSegments(edgeGeo, edgeMat))
 

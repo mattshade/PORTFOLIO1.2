@@ -11,11 +11,15 @@ export function ScrollToHash() {
     }
 
     const id = hash.replace('#', '')
+    let attempts = 0
+    const maxAttempts = 120
     const poll = () => {
       const el = document.getElementById(id)
       if (el) {
         el.scrollIntoView({ behavior: 'smooth' })
-      } else {
+        return
+      }
+      if (++attempts < maxAttempts) {
         requestAnimationFrame(poll)
       }
     }
