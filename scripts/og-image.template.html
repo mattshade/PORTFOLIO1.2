@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&family=Geist:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { position: relative; width: __W__px; height: __H__px; overflow: hidden; background: #0a0a0b; }
+    canvas { display: block; width: __W__px; height: __H__px; }
+    .overlay {
+      position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+      pointer-events: none;
+    }
+    .copy {
+      position: relative;
+      text-align: center;
+      padding: 0 2.5rem;
+    }
+    .copy::before {
+      content: '';
+      position: absolute;
+      inset: -3.5rem -7rem;
+      z-index: -1;
+      pointer-events: none;
+      background: radial-gradient(
+        ellipse 78% 68% at 50% 48%,
+        rgba(10, 10, 11, 0.68) 0%,
+        rgba(10, 10, 11, 0.3) 45%,
+        transparent 72%
+      );
+    }
+    .eyebrow {
+      font-family: 'Geist Mono', ui-monospace, monospace;
+      font-size: 22px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      margin-bottom: 1.1rem;
+    }
+    .eyebrow .seg { color: #999999; }
+    .eyebrow .pipe { color: #bef264; }
+    h1 {
+      font-family: Geist, system-ui, sans-serif;
+      font-size: 7.75rem;
+      font-weight: 700;
+      letter-spacing: -0.035em;
+      color: #bef264;
+      line-height: 0.98;
+      text-shadow: 2px 0 18px rgba(0, 0, 0, 0.55), -2px 0 18px rgba(0, 0, 0, 0.55);
+    }
+  </style>
+</head>
+<body>
+  <canvas id="c" width="__W__" height="__H__"></canvas>
+  <div class="overlay">
+    <div class="copy">
+      <p class="eyebrow">
+        <span class="seg">Engineering Leadership</span><span class="pipe"> | </span><span class="seg">Design Engineering</span>
+      </p>
+      <h1>Matt Shade</h1>
+    </div>
+  </div>
+  <script>
+    const W = __W__, H = __H__;
+    const canvas = document.getElementById('c');
+    const ctx = canvas.getContext('2d');
+
+    let seed = 0x41766972 >>> 0;
+    function rng() {
+      seed = (seed * 1664525 + 1013904223) >>> 0;
+      return seed / 0x100000000;
+    }
+
+    const BG = '#0a0a0b';
+    const LINE = '#5f7a58';
+    const LINE_BRIGHT = '#7a9a6e';
+    const LINE_DIM = '#3d4f3a';
+    const LIME = '#bef264';
+
+    function lerp(a, b, t) { return a + (b - a) * t; }
+
+    const VX = W * 0.5;
+    const VY = H * 0.5;
+    const GROUND = H * 0.92;
+
+    function toScreen(x, d, lift) {
+      const depth = 0.18 + d * 0.82;
+      return {
+        x: VX + x * (155 + d * 240),
+        y: VY + (1 - depth) * (GROUND - VY) - (lift || 0) * depth * 135,
+        depth: depth,
+      };
+    }
+
+    function drawLine(ax, ad, alift, bx, bd, blift, alpha, width) {
+      const a = toScreen(ax, ad, alift);
+      const b = toScreen(bx, bd, blift);
+      const t = (a.depth + b.depth) * 0.5;
+      ctx.globalAlpha = alpha * lerp(0.5, 1, t);
+      ctx.lineWidth = width * lerp(0.65, 1.55, t);
+      ctx.strokeStyle = t > 0.5 ? LINE : LINE_DIM;
+      if (t > 0.72) ctx.strokeStyle = LINE_BRIGHT;
+      ctx.beginPath();
+      ctx.moveTo(a.x, a.y);
+      ctx.lineTo(b.x, b.y);
+      ctx.stroke();
+    }
+
+    ctx.fillStyle = BG;
+    ctx.fillRect(0, 0, W, H);
+
+    const grad = ctx.createRadialGradient(W * 0.5, H * 0.42, 30, W * 0.5, H * 0.45, W * 0.62);
+    grad.addColorStop(0, 'rgba(122, 154, 110, 0.1)');
+    grad.addColorStop(0.5, 'rgba(122, 154, 110, 0.03)');
+    grad.addColorStop(1, 'transparent');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, W, H);
+
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    for (let i = -14; i <= 14; i++) {
+      const x = i * 0.085;
+      drawLine(x, 0.04, 0, x, 0.96, 0, 0.28, 0.65);
+    }
+    for (let j = 0; j < 12; j++) {
+      const d = 0.06 + j * 0.08;
+      drawLine(-1.1, d, 0, 1.1, d, 0, 0.24, 0.55);
+    }
+
+    for (let p = 0; p < 24; p++) {
+      const pt = toScreen((rng() - 0.5) * 2.1, 0.12 + rng() * 0.82, 0.1 + rng() * 0.5);
+      ctx.globalAlpha = 0.12 + rng() * 0.28;
+      ctx.fillStyle = rng() > 0.55 ? LIME : LINE_BRIGHT;
+      ctx.beginPath();
+      ctx.arc(pt.x, pt.y, 0.5 + rng() * 1.1, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    const vig = ctx.createRadialGradient(W/2, H/2, H*0.15, W/2, H/2, H*0.88);
+    vig.addColorStop(0, 'transparent');
+    vig.addColorStop(0.5, 'rgba(10, 10, 11, 0.08)');
+    vig.addColorStop(1, 'rgba(10, 10, 11, 0.45)');
+    ctx.fillStyle = vig;
+    ctx.globalAlpha = 1;
+    ctx.fillRect(0, 0, W, H);
+  </script>
+</body>
+</html>
