@@ -27,7 +27,7 @@
   height: 200%;
   transform: translate(-50%, -50%);
   background-image:
-    radial-gradient(rgba(15, 118, 110, 0.05) 1px, transparent 1px);
+    radial-gradient(rgba(190, 242, 100, 0.05) 1px, transparent 1px);
   background-size: 32px 32px;
   animation: gridPulse 6s ease-in-out infinite;
 }
@@ -43,7 +43,7 @@
 .hero-glow-1 {
   width: 500px;
   height: 500px;
-  background: rgba(15, 118, 110, 0.07);
+  background: rgba(190, 242, 100, 0.07);
   top: 5%;
   left: 15%;
   animation-delay: 0s;
@@ -52,7 +52,7 @@
 .hero-glow-2 {
   width: 380px;
   height: 380px;
-  background: rgba(20, 184, 166, 0.05);
+  background: rgba(190, 242, 100, 0.05);
   bottom: 15%;
   right: 10%;
   animation-delay: -5s;
@@ -61,7 +61,7 @@
 .hero-glow-3 {
   width: 280px;
   height: 280px;
-  background: rgba(13, 148, 136, 0.06);
+  background: rgba(190, 242, 100, 0.06);
   bottom: 35%;
   left: 5%;
   animation-delay: -8s;
@@ -71,8 +71,8 @@
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse 70% 40% at 50% 0%, rgba(15, 118, 110, 0.04), transparent 50%),
-    radial-gradient(ellipse 60% 30% at 80% 80%, rgba(20, 184, 166, 0.03), transparent 45%);
+    radial-gradient(ellipse 70% 40% at 50% 0%, rgba(190, 242, 100, 0.04), transparent 50%),
+    radial-gradient(ellipse 60% 30% at 80% 80%, rgba(190, 242, 100, 0.03), transparent 45%);
   pointer-events: none;
 }
 
@@ -129,6 +129,20 @@
   flex-direction: column;
   align-items: center;
   margin: 0 auto;
+}
+
+.hero-content::before {
+  content: '';
+  position: absolute;
+  inset: -2.5rem -4rem;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 78% 68% at 50% 48%,
+    rgba(10, 10, 11, 0.62) 0%,
+    rgba(10, 10, 11, 0.28) 45%,
+    transparent 72%
+  );
 }
 
 .hero-eyebrow {
@@ -300,44 +314,6 @@
     padding: 0.75rem 1.25rem;
     font-size: 0.875rem;
   }
-}
-
-/* Scroll indicator — line + bouncing dot */
-.hero-scroll {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0;
-  margin-top: 3.5rem;
-  animation: fadeUp 0.8s ease-out 0.4s backwards;
-  color: var(--text-muted);
-  text-decoration: none;
-}
-
-.hero-scroll:hover {
-  color: var(--hover);
-}
-
-.hero-scroll-line {
-  width: 1px;
-  height: 32px;
-  background: linear-gradient(to bottom, currentColor, transparent);
-  opacity: 0.6;
-}
-
-.hero-scroll-dot {
-  width: 6px;
-  height: 6px;
-  margin-top: -2px;
-  border-radius: 50%;
-  background: currentColor;
-  box-shadow: 0 0 12px currentColor;
-  animation: scrollBounce 2s ease-in-out 1.2s infinite;
-}
-
-@keyframes scrollBounce {
-  0%, 100% { transform: translateY(0); opacity: 1; }
-  50% { transform: translateY(8px); opacity: 0.6; }
 }
 
 /* —— Pixel swarm forming into birds —— */

@@ -1,0 +1,51 @@
+.origami-perspective-background {
+  position: fixed;
+  inset: 0;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  /* Above body decorative layers (-2 / -1); below .app-content (z-index 2) */
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+  transition: opacity 0.5s ease, filter 0.5s ease;
+}
+
+.origami-perspective-background__canvas-host {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.origami-perspective-background__canvas-host canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/*
+ * Edge-only vignette. A full-screen dark wash was stacking above the canvas and
+ * reading as “nothing but black” — keep the center visually open for the GL layer.
+ */
+.origami-perspective-background__readability {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 105% 95% at 50% 42%,
+    transparent 0%,
+    transparent 38%,
+    rgba(9, 9, 10, 0.22) 72%,
+    rgba(9, 9, 10, 0.55) 100%
+  );
+}
+
+body.modal-open .origami-perspective-background {
+  opacity: 0.2;
+  filter: blur(10px);
+  transition: opacity 0.5s ease, filter 0.5s ease;
+}
