@@ -171,6 +171,10 @@
   letter-spacing: -0.03em;
 }
 
+.hero-title--solo {
+  margin-bottom: 0;
+}
+
 .hero-name {
   display: inline-block;
   color: var(--accent);
@@ -225,7 +229,7 @@
   background: var(--bg-glass);
   color: var(--text);
   border: 1px solid var(--border-strong);
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(9px);
   box-shadow: var(--shadow-sm);
   white-space: normal;
   text-align: center;
@@ -244,7 +248,7 @@
   background: var(--bg-glass);
   color: var(--text);
   border: 1px solid var(--border-strong);
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(9px);
   box-shadow: var(--shadow-sm);
   transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease, color 0.3s ease, background 0.3s ease, border-color 0.3s ease;
 }
@@ -263,7 +267,7 @@
   background: var(--bg-glass);
   color: var(--text);
   border: 1px solid var(--border-strong);
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(9px);
   transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease, color 0.3s ease, background 0.3s ease, border-color 0.3s ease;
 }
 

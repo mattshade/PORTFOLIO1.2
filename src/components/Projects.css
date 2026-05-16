@@ -1,3 +1,7 @@
+#projects {
+  margin-bottom: 500px;
+}
+
 .projects {
   padding: 5rem 1.5rem;
 }
@@ -21,11 +25,11 @@
 
 .project-card {
   padding: 1.5rem;
-  background: var(--bg-glass);
+  background: var(--bg-glass-card);
   border: 1px solid var(--border);
   border-radius: 12px;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   animation: fadeUp 0.5s ease-out backwards;
   position: relative;
@@ -52,7 +56,7 @@
 .project-card:hover {
   transform: translateY(-8px);
   border-color: var(--accent);
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(255, 255, 255, 0.06);
   box-shadow: 
     0 30px 60px -20px rgba(0, 0, 0, 0.7),
     0 0 20px var(--accent-dim);
@@ -269,10 +273,10 @@
   width: 100%;
   max-width: 800px;
   max-height: 90vh;
-  background: var(--bg-glass);
+  background: rgba(14, 15, 16, 0.84);
   border: 1px solid var(--border-strong);
-  backdrop-filter: blur(40px);
-  -webkit-backdrop-filter: blur(40px);
+  backdrop-filter: blur(36px);
+  -webkit-backdrop-filter: blur(36px);
   border-radius: 20px;
   box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.8);
   overflow: hidden;

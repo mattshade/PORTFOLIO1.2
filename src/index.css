@@ -1,7 +1,9 @@
 :root {
   --bg: #0a0a0b;
   --bg-elevated: #111113;
-  --bg-glass: rgba(16, 16, 19, 0.7);
+  --bg-glass: rgba(16, 16, 19, 0.52);
+  /** More transparent panels (project / bio / experience cards) so the canvas background stays visible */
+  --bg-glass-card: rgba(10, 11, 11, 0.28);
   --border: rgba(255, 255, 255, 0.08);
   --border-strong: rgba(255, 255, 255, 0.15);
   --text: #f3f4f6;
@@ -171,8 +173,8 @@ a:hover {
 
 .glass {
   background: var(--bg-glass);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border: 1px solid var(--border);
   box-shadow: var(--shadow-md);
   border-radius: 12px;
