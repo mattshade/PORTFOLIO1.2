@@ -39,7 +39,6 @@ function growCurvedBranch(
   dz /= mag0
 
   for (let s = 0; s < steps; s++) {
-    const t = (s + 1) / steps
     const segLen = (length / steps) * (0.85 + rng() * 0.3)
     const wobbleX = (rng() - 0.5) * spread * 0.35
     const wobbleZ = (rng() - 0.5) * spread * 0.35
@@ -150,8 +149,15 @@ function addOrganicCanopy(
   }
 }
 
-function addOrganicRoots(batch: LineBatch, x: number, y: number, z: number, rng: Rng) {
-  const n = 4 + Math.floor(rng() * 3)
+function addOrganicRoots(
+  batch: LineBatch,
+  x: number,
+  y: number,
+  z: number,
+  rng: Rng,
+  tuning: OrigamiAviaryTuning,
+) {
+  const n = Math.max(2, Math.floor((4 + Math.floor(rng() * 3)) * tuning.forestRootDensity))
   for (let i = 0; i < n; i++) {
     const a = (i / n) * Math.PI * 2 + (rng() - 0.5) * 0.6
     const reach = 0.3 + rng() * 0.45
@@ -169,8 +175,10 @@ function buildOrganicTrunk(
   z: number,
   height: number,
   rng: Rng,
+  tuning: OrigamiAviaryTuning,
 ): { topX: number; topY: number; topZ: number; leanX: number } {
   const segs = 12 + Math.floor(rng() * 7)
+  const fine = Math.min(1, Math.max(0, tuning.forestFineDetail))
   let px = x
   let py = 0
   let pz = z
@@ -184,7 +192,7 @@ function buildOrganicTrunk(
     const ny = height * t
     const nz = z + leanZ * t + Math.cos(t * Math.PI * 2.1) * waveAmp * 0.6
     seg(batch, px, py, pz, nx, ny, nz)
-    if (s > 2 && s < segs - 1 && rng() > 0.55) {
+    if (s > 2 && s < segs - 1 && rng() > 1 - 0.45 * fine) {
       addFineBranchlets(batch, nx, ny, nz, nx - px, ny - py, nz - pz, 2 + Math.floor(rng() * 3), rng)
     }
     px = nx
@@ -205,10 +213,12 @@ export function buildDetailedForestTree(
 ): { lines: LineBatch; perches: Perch[] } {
   const batch = createLineBatch(layerOpacity)
   const perches: Perch[] = []
+  const fine = Math.min(1, Math.max(0, tuning.forestFineDetail))
+  const limbDensity = Math.min(1.2, Math.max(0.35, tuning.forestLimbDensity))
 
-  addOrganicRoots(batch, x, 0, z, rng)
+  addOrganicRoots(batch, x, 0, z, rng, tuning)
 
-  const trunk = buildOrganicTrunk(batch, x, z, height, rng)
+  const trunk = buildOrganicTrunk(batch, x, z, height, rng, tuning)
   const trunkLean = trunk.leanX
 
   for (let s = 0; s < 2 + Math.floor(rng() * 2); s++) {
@@ -225,7 +235,7 @@ export function buildDetailedForestTree(
     })
   }
 
-  const limbCount = 5 + Math.floor(rng() * 5)
+  const limbCount = Math.max(3, Math.floor((5 + Math.floor(rng() * 5)) * limbDensity))
   for (let b = 0; b < limbCount; b++) {
     const t = 0.38 + (b / limbCount) * 0.52 + (rng() - 0.5) * 0.08
     const by = height * Math.min(0.95, t)
@@ -253,13 +263,23 @@ export function buildDetailedForestTree(
       0.15,
     )
 
-    addFineBranchlets(batch, bx, by, bz, dx / mag, dy / mag, dz / mag, 3 + Math.floor(rng() * 3), rng)
+    addFineBranchlets(
+      batch,
+      bx,
+      by,
+      bz,
+      dx / mag,
+      dy / mag,
+      dz / mag,
+      Math.max(1, Math.floor((3 + Math.floor(rng() * 3)) * fine)),
+      rng,
+    )
 
     const tipX = bx + (dx / mag) * (0.65 + rng() * 0.35)
     const tipY = by + (dy / mag) * (0.65 + rng() * 0.35)
     const tipZ = bz + (dz / mag) * (0.65 + rng() * 0.35)
 
-    if (rng() > 0.2) {
+    if (rng() > 1 - 0.8 * fine) {
       addOrganicCanopy(batch, tipX, tipY + 0.1, tipZ, 0.35 + rng() * 0.4, rng)
       perches.push({
         position: new THREE.Vector3(tipX, tipY + 0.05, tipZ),
@@ -270,7 +290,7 @@ export function buildDetailedForestTree(
     }
   }
 
-  if (rng() > 0.35) {
+  if (rng() > 1 - 0.65 * fine) {
     addOrganicCanopy(batch, trunk.topX, trunk.topY + 0.05, trunk.topZ, 0.4 + rng() * 0.35, rng)
   }
 
@@ -341,7 +361,9 @@ export function buildDetailedForest(
   const treeAnchors: { x: number; y: number; z: number }[] = []
 
   const span = tuning.forestHalfWidth * 2
-  const centerFillCount = Math.max(4, Math.round(tuning.treeCount * 0.28))
+  const centerFillCount = tuning.posterComposition
+    ? Math.max(0, Math.round(tuning.treeCount * tuning.forestCenterFillFraction))
+    : Math.max(4, Math.round(tuning.treeCount * tuning.forestCenterFillFraction))
 
   for (let i = 0; i < tuning.treeCount; i++) {
     const layer = i % 3
@@ -375,7 +397,9 @@ export function buildDetailedForest(
     placeForestTree(rng, x, z, layer, tuning, accentSoft, lineMuted, depthLayers, roots, treeAnchors, perches)
   }
 
-  for (let i = 0; i < tuning.latticePanelCount; i++) {
+  const archMul = Math.min(1.25, Math.max(0, tuning.forestArchitectureDensity))
+
+  for (let i = 0; i < Math.max(0, Math.round(tuning.latticePanelCount * archMul)); i++) {
     const layer = 1 + (i % 2)
     const batch = createLineBatch(tuning.lineOpacity * 0.28)
     addLatticePanel(
@@ -390,7 +414,9 @@ export function buildDetailedForest(
     flushLineBatch(batch, depthLayers[layer], lineMuted, roots, tuning.sceneDepth, tuning.lineWidth * 0.9)
   }
 
-  for (let i = 0; i < tuning.vineConnectionCount && treeAnchors.length > 1; i++) {
+  const vineN =
+    treeAnchors.length > 1 ? Math.max(0, Math.round(tuning.vineConnectionCount * archMul)) : 0
+  for (let i = 0; i < vineN; i++) {
     const a = treeAnchors[Math.floor(rng() * treeAnchors.length)]
     const b = treeAnchors[Math.floor(rng() * treeAnchors.length)]
     const batch = createLineBatch(tuning.lineOpacity * 0.28)
@@ -410,7 +436,7 @@ export function buildDetailedForest(
     flushLineBatch(batch, depthLayers[1], accentSoft, roots, tuning.sceneDepth, tuning.lineWidth)
   }
 
-  for (let i = 0; i < tuning.suspendedLineCount; i++) {
+  for (let i = 0; i < Math.max(0, Math.round(tuning.suspendedLineCount * archMul)); i++) {
     const batch = createLineBatch(tuning.lineOpacity * 0.32)
     const z = -5 - rng() * 6
     const y = 2.2 + rng() * 2.8

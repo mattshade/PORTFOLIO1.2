@@ -1,6 +1,6 @@
 import * as THREE from 'three'
 import { createArticulatedOrigamiBird, type BirdRig } from './birdGeometry'
-import type { OrigamiAviaryTuning } from './constants'
+import type { OrigamiAviaryTuning, PosterHeroBirdSlot } from './constants'
 import { AVIARY_COLORS } from './constants'
 import type { Perch } from './environment'
 import { pointerOnPlaneZ } from './interaction'
@@ -64,6 +64,8 @@ export type AviaryBird = {
   preenDirection: 1 | -1
   depthSmooth: number
   catScareCooldownUntil: number
+  /** Added to perch Z while resting (poster flock sits deeper in fog) */
+  perchRestZOffset: number
 }
 
 function anyBirdInApproach(birds: AviaryBird[]) {
@@ -110,22 +112,75 @@ function perchClearOfOthers(
   return true
 }
 
+function scorePosterHeroPerch(
+  perches: Perch[],
+  idx: number,
+  slot: PosterHeroBirdSlot,
+  forestHalfWidth: number,
+  tuning: OrigamiAviaryTuning,
+): number {
+  const p = perches[idx]
+  if (p.surface !== 'tree') return -1e9
+  const minCenterX = forestHalfWidth * tuning.heroPerchMinCenterFraction
+  if (Math.abs(p.position.x) < minCenterX) return -1e9
+  const side = slot === 'upperLeft' ? -1 : 1
+  const sideScore = side * p.position.x * 1.15
+  const yScore = p.position.y * 1.45
+  const zScore = -Math.abs(p.position.z + 4.2) * 0.06
+  return yScore + sideScore + zScore
+}
+
+function scorePosterFlockPerch(perches: Perch[], idx: number): number {
+  const p = perches[idx]
+  if (p.surface !== 'tree') return -1e9
+  const depth = -p.position.z
+  const lateral = Math.abs(p.position.x)
+  return depth * 1.15 + lateral * 0.06 - p.position.y * 0.12
+}
+
 /** Tree perches only on load; random order with minimum spacing between birds. */
 function pickInitialPerch(
   rng: Rng,
   perches: Perch[],
   used: Set<number>,
   placed: THREE.Vector3[],
-  forestHalfWidth: number,
+  tuning: OrigamiAviaryTuning,
   kind: AviaryBird['kind'],
 ): number {
+  const forestHalfWidth = tuning.forestHalfWidth
   const minDist = kind === 'sculptural' ? 2.35 : 1.45
-  const minCenterX = forestHalfWidth * 0.12
+  const minCenterX = forestHalfWidth * tuning.heroPerchMinCenterFraction
 
   let candidates = perches
     .map((_, i) => i)
     .filter((i) => !used.has(i) && perches[i].surface === 'tree')
     .filter((i) => perchClearOfOthers(perches, i, placed, minDist))
+
+  if (tuning.posterComposition && kind === 'sculptural') {
+    let best = -Infinity
+    let bestIdx = -1
+    for (const i of candidates) {
+      const s = scorePosterHeroPerch(perches, i, tuning.posterHeroBirdSlot, forestHalfWidth, tuning)
+      if (s > best) {
+        best = s
+        bestIdx = i
+      }
+    }
+    if (bestIdx >= 0 && best > -1e8) return bestIdx
+  }
+
+  if (tuning.posterComposition && kind === 'flock') {
+    let best = -Infinity
+    let bestIdx = -1
+    for (const i of candidates) {
+      const s = scorePosterFlockPerch(perches, i)
+      if (s > best) {
+        best = s
+        bestIdx = i
+      }
+    }
+    if (bestIdx >= 0) return bestIdx
+  }
 
   if (kind === 'sculptural') {
     const offCenter = candidates.filter((i) => Math.abs(perches[i].position.x) >= minCenterX)
@@ -140,6 +195,22 @@ function pickInitialPerch(
     .filter((i) => !used.has(i) && perches[i].surface === 'tree')
   shuffleIndices(rng, fallback)
   return fallback[0] ?? 0
+}
+
+function applyPosterBirdMaterials(rig: BirdRig, tuning: OrigamiAviaryTuning, kind: AviaryBird['kind']) {
+  if (!tuning.posterComposition) return
+  const fMul = kind === 'sculptural' ? tuning.heroBirdFillOpacityMul : tuning.flockBirdFillOpacityMul
+  const eMul = kind === 'sculptural' ? tuning.heroBirdEdgeOpacityMul : tuning.flockBirdEdgeOpacityMul
+  if (fMul === 1 && eMul === 1) return
+
+  rig.root.traverse((o: THREE.Object3D) => {
+    if (o instanceof THREE.Mesh && o.material instanceof THREE.MeshBasicMaterial) {
+      o.material.opacity *= fMul
+    }
+    if (o instanceof THREE.LineSegments && o.material instanceof THREE.LineBasicMaterial) {
+      o.material.opacity *= eMul
+    }
+  })
 }
 
 function scheduleIdleRest(
@@ -215,7 +286,9 @@ function tryBeginViewerApproach(
   perches: Perch[],
   elapsed: number,
   rng: Rng,
+  tuning: OrigamiAviaryTuning,
 ): boolean {
+  if (!tuning.viewerApproachEnabled) return false
   if (
     !b.approachEligible ||
     elapsed < b.nextApproachAt ||
@@ -263,17 +336,25 @@ export function populateAviaryBirds(
   const placedPositions: THREE.Vector3[] = []
 
   type SpawnSpec = { kind: AviaryBird['kind']; scale: number }
-  const spawns: SpawnSpec[] = []
+  const sculpturalSpecs: SpawnSpec[] = []
+  const flockSpecs: SpawnSpec[] = []
   for (let i = 0; i < tuning.sculpturalBirdCount; i++) {
-    spawns.push({ kind: 'sculptural', scale: 2.5 + rng() * 0.55 })
+    sculpturalSpecs.push({
+      kind: 'sculptural',
+      scale: (2.5 + rng() * 0.55) * tuning.heroBirdScaleMul,
+    })
   }
   for (let i = 0; i < tuning.birdCount; i++) {
-    spawns.push({ kind: 'flock', scale: 0.92 + rng() * 0.38 })
+    flockSpecs.push({
+      kind: 'flock',
+      scale: (0.92 + rng() * 0.38) * tuning.flockBirdScaleMul,
+    })
   }
-  for (let i = spawns.length - 1; i > 0; i--) {
+  for (let i = flockSpecs.length - 1; i > 0; i--) {
     const j = Math.floor(rng() * (i + 1))
-    ;[spawns[i], spawns[j]] = [spawns[j], spawns[i]]
+    ;[flockSpecs[i], flockSpecs[j]] = [flockSpecs[j], flockSpecs[i]]
   }
+  const spawns: SpawnSpec[] = [...sculpturalSpecs, ...flockSpecs]
 
   const makeBird = (
     rig: BirdRig,
@@ -282,10 +363,12 @@ export function populateAviaryBirds(
     scale: number,
     extras: Partial<AviaryBird>,
   ): AviaryBird => {
+    const zOff = tuning.posterComposition && kind === 'flock' ? tuning.posterFlockZPush : 0
     resetCraneLimbs(rig)
+    applyPosterBirdMaterials(rig, tuning, kind)
     initRigScale(rig, scale)
     const p = perches[perchIndex]
-    rig.root.position.copy(p.position)
+    rig.root.position.set(p.position.x, p.position.y, p.position.z + zOff)
     rig.root.rotation.order = 'YXZ'
     rig.root.rotation.set(0, p.yaw, 0)
     rig.root.renderOrder = 5
@@ -306,7 +389,7 @@ export function populateAviaryBirds(
       flightProgress: 0,
       flightDuration: 1,
       flightPhase: 'normal',
-      approachEligible: rng() > 0.4,
+      approachEligible: tuning.viewerApproachEnabled && rng() > 0.4,
       nextApproachAt: scheduleRest(rng, 0, 5, 16),
       approachCooldownUntil: 0,
       flapPhase: rng(),
@@ -316,16 +399,24 @@ export function populateAviaryBirds(
       preenDirection: rng() > 0.5 ? 1 : -1,
       depthSmooth: 0.5,
       catScareCooldownUntil: 0,
+      perchRestZOffset: zOff,
       ...extras,
     }
   }
 
-  for (const spec of spawns) {
-    const pi = pickInitialPerch(rng, perches, used, placedPositions, tuning.forestHalfWidth, spec.kind)
+  const heroSilhouetteSlots = tuning.sculpturalBirdCount + Math.min(2, tuning.birdCount)
+
+  for (let spawnIdx = 0; spawnIdx < spawns.length; spawnIdx++) {
+    const spec = spawns[spawnIdx]
+    const pi = pickInitialPerch(rng, perches, used, placedPositions, tuning, spec.kind)
     used.add(pi)
     placedPositions.push(perches[pi].position.clone())
     const rig = createArticulatedOrigamiBird(fill, accent, spec.kind)
-    birds.push(makeBird(rig, spec.kind, pi, spec.scale, {}))
+    const scale =
+      spawnIdx < heroSilhouetteSlots && tuning.heroSilhouetteBoost > 1
+        ? spec.scale * tuning.heroSilhouetteBoost
+        : spec.scale
+    birds.push(makeBird(rig, spec.kind, pi, scale, {}))
   }
 
   return birds
@@ -351,8 +442,8 @@ function applyGaze(rig: BirdRig, b: AviaryBird, pointerNdc: THREE.Vector2, camer
   )
 }
 
-function placeOnPerch(rig: BirdRig, perch: Perch, scrollLift: number) {
-  rig.root.position.set(perch.position.x, perch.position.y + scrollLift, perch.position.z)
+function placeOnPerch(rig: BirdRig, perch: Perch, scrollLift: number, perchRestZOffset = 0) {
+  rig.root.position.set(perch.position.x, perch.position.y + scrollLift, perch.position.z + perchRestZOffset)
   rig.root.rotation.order = 'YXZ'
   rig.root.rotation.set(0, perch.yaw, 0)
 }
@@ -363,16 +454,19 @@ function chooseBirdAction(
   elapsed: number,
   rng: Rng,
   perches: Perch[],
+  tuning: OrigamiAviaryTuning,
 ) {
   if (perches.length < 2) return
   const roll = rng()
-  if (roll < 0.11 && tryBeginViewerApproach(b, birds, perches, elapsed, rng)) return
+  if (roll < 0.11 && tryBeginViewerApproach(b, birds, perches, elapsed, rng, tuning)) return
 
   const flyChance = b.kind === 'sculptural' ? 0.34 : 0.42
   if (roll < 0.11 + flyChance) {
     const target = pickPerch(rng, perches, b.perchIndex)
     b.perchIndexTarget = target
-    beginFlight(b, b.rig.root.position.clone(), perches[target].position.clone(), rng)
+    const to = perches[target].position.clone()
+    to.z += b.perchRestZOffset
+    beginFlight(b, b.rig.root.position.clone(), to, rng)
     enterState(b, 'takeoff', 0.5 + rng() * 0.28)
   } else if (roll < 0.86) {
     enterState(b, 'preening', 1.6 + rng() * 2.4)
@@ -402,13 +496,13 @@ function updateBird(
 
   switch (b.state) {
     case 'resting': {
-      placeOnPerch(rig, perch, scrollLift)
+      placeOnPerch(rig, perch, scrollLift, b.perchRestZOffset)
       applyPerchPose(rig, perch)
       b.flapPhase += delta / (b.flapPeriod * 3.4)
       applyRestingWingFlutter(rig, b.flapPhase, flapI * 0.32)
       if (elapsed >= b.nextDecisionAt) {
-        if (!tryBeginViewerApproach(b, birds, perches, elapsed, rng)) {
-          chooseBirdAction(b, birds, elapsed, rng, perches)
+        if (!tryBeginViewerApproach(b, birds, perches, elapsed, rng, tuning)) {
+          chooseBirdAction(b, birds, elapsed, rng, perches, tuning)
         }
       }
       applyGaze(rig, b, pointerNdc, camera, delta)
@@ -416,7 +510,7 @@ function updateBird(
     }
 
     case 'preening': {
-      placeOnPerch(rig, perch, scrollLift)
+      placeOnPerch(rig, perch, scrollLift, b.perchRestZOffset)
       const t = THREE.MathUtils.clamp(b.stateTime / b.stateDuration, 0, 1)
       const cycle = t < 0.5 ? t * 2 : 2 - t * 2
       preenHeadPose(rig, cycle)
@@ -468,6 +562,7 @@ function updateBird(
       if (b.flightPhase === 'toViewer' && u >= 0.9) {
         const near = rig.root.position.clone()
         const targetPos = perches[b.perchIndexTarget].position.clone()
+        targetPos.z += b.perchRestZOffset
         beginRetreatFromViewer(b, near, targetPos, rng)
       } else if (b.flightPhase === 'fromViewer' && u >= 0.82) {
         b.flightPhase = 'normal'
@@ -511,7 +606,7 @@ function updateBird(
       const u = THREE.MathUtils.clamp(b.stateTime / b.stateDuration, 0, 1)
       b.settleBlend = easeInOutCubic(u)
 
-      _pathPos.set(target.position.x, target.position.y + scrollLift, target.position.z)
+      _pathPos.set(target.position.x, target.position.y + scrollLift, target.position.z + b.perchRestZOffset)
       rig.root.position.lerp(_pathPos, b.settleBlend * 0.4)
       smoothRotationYXZ(rig.root.rotation, 0, target.yaw, 0, delta, 2.35)
       if (target.surface === 'ground') {
@@ -527,7 +622,7 @@ function updateBird(
 
       if (b.stateTime >= b.stateDuration) {
         enterState(b, 'resting', 0)
-        placeOnPerch(rig, target, scrollLift)
+        placeOnPerch(rig, target, scrollLift, b.perchRestZOffset)
         applyPerchPose(rig, target)
         b.nextDecisionAt = scheduleIdleRest(rng, elapsed, target, b.kind)
       }
@@ -562,7 +657,7 @@ export function updateAviaryBirds(
 
     if (reducedMotion) {
       const p = perches[b.perchIndex]
-      placeOnPerch(b.rig, p, scrollLift)
+      placeOnPerch(b.rig, p, scrollLift, b.perchRestZOffset)
       applyPerchPose(b.rig, p)
       b.depthSmooth = applyBirdDepthCue(b.rig, b.rig.root.position.z, tuning.sceneDepth, b.depthSmooth, delta)
       continue
@@ -610,7 +705,7 @@ function scareBirdFromCat(
 
   b.flightPhase = 'normal'
   b.flightFrom.copy(_fleeFrom)
-  b.flightTo.copy(to)
+  b.flightTo.set(to.x, to.y, to.z + b.perchRestZOffset)
 
   const awayX = _fleeFrom.x - catPos.x
   const awayZ = _fleeFrom.z - catPos.z

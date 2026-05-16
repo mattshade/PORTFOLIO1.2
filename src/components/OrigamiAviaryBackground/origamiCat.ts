@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import type { OrigamiAviaryTuning } from './constants'
+import type { AviaryViewportProfile, OrigamiAviaryTuning } from './constants'
 import { createLineBatch, flushLineBatch } from './lineBatch'
 import type { createMulberry32 } from './seededRandom'
 
@@ -89,8 +89,37 @@ function buildCatLines(rig: CatRig, color: THREE.Color, opacity: number, lineWid
   leg(rig.legBR, -1, -1)
 }
 
-function clampCatZ(z: number, sceneDepth: number) {
-  return THREE.MathUtils.clamp(z, -sceneDepth + 2.2, -8.6)
+/** Horizontal wander half-extent: keep inside frustum for portrait + parallax. */
+function catWanderHalfX(t: OrigamiAviaryTuning): number {
+  const base = t.forestHalfWidth * 1.55
+  if (t.viewportProfile === 'narrow') return base * 0.36
+  if (t.viewportProfile === 'tablet') return base * 0.58
+  return base * 0.88
+}
+
+function catZBounds(sceneDepth: number, viewport: AviaryViewportProfile): { far: number; near: number } {
+  // far = more negative (deeper); near = closer to camera — tighter on narrow to beat fog + clipping.
+  if (viewport === 'narrow') {
+    return { far: -sceneDepth + 5.1, near: -7.75 }
+  }
+  if (viewport === 'tablet') {
+    return { far: -sceneDepth + 3.6, near: -8.35 }
+  }
+  return { far: -sceneDepth + 2.85, near: -8.55 }
+}
+
+function clampCatZ(z: number, sceneDepth: number, viewport: AviaryViewportProfile) {
+  const { far, near } = catZBounds(sceneDepth, viewport)
+  return THREE.MathUtils.clamp(z, far, near)
+}
+
+function sanitizeCatRoot(rig: CatRig, state: CatState, t: OrigamiAviaryTuning) {
+  const halfX = catWanderHalfX(t)
+  rig.root.position.x = THREE.MathUtils.clamp(rig.root.position.x, -halfX, halfX)
+  rig.root.position.z = clampCatZ(rig.root.position.z, t.sceneDepth, t.viewportProfile)
+  if (state !== 'pounce') {
+    rig.root.position.y = THREE.MathUtils.clamp(rig.root.position.y, 0.02, 0.14)
+  }
 }
 
 export function createOrigamiCat(
@@ -143,21 +172,21 @@ export function createOrigamiCat(
   let pounceCount = 0
   let stalkCreep = false
 
-  const span = tuning.forestHalfWidth * 1.55
-
-  const randomGroundPoint = (out: THREE.Vector3) => {
+  const randomGroundPoint = (out: THREE.Vector3, t: OrigamiAviaryTuning) => {
+    const halfX = catWanderHalfX(t)
     out.set(
-      (rng() - 0.5) * span * 2,
+      (rng() - 0.5) * 2 * halfX,
       0.04 + rng() * 0.03,
-      clampCatZ(-9.2 - rng() * (tuning.sceneDepth - 10.5), tuning.sceneDepth),
+      clampCatZ(-9.2 - rng() * (t.sceneDepth - 10.5), t.sceneDepth, t.viewportProfile),
     )
   }
 
-  const pickWaypoint = () => {
-    randomGroundPoint(_target)
+  const pickWaypoint = (t: OrigamiAviaryTuning) => {
+    randomGroundPoint(_target, t)
   }
 
-  const pickPreyAhead = (out: THREE.Vector3) => {
+  const pickPreyAhead = (out: THREE.Vector3, t: OrigamiAviaryTuning) => {
+    const halfX = catWanderHalfX(t)
     const yaw = rig.root.rotation.y + (rng() - 0.5) * 0.35
     const dist = 1.05 + rng() * 0.85
     out.set(
@@ -165,10 +194,12 @@ export function createOrigamiCat(
       rig.root.position.y,
       rig.root.position.z + Math.cos(yaw) * dist,
     )
-    out.z = clampCatZ(out.z, tuning.sceneDepth)
+    out.x = THREE.MathUtils.clamp(out.x, -halfX, halfX)
+    out.z = clampCatZ(out.z, t.sceneDepth, t.viewportProfile)
   }
 
-  const aimPounce = (target: THREE.Vector3, crouchDuration: number) => {
+  const aimPounce = (target: THREE.Vector3, crouchDuration: number, t: OrigamiAviaryTuning) => {
+    const halfX = catWanderHalfX(t)
     _pounceFrom.copy(rig.root.position)
     _pounceTo.copy(target)
     _pounceTo.y = _pounceFrom.y
@@ -180,7 +211,8 @@ export function createOrigamiCat(
       _dir.normalize()
       if (len > 2.5) _pounceTo.copy(_pounceFrom).addScaledVector(_dir, 2.5)
     }
-    _pounceTo.z = clampCatZ(_pounceTo.z, tuning.sceneDepth)
+    _pounceTo.x = THREE.MathUtils.clamp(_pounceTo.x, -halfX, halfX)
+    _pounceTo.z = clampCatZ(_pounceTo.z, t.sceneDepth, t.viewportProfile)
     rig.root.rotation.y = Math.atan2(_dir.x, _dir.z)
     state = 'crouch'
     stateTime = 0
@@ -189,14 +221,14 @@ export function createOrigamiCat(
     pounceCount += 1
   }
 
-  const beginPounce = () => {
-    pickPreyAhead(_pounceTo)
-    aimPounce(_pounceTo, 0.85 + rng() * 0.5)
+  const beginPounce = (t: OrigamiAviaryTuning) => {
+    pickPreyAhead(_pounceTo, t)
+    aimPounce(_pounceTo, 0.85 + rng() * 0.5, t)
   }
 
   const pounceAt = (target: THREE.Vector3, elapsed: number) => {
     if (state === 'crouch' || state === 'windup' || state === 'pounce') return
-    aimPounce(target, 0.22 + rng() * 0.18)
+    aimPounce(target, 0.22 + rng() * 0.18, tuning)
     nextPounceAllowedAt = elapsed + 28 + rng() * 32
   }
 
@@ -204,9 +236,9 @@ export function createOrigamiCat(
 
   const getPosition = (out: THREE.Vector3) => out.copy(rig.root.position)
 
-  randomGroundPoint(rig.root.position)
+  randomGroundPoint(rig.root.position, tuning)
   rig.root.rotation.y = rng() * Math.PI * 2
-  pickWaypoint()
+  pickWaypoint(tuning)
   state = 'stalking'
   stateTime = 0
 
@@ -225,7 +257,7 @@ export function createOrigamiCat(
       if (dist < 0.4) {
         const pounceChance = pounceCount === 0 ? 0.72 : 0.4
         if (elapsed >= nextPounceAllowedAt && rng() < pounceChance) {
-          beginPounce()
+          beginPounce(t)
           nextPounceAllowedAt = elapsed + 38 + rng() * 42
         } else {
           const roll = rng()
@@ -250,11 +282,10 @@ export function createOrigamiCat(
         const step = speed * dt * (stalkCreep ? 0.48 : 1)
         rig.root.position.x += _dir.x * step
         rig.root.position.z += _dir.z * step
-        rig.root.position.z = clampCatZ(rig.root.position.z, t.sceneDepth)
         rig.root.rotation.y = Math.atan2(_dir.x, _dir.z)
 
         if (stalkCreep && elapsed >= nextPounceAllowedAt && dist < 2.2 && rng() < 0.018) {
-          beginPounce()
+          beginPounce(t)
           nextPounceAllowedAt = elapsed + 38 + rng() * 42
         }
       }
@@ -285,19 +316,19 @@ export function createOrigamiCat(
         state = 'paused'
         stateTime = 0
         stateDuration = 1.2 + rng() * 2
-        pickWaypoint()
+        pickWaypoint(t)
       }
     } else if (state === 'stretching') {
       if (stateTime >= stateDuration) {
         state = 'stalking'
-        pickWaypoint()
+        pickWaypoint(t)
         stateTime = 0
       }
     } else if (stateTime >= stateDuration) {
       const roll = rng()
       if (roll < 0.58) {
         state = 'stalking'
-        pickWaypoint()
+        pickWaypoint(t)
         stateTime = 0
       } else if (roll < 0.76) {
         state = 'grooming'
@@ -313,6 +344,8 @@ export function createOrigamiCat(
         stateTime = 0
       }
     }
+
+    sanitizeCatRoot(rig, state, t)
 
     const moving = state === 'stalking' && !stalkCreep
     const creeping = state === 'stalking' && stalkCreep

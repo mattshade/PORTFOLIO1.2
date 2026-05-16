@@ -18,7 +18,9 @@ export type Perch = {
 function buildGroundPerches(rng: Rng, tuning: OrigamiAviaryTuning): Perch[] {
   const perches: Perch[] = []
   const span = tuning.forestHalfWidth * 2
-  const count = 6 + Math.floor(rng() * 5)
+  const count = tuning.posterComposition
+    ? 3 + Math.floor(rng() * 3)
+    : 6 + Math.floor(rng() * 5)
 
   for (let i = 0; i < count; i++) {
     perches.push({

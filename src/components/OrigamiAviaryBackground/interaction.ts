@@ -74,13 +74,19 @@ export function applyCameraInteraction(
     camera.position.copy(baseCam)
     camera.lookAt(baseLook)
     camera.rotation.z = 0
-    camera.fov = 43
+    camera.fov = tuning.baseFov
+    if (camera.aspect < 1 && tuning.viewportProfile === 'narrow' && tuning.portraitFovTrim > 0) {
+      camera.fov = Math.max(30, camera.fov - tuning.portraitFovTrim)
+    }
     camera.updateProjectionMatrix()
     return
   }
 
-  const s = 0.011 * tuning.parallaxIntensity
-  const scrollDrive = scrollParallaxDrive(state.scrollSmooth)
+  const ptr = tuning.pointerParallaxScale
+  const ss = tuning.touchScrollScale
+  const s = 0.011 * tuning.parallaxIntensity * ptr
+  const scrollDriveRaw = scrollParallaxDrive(state.scrollSmooth)
+  const scrollDrive = scrollDriveRaw * ss
   const scrollOff = scrollDrive * tuning.scrollDriftIntensity * 0.5
   const scrollT = scrollDrive
 
@@ -95,7 +101,7 @@ export function applyCameraInteraction(
     baseLook.z,
   )
   camera.rotation.z = scrollT * tuning.scrollRotateIntensity * 0.06
-  camera.fov = 43 - scrollT * 5.5
+  camera.fov = tuning.baseFov - scrollT * 5.5
   camera.updateProjectionMatrix()
 }
 
@@ -113,14 +119,17 @@ export function applyEnvironmentInteraction(
     return
   }
 
-  const s = tuning.parallaxIntensity * 0.055
-  const scrollOff = scrollParallaxDrive(state.scrollSmooth) * tuning.scrollDriftIntensity * 0.5
+  const posScale = tuning.pointerParallaxScale
+  const rotScale = tuning.layerPointerRotationScale
+  const s = tuning.parallaxIntensity * 0.055 * posScale
+  const scrollOff =
+    scrollParallaxDrive(state.scrollSmooth) * tuning.scrollDriftIntensity * 0.5 * tuning.touchScrollScale
   layers.forEach((layer, i) => {
     const depth = 0.28 + i * 0.28
     layer.position.x = state.pointerSmooth.x * s * depth
     layer.position.y = state.pointerSmooth.y * s * depth * 0.35 + scrollOff * 0.032 * (i + 1)
     layer.position.z = scrollOff * 0.022 * (i + 1)
-    layer.rotation.y = state.pointerSmooth.x * 0.003 * (i + 1)
-    layer.rotation.x = state.pointerSmooth.y * 0.002 * (i + 1)
+    layer.rotation.y = state.pointerSmooth.x * 0.003 * (i + 1) * rotScale
+    layer.rotation.x = state.pointerSmooth.y * 0.002 * (i + 1) * rotScale
   })
 }

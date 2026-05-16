@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import type { OrigamiAviaryTuning } from './constants'
 
 /** Ramp scroll parallax in from the top so the hero loads level. */
 export function scrollParallaxWeight(scrollSmooth: number): number {
@@ -40,11 +41,23 @@ export function applyScrollParallaxRotation(
   stage.position.set(0, t * i * 0.14, t * i * 0.42)
 }
 
-/** Pull camera back slightly on ultrawide so edge trees stay in frame */
-export function applyWideForestCamera(camera: THREE.PerspectiveCamera, aspect: number) {
+/**
+ * After pointer/scroll offsets are applied: portrait crop on narrow, ultrawide pull-back.
+ * Mutates `camera.fov` and `camera.position.z` relative to the current interaction state.
+ */
+export function applyWideForestCamera(
+  camera: THREE.PerspectiveCamera,
+  aspect: number,
+  tuning: OrigamiAviaryTuning,
+) {
+  if (aspect < 1 && tuning.viewportProfile === 'narrow' && tuning.portraitFovTrim > 0) {
+    camera.fov = Math.max(30, camera.fov - tuning.portraitFovTrim)
+    camera.updateProjectionMatrix()
+  }
+
   if (aspect > 1.85) {
     camera.position.z += (aspect - 1.85) * 1.1
-    camera.fov = 43 + (aspect - 1.85) * 4
+    camera.fov += (aspect - 1.85) * 4
     camera.updateProjectionMatrix()
   }
 }

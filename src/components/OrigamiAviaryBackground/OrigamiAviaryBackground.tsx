@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import * as THREE from 'three'
 import './OrigamiAviaryBackground.css'
-import { DEFAULT_AVIARY_TUNING, AVIARY_COLORS, getResponsiveAviaryTuning } from './constants'
+import { AVIARY_COLORS, getResponsiveAviaryTuning } from './constants'
 import { createMulberry32 } from './seededRandom'
 import { buildAviaryEnvironment } from './environment'
 import {
@@ -123,9 +123,12 @@ export function OrigamiAviaryBackground() {
       world.name = 'aviary-world'
       stage.add(world)
 
-      camera = new THREE.PerspectiveCamera(43, 1, 0.1, 120)
-      const baseCam = BOTTOM_ANCHOR_CAMERA.clone()
+      camera = new THREE.PerspectiveCamera(tuning.baseFov, 1, 0.1, 120)
+      const baseCam = BOTTOM_ANCHOR_CAMERA.clone().add(
+        new THREE.Vector3(tuning.cameraOffsetX, tuning.cameraOffsetY, tuning.cameraOffsetZ),
+      )
       const baseLook = BOTTOM_ANCHOR_LOOK.clone()
+      baseLook.y += tuning.lookAtOffsetY
       camera.position.copy(baseCam)
       camera.lookAt(baseLook)
 
@@ -158,7 +161,7 @@ export function OrigamiAviaryBackground() {
         camera.updateProjectionMatrix()
         applyScrollParallaxRotation(stage, interaction.scrollSmooth, tuning.scrollRotateIntensity)
         applyBottomAnchor(camera, world, w / h, interaction.scrollSmooth, tuning.scrollDriftIntensity)
-        applyWideForestCamera(camera, w / h)
+        applyWideForestCamera(camera, w / h, tuning)
         renderer.setSize(w, h, false)
         pipeline.resize(w, h)
         setLineResolution(w, h)
@@ -178,12 +181,7 @@ export function OrigamiAviaryBackground() {
 
           updateInteractionState(interaction, pointer, scrollNormRef.current, delta, tuning, rm)
           applyCameraInteraction(camera, baseCam, baseLook, interaction, tuning, rm)
-          if (!rm) applyWideForestCamera(camera, camera.aspect)
-          else {
-            camera.position.copy(baseCam)
-            camera.fov = 43
-            camera.updateProjectionMatrix()
-          }
+          if (!rm) applyWideForestCamera(camera, camera.aspect, tuning)
           if (rm) {
             stage.rotation.set(0, 0, 0)
             stage.position.set(0, 0, 0)
@@ -195,10 +193,11 @@ export function OrigamiAviaryBackground() {
           updateAviaryBirds(birds, perches, elapsed, delta, rm, rng, tuning, interaction.pointerSmooth, camera, interaction.scrollSmooth)
           cat?.tick(elapsed, delta, tuning, rm)
           if (cat && !rm) {
+            const activeCat = cat
             handleCatBirdCollisions(
-              cat.getPosition(catPosScratch),
-              (target) => cat.pounceAt(target, elapsed),
-              cat.isPouncing,
+              activeCat.getPosition(catPosScratch),
+              (target) => activeCat.pounceAt(target, elapsed),
+              activeCat.isPouncing,
               birds,
               perches,
               rng,

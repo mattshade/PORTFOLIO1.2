@@ -7,6 +7,10 @@
   pointer-events: none;
   overflow: hidden;
   transition: opacity 0.5s ease, filter 0.5s ease;
+  --origami-aviary-vignette-title: 0.52;
+  --origami-aviary-vignette-mid: 0.22;
+  --origami-aviary-vignette-edge: 0.62;
+  --origami-aviary-vignette-accent: 0.04;
 }
 
 .origami-aviary-background__canvas-host {
@@ -32,15 +36,32 @@
   z-index: 1;
   pointer-events: none;
   background:
-    radial-gradient(ellipse 62% 42% at 50% 22%, rgba(10, 10, 11, 0.52) 0%, transparent 68%),
-    radial-gradient(ellipse 70% 45% at 50% 18%, rgba(122, 154, 110, 0.04) 0%, transparent 55%),
+    radial-gradient(
+      ellipse 62% 42% at 50% 22%,
+      rgba(10, 10, 11, var(--origami-aviary-vignette-title)) 0%,
+      transparent 68%
+    ),
+    radial-gradient(
+      ellipse 70% 45% at 50% 18%,
+      rgba(122, 154, 110, var(--origami-aviary-vignette-accent)) 0%,
+      transparent 55%
+    ),
     radial-gradient(
       ellipse 100% 88% at 50% 40%,
       transparent 0%,
       transparent 36%,
-      rgba(10, 10, 11, 0.22) 66%,
-      rgba(10, 10, 11, 0.62) 100%
+      rgba(10, 10, 11, var(--origami-aviary-vignette-mid)) 66%,
+      rgba(10, 10, 11, var(--origami-aviary-vignette-edge)) 100%
     );
+}
+
+@media (max-width: 768px) {
+  .origami-aviary-background {
+    --origami-aviary-vignette-title: 0.34;
+    --origami-aviary-vignette-mid: 0.24;
+    --origami-aviary-vignette-edge: 0.48;
+    --origami-aviary-vignette-accent: 0.045;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
