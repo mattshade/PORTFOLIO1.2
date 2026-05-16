@@ -110,7 +110,9 @@ export function buildAviaryEnvironment(
   world.add(horizon)
   roots.push(horizon)
 
-  const cat = createOrigamiCat(depthLayers[2], rng, tuning, accent, lineMuted, roots)
+  // Cat lives on `world` (same as birds), not a parallax depth layer — layer transforms were
+  // moving the rig while clamps assumed world Z, so the silhouette often sat off-frustum / in heavy fog.
+  const cat = createOrigamiCat(world, rng, tuning, accent, lineMuted, roots)
 
   return { roots, perches, depthLayers, cat }
 }

@@ -680,13 +680,12 @@ function pickFleePerch(rng: Rng, perches: Perch[], avoid: number, catPos: THREE.
   return pool[Math.floor(rng() * pool.length)].i
 }
 
-function birdNearCat(b: AviaryBird, catPos: THREE.Vector3): boolean {
+/** True when bird is within strike range of the cat (3D), including elevated climbs. */
+export function birdNearCat(b: AviaryBird, catPos: THREE.Vector3): boolean {
   const bp = b.rig.root.position
   const scale = b.rig.root.scale.x
-  const reach = 0.88 + (b.kind === 'sculptural' ? 1.05 : 0.68) * scale
-  const horiz = Math.hypot(bp.x - catPos.x, bp.z - catPos.z)
-  const vert = Math.abs(bp.y - catPos.y)
-  return horiz < reach && vert < 2.5 + scale * 0.45
+  const reach = 0.92 + (b.kind === 'sculptural' ? 1.1 : 0.72) * scale
+  return bp.distanceTo(catPos) < reach
 }
 
 function scareBirdFromCat(
@@ -727,6 +726,21 @@ function scareBirdFromCat(
   return true
 }
 
+/** Scare every uncooled bird in range (no pounce). Used for tree leap strike. */
+export function scareBirdsNearCat(
+  catPos: THREE.Vector3,
+  birds: AviaryBird[],
+  perches: Perch[],
+  rng: Rng,
+  elapsed: number,
+) {
+  for (const b of birds) {
+    if (elapsed < b.catScareCooldownUntil) continue
+    if (!birdNearCat(b, catPos)) continue
+    scareBirdFromCat(b, perches, catPos, rng, elapsed)
+  }
+}
+
 export function handleCatBirdCollisions(
   catPos: THREE.Vector3,
   pounceAt: (target: THREE.Vector3) => void,
@@ -735,7 +749,9 @@ export function handleCatBirdCollisions(
   perches: Perch[],
   rng: Rng,
   elapsed: number,
+  options?: { suppress?: boolean },
 ) {
+  if (options?.suppress) return
   if (isCatPouncing()) return
 
   let prey: AviaryBird | null = null
@@ -745,20 +761,16 @@ export function handleCatBirdCollisions(
     if (elapsed < b.catScareCooldownUntil) continue
     if (!birdNearCat(b, catPos)) continue
     const bp = b.rig.root.position
-    const horiz = Math.hypot(bp.x - catPos.x, bp.z - catPos.z)
-    if (horiz < preyDist) {
-      preyDist = horiz
+    const d = bp.distanceTo(catPos)
+    if (d < preyDist) {
+      preyDist = d
       prey = b
     }
   }
 
   if (!prey) return
 
-  for (const b of birds) {
-    if (elapsed < b.catScareCooldownUntil) continue
-    if (!birdNearCat(b, catPos)) continue
-    scareBirdFromCat(b, perches, catPos, rng, elapsed)
-  }
+  scareBirdsNearCat(catPos, birds, perches, rng, elapsed)
 
   _catBirdDelta.copy(prey.rig.root.position)
   pounceAt(_catBirdDelta)

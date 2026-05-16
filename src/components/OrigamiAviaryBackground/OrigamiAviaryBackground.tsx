@@ -17,6 +17,7 @@ import {
   handleCatBirdCollisions,
   type AviaryBird,
 } from './birdMotion'
+import { captureTreeLeapStrike } from './catTreeStrike'
 import { buildAviaryAtmosphere, type AtmosphereSystem } from './atmosphere'
 import {
   applyBottomAnchor,
@@ -191,7 +192,18 @@ export function OrigamiAviaryBackground() {
           applyEnvironmentInteraction(depthLayers, interaction, tuning, rm)
 
           updateAviaryBirds(birds, perches, elapsed, delta, rm, rng, tuning, interaction.pointerSmooth, camera, interaction.scrollSmooth)
-          cat?.tick(elapsed, delta, tuning, rm)
+          cat?.tick(
+            elapsed,
+            delta,
+            tuning,
+            rm,
+            cat && !rm
+              ? {
+                  perches,
+                  attemptTreeLeapStrike: (pos, out) => captureTreeLeapStrike(pos, birds, perches, rng, elapsed, out),
+                }
+              : undefined,
+          )
           if (cat && !rm) {
             const activeCat = cat
             handleCatBirdCollisions(
@@ -202,6 +214,7 @@ export function OrigamiAviaryBackground() {
               perches,
               rng,
               elapsed,
+              { suppress: activeCat.suppressCatBirdHandling() },
             )
           }
           atmosphere?.tick(elapsed, delta, interaction, tuning, rm)

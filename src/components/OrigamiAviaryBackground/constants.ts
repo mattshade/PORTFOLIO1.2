@@ -177,6 +177,48 @@ export const AVIARY_COLORS = {
   birdFill: 0x121a14,
 } as const
 
+/** Origami cat tree climb / leap strike (see `origamiCat` states `approach_tree`, `climbing`, `tree_leap`). */
+export const CAT_TREE_TUNING = {
+  climbCooldownMin: 36,
+  climbCooldownMax: 82,
+  climbEvaluatePeriod: 3.4,
+  climbPickChance: 0.4,
+  maxPerchPickDistanceXZ: 11,
+  minPerchPickDistanceXZ: 1.15,
+  approachXZThreshold: 0.38,
+  climbRate: 0.52,
+  climbBelowPerch: 0.13,
+  climbXZPull: 0.16,
+  leapTriggerDistance: 1.02,
+  leapDurationMin: 0.4,
+  leapDurationMax: 0.55,
+  leapArcHeight: 0.38,
+  /** Hard ceiling on cat root Y per viewport — climb/leap/sanitize never exceed this (keeps cat on-camera). */
+  catVisibleMaxY: {
+    narrow: 2.52,
+    tablet: 2.92,
+    desktop: 3.28,
+  } as const,
+  /** Idle / patrol vertical band (world Y). */
+  catGroundMinY: 0.045,
+  catGroundMaxY: 0.17,
+  /** Nominal feet-on-ground root Y (grid/horizon at ~0; matches approach/descend targets). */
+  catSpawnGroundY: 0.055,
+  /** Extra slack above climb target for sanitize during `approach_tree` / `climbing`. */
+  catClimbSanitizeMargin: 0.2,
+  /** Ground pounce arc height cap uses the smaller of this and remaining headroom under {@link catVisibleMaxY}. */
+  pounceArcHeight: 0.32,
+  /** When |x|/halfX exceeds this, gently pull toward center (narrow profile only). */
+  catFrustumEdgeNudgeStart: 0.86,
+  catFrustumEdgeNudgeSpeed: 1.15,
+} as const
+
+export function catVisibleMaxYForProfile(vp: AviaryViewportProfile): number {
+  if (vp === 'narrow') return CAT_TREE_TUNING.catVisibleMaxY.narrow
+  if (vp === 'tablet') return CAT_TREE_TUNING.catVisibleMaxY.tablet
+  return CAT_TREE_TUNING.catVisibleMaxY.desktop
+}
+
 function posterHeroSlotFromSeed(seed: number): PosterHeroBirdSlot {
   let h = seed >>> 0
   h ^= h << 13
