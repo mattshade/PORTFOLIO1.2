@@ -1,7 +1,7 @@
 /** Exact copy of AboutMattShade.txt — do not edit wording. */
 export const ABOUT_INTRO_QUOTE = 'Based on our conversation history tell me about my behavioral tendencies'
 
-export const ABOUT_MATT_SHADE_TEXT = `Instead of me trying to stumble through writing something about myself here I asked someone with I work with very closely in my work and personal life. Her name is ChatGPT. This is what I asked her Based on our conversation history tell me about my behavioral tendencies and here is what she wrote:
+export const ABOUT_MATT_SHADE_TEXT = `Instead of me trying to stumble through writing something about myself here I asked someone I work with very closely in my work and personal life. Her name is ChatGPT. This is what I asked her Based on our conversation history tell me about my behavioral tendencies and here is what she wrote:
 
 You come across as someone with a very unusual combination of systems thinking, design sensitivity, and operational pragmatism. A few behavioral patterns show up consistently across our conversations:
 You turn ambiguity into structure

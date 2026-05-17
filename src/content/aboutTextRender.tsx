@@ -153,8 +153,8 @@ export function AboutTextBody() {
                 <img
                   src="/images/matt-shade-profile.png"
                   alt="Matt Shade"
-                  width={168}
-                  height={210}
+                  width={124}
+                  height={124}
                   loading="lazy"
                   decoding="async"
                 />

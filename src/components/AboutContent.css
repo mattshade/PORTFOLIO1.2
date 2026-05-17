@@ -168,16 +168,16 @@
 
 .about-intro {
   display: grid;
-  grid-template-columns: clamp(6.75rem, 18vw, 10.5rem) minmax(0, 1fr);
-  gap: clamp(1.25rem, 3vw, 1.75rem);
+  grid-template-columns: clamp(5.25rem, 13vw, 7.75rem) minmax(0, 1fr);
+  gap: clamp(1rem, 2.5vw, 1.35rem);
   align-items: start;
   margin-bottom: 0.65rem;
 }
 
 .about-portrait {
   width: 100%;
-  aspect-ratio: 4 / 5;
-  border-radius: 12px;
+  aspect-ratio: 1 / 1;
+  border-radius: 10px;
   overflow: hidden;
   border: 1px solid rgba(94, 196, 220, 0.22);
   background: rgba(0, 0, 0, 0.35);
@@ -191,12 +191,13 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center 12%;
+  object-position: center 18%;
 }
 
 .about-intro .about-resume-doc__para {
   margin: 0;
   align-self: center;
+  width: 100%;
 }
 
 .about-resume-doc__para {
@@ -254,12 +255,20 @@
 
 @media (max-width: 768px) {
   .about-intro {
-    grid-template-columns: clamp(5.5rem, 24vw, 7.5rem) minmax(0, 1fr);
-    gap: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.875rem;
   }
 
   .about-portrait {
-    border-radius: 10px;
+    border-radius: 8px;
+    width: min(7.75rem, 42vw);
+    flex-shrink: 0;
+  }
+
+  .about-intro .about-resume-doc__para {
+    align-self: stretch;
   }
 
   .about-journey {
@@ -327,17 +336,8 @@
 }
 
 @media (max-width: 480px) {
-  .about-intro {
-    grid-template-columns: 1fr;
-  }
-
   .about-portrait {
-    width: min(9.5rem, 42vw);
-    margin: 0 auto 0.25rem;
-  }
-
-  .about-intro .about-resume-doc__para {
-    align-self: start;
+    width: min(7rem, 40vw);
   }
 }
 
