@@ -40,10 +40,17 @@ import {
 import type { CavernAtmosphereSystem } from '../OrigamiAboutBackground/cavernAtmosphere'
 import { readAboutScrollJourney } from '../OrigamiAboutBackground/homeDescentProgress'
 import {
+  buildEmbeddedAboutVine,
+  disposeEmbeddedAboutVine,
+  updateEmbeddedAboutVine,
+  type EmbeddedAboutVine,
+} from '../AboutDnaBackground/aboutVineEmbed'
+import {
   getWebGLRendererOptions,
   shouldBuildAviaryCavern,
   shouldPauseAviaryWhileAboutVine,
   shouldUseAboutCavernInversion,
+  shouldUseEmbeddedAboutVine,
 } from './webglCapabilities'
 import {
   disposeAboutBats,
@@ -101,6 +108,8 @@ export function OrigamiAviaryBackground() {
     let bats: AboutBat[] = []
     let batPerches: ReturnType<typeof buildCavernLayer>['batPerches'] = []
     let cavernAtmosphere: CavernAtmosphereSystem | undefined
+    let embeddedVine: EmbeddedAboutVine | undefined
+    let cavernRng: ReturnType<typeof createMulberry32> | undefined
     let aboutProfile: AboutSceneProfile = getAboutSceneProfile(window.innerWidth)
     let journeySmooth = { entry: 0, depth: 0 }
 
@@ -215,8 +224,12 @@ export function OrigamiAviaryBackground() {
       atmosphere = buildAviaryAtmosphere(stage, rng, tuning, accent)
       seedSurfaceOpacityBaselines(surfaceWorld, atmosphere.glowLayer, atmosphere.arcParent)
 
+      if (shouldUseEmbeddedAboutVine()) {
+        embeddedVine = buildEmbeddedAboutVine(world)
+      }
+
       if (shouldBuildAviaryCavern()) {
-        const cavernRng = createMulberry32(0xab0f4e75)
+        cavernRng = createMulberry32(0xab0f4e75)
         const cavernLayer = buildCavernLayer(world, cavernRng, aboutProfile, tuning.sceneDepth, envRoots)
         cavern = cavernLayer.cavern
         batPerches = cavernLayer.batPerches
@@ -362,7 +375,10 @@ export function OrigamiAviaryBackground() {
             scrollForParallax,
             surfaceVis,
           )
-          updateAboutBats(bats, batPerches, elapsed, delta, aboutProfile.cavern, cavernRng, rm, depth)
+          if (cavernRng) {
+            updateAboutBats(bats, batPerches, elapsed, delta, aboutProfile.cavern, cavernRng, rm, depth)
+          }
+          if (embeddedVine) updateEmbeddedAboutVine(embeddedVine, elapsed, depth, rm)
           cavernAtmosphere?.tick(
             elapsed,
             THREE.MathUtils.smoothstep(cavernMix, 0.25, 0.95),
@@ -432,6 +448,8 @@ export function OrigamiAviaryBackground() {
         atmosphere = undefined
         cavernAtmosphere?.dispose()
         cavernAtmosphere = undefined
+        if (embeddedVine && world) disposeEmbeddedAboutVine(embeddedVine, world)
+        embeddedVine = undefined
         if (scene) {
           if (cavern) disposeAboutBats(bats, cavern)
           disposeAviaryBirds(birds, world ?? scene)

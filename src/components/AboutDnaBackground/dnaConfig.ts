@@ -127,6 +127,42 @@ const DESKTOP: AboutDnaConfig = {
   batScale: 2.05,
 }
 
+/** Lightweight vine for fragile GPUs — rendered inside the main aviary canvas. */
+const FRAGILE_EMBED: AboutDnaConfig = {
+  ...MOBILE,
+  strandOpacity: 0.54,
+  backboneLineWidth: 1.05,
+  stalkHeight: 14,
+  yCenter: 0.52,
+  stalkBelowExtra: 1.4,
+  stalkPanStartBias: 2.4,
+  stalkOffsetX: 1.35,
+  scaleXZ: 0.74,
+  scaleY: 1.12,
+  waveCount: 2.4,
+  snakeSway: 0.38,
+  samples: 96,
+  filamentCount: 1,
+  helixRadius: 0.58,
+  helixTurns: 5.4,
+  scrollHelixTurns: 2.35,
+  wrapperCount: 1,
+  wrapperRadiusScales: [1.42],
+  wrapperFilaments: [2],
+  wrapperTurnScales: [0.95],
+  wrapperLineWidth: 0.5,
+  wrapperOpacity: 0.36,
+  leafCount: 0,
+  branchCount: 0,
+  swirlBranchCount: 0,
+  artichokeRingCount: 0,
+  artichokeBractsPerRing: 0,
+  stalkDotCount: 0,
+  batCount: 0,
+  flyingBatCount: 0,
+  batPerchPool: 0,
+}
+
 const MOBILE: AboutDnaConfig = {
   ...DESKTOP,
   strandOpacity: 0.56,
@@ -176,8 +212,17 @@ export function getStalkVerticalBounds(cfg: AboutDnaConfig): { yMin: number; yMa
   return { yMin, yMax }
 }
 
-export function getAboutDnaConfig(isNarrow: boolean): AboutDnaConfig {
-  return isNarrow ? MOBILE : DESKTOP
+export type AboutDnaTier = 'desktop' | 'mobile' | 'fragile-embed'
+
+export function getAboutDnaConfig(tier: AboutDnaTier): AboutDnaConfig {
+  if (tier === 'fragile-embed') return FRAGILE_EMBED
+  if (tier === 'mobile') return MOBILE
+  return DESKTOP
+}
+
+/** @deprecated Use getAboutDnaConfig(tier) */
+export function getAboutDnaConfigForViewport(isNarrow: boolean): AboutDnaConfig {
+  return getAboutDnaConfig(isNarrow ? 'mobile' : 'desktop')
 }
 
 export function getSnakeVerticalHalfExtent(cfg: AboutDnaConfig): number {

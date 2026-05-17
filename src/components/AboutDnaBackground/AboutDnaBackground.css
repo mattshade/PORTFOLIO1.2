@@ -30,13 +30,13 @@
   visibility: visible;
 }
 
-/* CSS-only vine on mobile / Android — avoids a second WebGL context. */
+/* Subtle underlay when the vine renders in the main aviary canvas (fragile GPUs). */
 .about-dna-background--static.about-dna-background--visible {
   background:
     radial-gradient(
       ellipse 28% 72% at 78% 42%,
-      rgba(94, 196, 220, 0.2) 0%,
-      rgba(94, 196, 220, 0.06) 42%,
+      rgba(94, 196, 220, 0.1) 0%,
+      rgba(94, 196, 220, 0.03) 42%,
       transparent 68%
     ),
     radial-gradient(
@@ -59,8 +59,8 @@
     background:
       radial-gradient(
         ellipse 34% 68% at 72% 44%,
-        rgba(94, 196, 220, 0.22) 0%,
-        rgba(94, 196, 220, 0.07) 45%,
+        rgba(94, 196, 220, 0.12) 0%,
+        rgba(94, 196, 220, 0.04) 45%,
         transparent 70%
       ),
       linear-gradient(

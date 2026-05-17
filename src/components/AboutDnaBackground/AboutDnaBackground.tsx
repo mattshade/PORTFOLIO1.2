@@ -19,11 +19,11 @@ import {
   populateAboutDnaBats,
   updateAboutDnaBats,
 } from './aboutDnaBats'
+import { computeStalkPanY } from './aboutVineEmbed'
 import {
   getAboutDnaConfig,
   getSnakeVerticalHalfExtent,
   getStalkCenterX,
-  getStalkVerticalBounds,
   type AboutDnaConfig,
 } from './dnaConfig'
 import { buildSpineSamples } from './spinePath'
@@ -35,20 +35,6 @@ const CAMERA_LOOK_Y = -0.38
 
 function getCameraHalfHeight(cfg: AboutDnaConfig): number {
   return Math.min(4.25, getSnakeVerticalHalfExtent(cfg) * 0.21)
-}
-
-function computeStalkPanY(cfg: AboutDnaConfig, progress: number): number {
-  const t = THREE.MathUtils.clamp(progress, 0, 1)
-  const { yMin, yMax } = getStalkVerticalBounds(cfg)
-  const halfH = getCameraHalfHeight(cfg)
-  const viewSpan = halfH * 2
-  const windowBottom = THREE.MathUtils.lerp(
-    Math.max(yMin, yMax - viewSpan) + cfg.stalkPanStartBias,
-    yMin,
-    t,
-  )
-  const frustumBottom = CAMERA_LOOK_Y - halfH
-  return frustumBottom - windowBottom
 }
 
 function fitAboutDnaCamera(
@@ -144,7 +130,9 @@ export function AboutDnaBackground() {
     document.addEventListener('visibilitychange', onVisibility)
 
     const scene = new THREE.Scene()
-    const cfg = getAboutDnaConfig(getAviaryViewportProfile(window.innerWidth) === 'narrow')
+    const cfg = getAboutDnaConfig(
+      getAviaryViewportProfile(window.innerWidth) === 'narrow' ? 'mobile' : 'desktop',
+    )
     const camera = new THREE.PerspectiveCamera(CAMERA_FOV, 1, 0.1, 120)
     const world = new THREE.Group()
     scene.add(world)

@@ -10,9 +10,14 @@ export function isFragileWebGLDevice(): boolean {
   return w <= 768 || coarse || android
 }
 
-/** Second WebGL canvas (About DNA vine) — skip on fragile devices; use CSS fallback. */
+/** Second WebGL canvas (About DNA vine) — desktop/tablet only; fragile uses embed in aviary. */
 export function shouldUseAboutDnaWebGL(): boolean {
   return !isFragileWebGLDevice()
+}
+
+/** Simplified 3D vine inside the main aviary canvas (single WebGL context). */
+export function shouldUseEmbeddedAboutVine(): boolean {
+  return isFragileWebGLDevice()
 }
 
 /** Heavy cavern geometry in the main aviary — skip on fragile devices. */
