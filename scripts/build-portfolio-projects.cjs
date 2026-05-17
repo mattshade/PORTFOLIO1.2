@@ -58,11 +58,11 @@ for (const entry of PORTFOLIO_PROJECTS) {
       console.warn('Skip (no package.json):', root)
       continue
     }
-    run('npm install', root)
-    run('npm run build', root, {
-      BASE_PATH: basePath,
-      NODE_ENV: 'production',
-    })
+    run('npm install', root, { CI: 'true' })
+    // shadcnBlocks (and other npm apps) must use Vite --base for subpath hosting on Netlify.
+    const buildEnv = { NODE_ENV: 'production', CI: 'true' }
+    run('npx tsc -b', root, buildEnv)
+    run(`npx vite build --base=${basePath}`, root, buildEnv)
   }
 
   const out = getBuiltOutputDir(entry)
