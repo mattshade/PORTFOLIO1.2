@@ -64,33 +64,7 @@
   .experience-impact-wrap .experience-impact-card {
     width: 100%;
     max-width: 100%;
-    padding: 1rem 1.35rem 1.1rem;
     transform: none;
-  }
-
-  .experience-impact-card .project-card__inner {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.65rem;
-    min-height: unset;
-    height: auto;
-    grid-template-columns: unset;
-  }
-
-  .experience-impact-card .project-card__icon {
-    grid-column: unset;
-    grid-row: unset;
-    justify-self: start;
-  }
-
-  .experience-impact-card .project-card__details {
-    grid-column: unset;
-    grid-row: unset;
-    width: 100%;
-    align-self: stretch;
-    padding-left: 0;
-    padding-top: 0;
   }
 
   .experience-impact-card__title {
@@ -98,7 +72,8 @@
   }
 
   .experience-impact-card__list {
-    padding-left: 1rem;
+    padding-left: 1.1rem;
+    margin: 0;
   }
 
   .experience-highlight {
