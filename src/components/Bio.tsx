@@ -91,21 +91,9 @@ export function Bio() {
     <section id="bio" className="bio" aria-label="About">
       <div className="bio-inner">
         <div className="bio-block">
-          <div className="bio-intro">
-            <div className="bio-portrait">
-              <img
-                src="/images/matt-shade-profile.png"
-                alt="Matt Shade"
-                width={168}
-                height={210}
-                loading="eager"
-                decoding="async"
-              />
-            </div>
-            <p className="bio-typography-wall">
-              <span className="bird-perch">{resume.summary}</span>
-            </p>
-          </div>
+          <p className="bio-typography-wall">
+            <span className="bird-perch">{resume.summary}</span>
+          </p>
         </div>
 
         <div className="leadership-pillars">

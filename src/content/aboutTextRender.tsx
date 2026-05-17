@@ -103,6 +103,7 @@ const ABOUT_BLOCKS = buildBlocks(ABOUT_MATT_SHADE_TEXT)
 
 export function AboutTextBody() {
   let beforeFirstHeading = true
+  let portraitPlaced = false
 
   return (
     <div className="about-resume-doc__body">
@@ -141,12 +142,31 @@ export function AboutTextBody() {
         }
 
         const isLead = beforeFirstHeading
+        const text = isLead ? renderLeadIntro(block.lines.join('\n')) : block.lines.join('\n')
+        const paraClass = `about-resume-doc__para${isLead ? ' about-resume-doc__para--lead' : ''}`
+
+        if (isLead && !portraitPlaced) {
+          portraitPlaced = true
+          return (
+            <div key={key} className="about-intro">
+              <div className="about-portrait">
+                <img
+                  src="/images/matt-shade-profile.png"
+                  alt="Matt Shade"
+                  width={168}
+                  height={210}
+                  loading="lazy"
+                  decoding="async"
+                />
+              </div>
+              <p className={paraClass}>{text}</p>
+            </div>
+          )
+        }
+
         return (
-          <p
-            key={key}
-            className={`about-resume-doc__para${isLead ? ' about-resume-doc__para--lead' : ''}`}
-          >
-            {isLead ? renderLeadIntro(block.lines.join('\n')) : block.lines.join('\n')}
+          <p key={key} className={paraClass}>
+            {text}
           </p>
         )
       })}
