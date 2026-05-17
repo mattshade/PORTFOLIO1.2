@@ -6,11 +6,23 @@
 
 @media (max-width: 768px) {
   .bio {
-    padding: 3rem 1rem;
+    padding: 3rem 1.5rem;
+  }
+
+  .bio-inner {
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
   }
 
   .leadership-pillars {
     margin-top: 4rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .bio {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
   }
 }
 

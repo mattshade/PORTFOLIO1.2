@@ -30,47 +30,20 @@
   visibility: visible;
 }
 
-/* CSS-only vine on mobile / Android — avoids a second WebGL context. */
+/* Atmospheric glow behind SVG stalk (mobile / fragile). */
 .about-dna-background--static.about-dna-background--visible {
   background:
     radial-gradient(
-      ellipse 28% 72% at 78% 42%,
-      rgba(94, 196, 220, 0.2) 0%,
-      rgba(94, 196, 220, 0.06) 42%,
-      transparent 68%
+      ellipse 38% 70% at 74% 42%,
+      rgba(94, 196, 220, 0.14) 0%,
+      rgba(94, 196, 220, 0.04) 48%,
+      transparent 72%
     ),
     radial-gradient(
-      ellipse 18% 55% at 74% 58%,
-      rgba(61, 106, 120, 0.14) 0%,
-      transparent 62%
-    ),
-    linear-gradient(
-      105deg,
-      transparent 52%,
-      rgba(94, 196, 220, 0.05) 68%,
-      rgba(94, 196, 220, 0.12) 76%,
-      rgba(61, 106, 120, 0.08) 84%,
-      transparent 94%
+      ellipse 22% 45% at 68% 62%,
+      rgba(61, 106, 120, 0.1) 0%,
+      transparent 65%
     );
-}
-
-@media (max-width: 768px) {
-  .about-dna-background--static.about-dna-background--visible {
-    background:
-      radial-gradient(
-        ellipse 34% 68% at 72% 44%,
-        rgba(94, 196, 220, 0.22) 0%,
-        rgba(94, 196, 220, 0.07) 45%,
-        transparent 70%
-      ),
-      linear-gradient(
-        100deg,
-        transparent 48%,
-        rgba(94, 196, 220, 0.08) 70%,
-        rgba(61, 106, 120, 0.1) 82%,
-        transparent 96%
-      );
-  }
 }
 
 .about-dna-background__canvas {
@@ -83,6 +56,22 @@
 @media (max-width: 768px) {
   .about-dna-background__canvas {
     transform: translateX(96px);
+  }
+
+  /* Match taller static vine on the right */
+  .about-dna-background--static.about-dna-background--visible {
+    background:
+      radial-gradient(
+        ellipse 44% 72% at 92% 88%,
+        rgba(94, 196, 220, 0.14) 0%,
+        rgba(94, 196, 220, 0.04) 48%,
+        transparent 76%
+      ),
+      radial-gradient(
+        ellipse 28% 48% at 88% 92%,
+        rgba(61, 106, 120, 0.1) 0%,
+        transparent 65%
+      );
   }
 }
 
