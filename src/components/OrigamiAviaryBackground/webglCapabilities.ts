@@ -5,9 +5,11 @@ import type { OrigamiAviaryTuning } from './constants'
 export function isFragileWebGLDevice(): boolean {
   if (typeof window === 'undefined') return false
   const w = window.innerWidth
-  const coarse = window.matchMedia('(pointer: coarse)').matches
-  const android = /Android/i.test(navigator.userAgent)
-  return w <= 768 || coarse || android
+  if (/Android/i.test(navigator.userAgent)) return true
+  if (w <= 768) return true
+  // Coarse pointer on tablet-sized viewports only — not touch-screen desktops.
+  if (w <= 1100 && window.matchMedia('(pointer: coarse)').matches) return true
+  return false
 }
 
 /** Second WebGL canvas (About DNA vine) — desktop/tablet only; fragile uses embed in aviary. */
@@ -15,9 +17,9 @@ export function shouldUseAboutDnaWebGL(): boolean {
   return !isFragileWebGLDevice()
 }
 
-/** Simplified 3D vine inside the main aviary canvas (single WebGL context). */
+/** Mobile uses SVG static art in AboutDnaBackground instead of aviary embed. */
 export function shouldUseEmbeddedAboutVine(): boolean {
-  return isFragileWebGLDevice()
+  return false
 }
 
 /** Heavy cavern geometry in the main aviary — skip on fragile devices. */
@@ -37,8 +39,19 @@ export function setAboutVineSceneActive(active: boolean): void {
   aboutVineSceneActive = active
 }
 
+/** @deprecated Aviary must keep rendering during About (cavern transition + embed vine). */
 export function shouldPauseAviaryWhileAboutVine(): boolean {
-  return aboutVineSceneActive
+  return false
+}
+
+/** Dedicated About DNA overlay canvas (desktop / tablet) — transparent over the aviary. */
+export function getAboutDnaWebGLRendererOptions(): WebGLRendererParameters {
+  return {
+    antialias: true,
+    alpha: true,
+    powerPreference: 'high-performance',
+    stencil: false,
+  }
 }
 
 function lightWebGLRendererOptions(forceLight?: boolean): WebGLRendererParameters {

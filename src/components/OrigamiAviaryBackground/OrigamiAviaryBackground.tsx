@@ -48,7 +48,6 @@ import {
 import {
   getWebGLRendererOptions,
   shouldBuildAviaryCavern,
-  shouldPauseAviaryWhileAboutVine,
   shouldUseAboutCavernInversion,
   shouldUseEmbeddedAboutVine,
 } from './webglCapabilities'
@@ -283,7 +282,6 @@ export function OrigamiAviaryBackground() {
         if (tabHiddenRef.v || contextLost) return
         const gl = renderer.getContext()
         if (gl.isContextLost()) return
-        const aboutVinePause = shouldPauseAviaryWhileAboutVine()
         try {
           const delta = Math.min(clock.getDelta(), 0.05)
           const elapsed = clock.getElapsedTime()
@@ -411,7 +409,6 @@ export function OrigamiAviaryBackground() {
             )
           }
           applyAboutSurfaceFade(transitionTargets, surfaceVis)
-          if (aboutVinePause) return
           const bloomOn = !rm && tuning.viewportProfile !== 'narrow'
           pipeline?.setBloomStrength(bloomOn ? tuning.bloomStrength * surfaceVis : 0)
           pipeline?.render()

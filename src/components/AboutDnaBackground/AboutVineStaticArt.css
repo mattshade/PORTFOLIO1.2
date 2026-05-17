@@ -1,0 +1,57 @@
+.about-vine-static-art {
+  position: absolute;
+  top: 50%;
+  right: -6%;
+  height: min(92vh, 720px);
+  width: auto;
+  max-width: min(58vw, 280px);
+  transform: translate(
+    8vw,
+    calc(-50% + (0.5 - var(--about-vine-scroll, 0)) * 14vh)
+  );
+  opacity: calc(var(--about-vine-opacity, 1) * 0.88);
+  pointer-events: none;
+  filter: drop-shadow(0 0 28px rgba(94, 196, 220, 0.12));
+}
+
+.about-vine-static-art__stalk {
+  vector-effect: non-scaling-stroke;
+}
+
+.about-vine-static-art__bats {
+  vector-effect: non-scaling-stroke;
+}
+
+@media (max-width: 768px) {
+  .about-vine-static-art {
+    top: 0;
+    bottom: 0;
+    right: -16%;
+    left: auto;
+    width: auto;
+    height: 100%;
+    max-width: min(86vw, 420px);
+    transform: translate(
+      12vw,
+      calc((var(--about-vine-scroll, 0) - 0.5) * 8vh)
+    );
+    transform-origin: 100% 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .about-vine-static-art {
+    transform: translate(6vw, -50%);
+  }
+}
+
+@media (max-width: 768px) and (prefers-reduced-motion: reduce) {
+  .about-vine-static-art {
+    top: 0;
+    bottom: 0;
+    right: -16%;
+    height: 100%;
+    transform: translate(12vw, 0);
+    transform-origin: 100% 100%;
+  }
+}
