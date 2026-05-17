@@ -55,14 +55,3 @@ body.modal-open .birds-bg {
   /* Above OrigamiAviaryBackground (z-index 1) */
   z-index: 2;
 }
-
-.bird-wire {
-  height: 1px;
-  width: 100vw;
-  position: relative;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(0, 0, 0, 0.05);
-  box-shadow: none;
-  margin: 4rem 0;
-}

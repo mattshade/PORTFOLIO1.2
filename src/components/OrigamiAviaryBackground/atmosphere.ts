@@ -54,12 +54,14 @@ const particleFragment = /* glsl */ `
 export type AtmosphereSystem = {
   roots: THREE.Object3D[]
   glowLayer: THREE.Group
+  arcParent: THREE.Group
   tick: (
     elapsed: number,
     delta: number,
     state: InteractionState,
     tuning: OrigamiAviaryTuning,
     reducedMotion: boolean,
+    intensityScale?: number,
   ) => void
   dispose: () => void
 }
@@ -183,12 +185,12 @@ export function buildAviaryAtmosphere(
     state: InteractionState,
     tuning: OrigamiAviaryTuning,
     reducedMotion: boolean,
+    intensityScale = 1,
   ) => {
     particleMat.uniforms.uTime.value = elapsed
     particleMat.uniforms.uPixelRatio.value = Math.min(window.devicePixelRatio || 1, tuning.maxPixelRatio)
-    particleMat.uniforms.uIntensity.value = reducedMotion
-      ? tuning.particleIntensity * 0.55
-      : tuning.particleIntensity
+    const base = reducedMotion ? tuning.particleIntensity * 0.55 : tuning.particleIntensity
+    particleMat.uniforms.uIntensity.value = base * intensityScale
 
     const driftScale = reducedMotion ? 0 : tuning.atmosphereDrift * delta * 0.65
     const xLimit = tuning.forestHalfWidth
@@ -228,5 +230,5 @@ export function buildAviaryAtmosphere(
     })
   }
 
-  return { roots, glowLayer, tick, dispose }
+  return { roots, glowLayer, arcParent, tick, dispose }
 }

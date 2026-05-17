@@ -228,8 +228,14 @@
     padding: 3rem 1rem;
   }
 
+  .section-header-flex {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1.25rem;
+  }
+
   .experience-item {
-    padding: 1.5rem;
+    padding: 1.35rem;
   }
 
   .experience-header {
@@ -240,6 +246,7 @@
 
   .experience-period {
     margin-left: 0;
+    width: 100%;
     font-size: 0.75rem;
   }
 
@@ -267,6 +274,16 @@
   .skills-item {
     font-size: 0.75rem;
     padding: 0.3rem 0.6rem;
+  }
+
+  /* Coarse pointers: WCAG-ish tap targets without desktop layout shift */
+  @media (pointer: coarse) {
+    .skills-item {
+      padding: 0.5rem 0.95rem;
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+    }
   }
 }
 

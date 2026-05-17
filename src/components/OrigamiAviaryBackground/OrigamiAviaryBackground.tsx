@@ -21,13 +21,29 @@ import { captureTreeLeapStrike } from './catTreeStrike'
 import { buildAviaryAtmosphere, type AtmosphereSystem } from './atmosphere'
 import {
   applyBottomAnchor,
-  applyScrollParallaxRotation,
   applyWideForestCamera,
   BOTTOM_ANCHOR_CAMERA,
   BOTTOM_ANCHOR_LOOK,
 } from './sceneAnchor'
 import { clearLineMaterialRegistry, isLine2Object, disposeLine2, setLineResolution } from './lineBatch'
 import { createAviaryComposer, type AviaryComposer } from './renderPipeline'
+import { getAboutSceneProfile, type AboutSceneProfile } from '../OrigamiAboutBackground/aboutSceneConfig'
+import { buildCavernLayer } from '../OrigamiAboutBackground/aboutEnvironment'
+import {
+  applyAboutScrollTransition,
+  applyAboutSurfaceFade,
+  applyCavernDepthEffects,
+  seedSurfaceOpacityBaselines,
+  applyCavernInversionMotion,
+} from '../OrigamiAboutBackground/aboutTransition'
+import type { CavernAtmosphereSystem } from '../OrigamiAboutBackground/cavernAtmosphere'
+import { readAboutScrollJourney } from '../OrigamiAboutBackground/homeDescentProgress'
+import {
+  disposeAboutBats,
+  populateAboutBats,
+  updateAboutBats,
+  type AboutBat,
+} from '../OrigamiAboutBackground/batMotion'
 
 function disposeObject3D(root: THREE.Object3D) {
   root.traverse((obj) => {
@@ -46,9 +62,12 @@ function disposeObject3D(root: THREE.Object3D) {
 
 export function OrigamiAviaryBackground() {
   const mountRef = useRef<HTMLDivElement>(null)
+  const readabilityRef = useRef<HTMLDivElement>(null)
   const reducedMotionRef = useRef(false)
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null)
   const scrollNormRef = useRef(0)
+  const journeyRef = useRef({ entry: 0, depth: 0 })
+  const journeySmoothRef = useRef({ entry: 0, depth: 0 })
 
   useEffect(() => {
     const mount = mountRef.current
@@ -66,7 +85,15 @@ export function OrigamiAviaryBackground() {
     let scene: THREE.Scene | undefined
     let stage: THREE.Group | undefined
     let world: THREE.Group | undefined
+    let surfaceWorld: THREE.Group | undefined
     let camera: THREE.PerspectiveCamera | undefined
+    let fog: THREE.FogExp2 | undefined
+    let cavern: THREE.Group | undefined
+    let bats: AboutBat[] = []
+    let batPerches: ReturnType<typeof buildCavernLayer>['batPerches'] = []
+    let cavernAtmosphere: CavernAtmosphereSystem | undefined
+    let aboutProfile: AboutSceneProfile = getAboutSceneProfile(window.innerWidth)
+    let journeySmooth = { entry: 0, depth: 0 }
 
     const interaction = createInteractionState()
     const pointer = new THREE.Vector2(0, 0)
@@ -85,17 +112,23 @@ export function OrigamiAviaryBackground() {
     })
 
     const onPointer = (e: PointerEvent) => {
-      pointer.x = (e.clientX / Math.max(1, window.innerWidth)) * 2 - 1
-      pointer.y = (e.clientY / Math.max(1, window.innerHeight)) * 2 - 1
+      const vv = window.visualViewport
+      const ww = vv?.width ?? window.innerWidth
+      const hh = vv?.height ?? window.innerHeight
+      pointer.x = (e.clientX / Math.max(1, ww)) * 2 - 1
+      pointer.y = (e.clientY / Math.max(1, hh)) * 2 - 1
     }
     window.addEventListener('pointermove', onPointer, { passive: true })
 
     const onScroll = () => {
       const max = Math.max(1, document.documentElement.scrollHeight - window.innerHeight)
       scrollNormRef.current = window.scrollY / max
+      journeyRef.current = readAboutScrollJourney()
     }
     onScroll()
     window.addEventListener('scroll', onScroll, { passive: true })
+    const vvScroll = window.visualViewport
+    vvScroll?.addEventListener('scroll', onScroll, { passive: true })
 
     let resize: (() => void) | undefined
     let teardownScene: (() => void) | null = null
@@ -114,7 +147,10 @@ export function OrigamiAviaryBackground() {
       const rng = createMulberry32(tuning.seed)
       scene = new THREE.Scene()
       scene.background = new THREE.Color(AVIARY_COLORS.background)
-      scene.fog = new THREE.FogExp2(0x0c0e0c, tuning.fogDensity)
+      fog = new THREE.FogExp2(0x0c0e0c, tuning.fogDensity)
+      scene.fog = fog
+      aboutProfile = getAboutSceneProfile(window.innerWidth)
+      aboutProfile.upper.fogDensity = tuning.fogDensity
 
       stage = new THREE.Group()
       stage.name = 'aviary-stage'
@@ -123,6 +159,10 @@ export function OrigamiAviaryBackground() {
       world = new THREE.Group()
       world.name = 'aviary-world'
       stage.add(world)
+
+      surfaceWorld = new THREE.Group()
+      surfaceWorld.name = 'aviary-surface'
+      world.add(surfaceWorld)
 
       camera = new THREE.PerspectiveCamera(tuning.baseFov, 1, 0.1, 120)
       const baseCam = BOTTOM_ANCHOR_CAMERA.clone().add(
@@ -144,23 +184,43 @@ export function OrigamiAviaryBackground() {
       pipeline = createAviaryComposer(renderer, scene, camera, tuning)
 
       const accent = new THREE.Color(tuning.accentColor)
-      const env = buildAviaryEnvironment(world, rng, tuning, accent)
+      const env = buildAviaryEnvironment(surfaceWorld, rng, tuning, accent)
       envRoots = env.roots
       depthLayers = env.depthLayers
       perches = env.perches
       cat = env.cat
-      birds = populateAviaryBirds(world, rng, tuning, perches)
+      birds = populateAviaryBirds(surfaceWorld, rng, tuning, perches)
       atmosphere = buildAviaryAtmosphere(stage, rng, tuning, accent)
+      seedSurfaceOpacityBaselines(surfaceWorld, atmosphere.glowLayer, atmosphere.arcParent)
+
+      const cavernRng = createMulberry32(0xab0f4e75)
+      const cavernLayer = buildCavernLayer(world, cavernRng, aboutProfile, tuning.sceneDepth, envRoots)
+      cavern = cavernLayer.cavern
+      batPerches = cavernLayer.batPerches
+      cavernAtmosphere = cavernLayer.cavernAtmosphere
+      const cyan = new THREE.Color(aboutProfile.cavern.accentColor)
+      const cyanMuted = new THREE.Color(0x3d6a78)
+      bats = populateAboutBats(
+        cavern,
+        cavernRng,
+        batPerches,
+        aboutProfile.cavern,
+        cyan,
+        cyanMuted,
+        tuning.sceneDepth,
+        envRoots,
+      )
 
       const clock = new THREE.Clock()
 
       resize = () => {
         if (disposed || !renderer || !camera || !world || !stage || !pipeline) return
-        const w = Math.max(1, window.innerWidth)
-        const h = Math.max(1, window.innerHeight)
+        const vw = window.visualViewport
+        const w = Math.max(1, Math.round(vw?.width ?? window.innerWidth))
+        const h = Math.max(1, Math.round(vw?.height ?? window.innerHeight))
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio ?? 1, tuning.maxPixelRatio))
         camera.aspect = w / h
         camera.updateProjectionMatrix()
-        applyScrollParallaxRotation(stage, interaction.scrollSmooth, tuning.scrollRotateIntensity)
         applyBottomAnchor(camera, world, w / h, interaction.scrollSmooth, tuning.scrollDriftIntensity)
         applyWideForestCamera(camera, w / h, tuning)
         renderer.setSize(w, h, false)
@@ -170,28 +230,105 @@ export function OrigamiAviaryBackground() {
       resize()
       requestAnimationFrame(() => resize?.())
       window.addEventListener('resize', resize)
+      const vv = window.visualViewport
+      vv?.addEventListener('resize', resize)
+      vv?.addEventListener('scroll', resize)
 
       const animate = () => {
-        if (disposed || !renderer || !scene || !camera || !world || !stage) return
+        if (disposed || !renderer || !scene || !camera || !world || !surfaceWorld || !stage || !fog || !cavern)
+          return
         raf = requestAnimationFrame(animate)
         if (tabHiddenRef.v) return
         try {
           const delta = Math.min(clock.getDelta(), 0.05)
           const elapsed = clock.getElapsedTime()
           const rm = reducedMotionRef.current
+          const journeyTarget = journeyRef.current
+          const smoothRate = rm ? 1 : 1 - Math.exp(-delta * 6)
+          journeySmooth.entry += (journeyTarget.entry - journeySmooth.entry) * smoothRate
+          journeySmooth.depth += (journeyTarget.depth - journeySmooth.depth) * smoothRate
+          journeySmoothRef.current = { ...journeySmooth }
 
-          updateInteractionState(interaction, pointer, scrollNormRef.current, delta, tuning, rm)
+          const { entry, depth } = journeySmooth
+          const scrollEntry = journeyTarget.entry
+          const surfaceLayers: THREE.Object3D[] = []
+          if (atmosphere) {
+            surfaceLayers.push(atmosphere.glowLayer, atmosphere.arcParent)
+          }
+
+          const transitionTargets = {
+            surfaceWorld,
+            cavern,
+            scene,
+            fog,
+            renderer,
+            birds,
+            bats,
+            surfaceLayers,
+            cat: cat ?? null,
+            readabilityEl: readabilityRef.current,
+            upperFogDensity: tuning.fogDensity,
+          }
+
+          const { t: entryT, revealCavern, surfaceVis } = applyAboutScrollTransition(
+            scrollEntry,
+            aboutProfile,
+            transitionTargets,
+          )
+          const cavernMix = applyCavernDepthEffects(
+            depth,
+            scrollEntry,
+            revealCavern,
+            surfaceVis,
+            aboutProfile,
+            transitionTargets,
+          )
+
+          const scrollForParallax = scrollNormRef.current * (1 - entryT * 0.65 - depth * 0.25)
+
+          updateInteractionState(interaction, pointer, scrollForParallax, delta, tuning, rm)
           applyCameraInteraction(camera, baseCam, baseLook, interaction, tuning, rm)
+          const { transition: tr, descent: d } = aboutProfile
+          const inv = entryT
+          camera.position.y += inv * tr.cameraDriftY + depth * d.cameraDepthY
+          camera.position.z += inv * tr.cameraDriftZ + depth * d.cameraDepthZ
           if (!rm) applyWideForestCamera(camera, camera.aspect, tuning)
           if (rm) {
             stage.rotation.set(0, 0, 0)
             stage.position.set(0, 0, 0)
+          } else {
+            applyCavernInversionMotion(
+              stage,
+              interaction.scrollSmooth,
+              aboutProfile.scrollRotateIntensity,
+              entry,
+              depth,
+              aboutProfile,
+            )
           }
-          else applyScrollParallaxRotation(stage, interaction.scrollSmooth, tuning.scrollRotateIntensity)
-          applyBottomAnchor(camera, world, camera.aspect, interaction.scrollSmooth, tuning.scrollDriftIntensity)
+          applyBottomAnchor(camera, world, camera.aspect, scrollForParallax, tuning.scrollDriftIntensity)
           applyEnvironmentInteraction(depthLayers, interaction, tuning, rm)
 
-          updateAviaryBirds(birds, perches, elapsed, delta, rm, rng, tuning, interaction.pointerSmooth, camera, interaction.scrollSmooth)
+          updateAviaryBirds(
+            birds,
+            perches,
+            elapsed,
+            delta,
+            rm,
+            rng,
+            tuning,
+            interaction.pointerSmooth,
+            camera,
+            scrollForParallax,
+            surfaceVis,
+          )
+          updateAboutBats(bats, batPerches, elapsed, delta, aboutProfile.cavern, cavernRng, rm, depth)
+          cavernAtmosphere?.tick(
+            elapsed,
+            THREE.MathUtils.smoothstep(cavernMix, 0.25, 0.95),
+            rm,
+          )
+          atmosphere?.tick(elapsed, delta, interaction, tuning, rm, surfaceVis)
           cat?.tick(
             elapsed,
             delta,
@@ -217,8 +354,9 @@ export function OrigamiAviaryBackground() {
               { suppress: activeCat.suppressCatBirdHandling() },
             )
           }
-          atmosphere?.tick(elapsed, delta, interaction, tuning, rm)
-          pipeline?.setBloomEnabled(!rm)
+          applyAboutSurfaceFade(transitionTargets, surfaceVis)
+          const bloomOn = !rm && tuning.viewportProfile !== 'narrow'
+          pipeline?.setBloomStrength(bloomOn ? tuning.bloomStrength * surfaceVis : 0)
           pipeline?.render()
         } catch (e) {
           console.error('[OrigamiAviaryBackground] frame error', e)
@@ -233,7 +371,12 @@ export function OrigamiAviaryBackground() {
         mq.removeEventListener('change', onMq)
         window.removeEventListener('pointermove', onPointer)
         window.removeEventListener('scroll', onScroll)
-        if (resize) window.removeEventListener('resize', resize)
+        vvScroll?.removeEventListener('scroll', onScroll)
+        if (resize) {
+          window.removeEventListener('resize', resize)
+          window.visualViewport?.removeEventListener('resize', resize)
+          window.visualViewport?.removeEventListener('scroll', resize)
+        }
         pipeline?.dispose()
         pipeline = undefined
         clearLineMaterialRegistry()
@@ -241,7 +384,10 @@ export function OrigamiAviaryBackground() {
         cat = undefined
         atmosphere?.dispose()
         atmosphere = undefined
+        cavernAtmosphere?.dispose()
+        cavernAtmosphere = undefined
         if (scene) {
+          if (cavern) disposeAboutBats(bats, cavern)
           disposeAviaryBirds(birds, world ?? scene)
           envRoots.forEach((r) => {
             ;(world ?? scene).remove(r)
@@ -258,7 +404,12 @@ export function OrigamiAviaryBackground() {
       mq.removeEventListener('change', onMq)
       window.removeEventListener('pointermove', onPointer)
       window.removeEventListener('scroll', onScroll)
-      if (resize) window.removeEventListener('resize', resize)
+      vvScroll?.removeEventListener('scroll', onScroll)
+      if (resize) {
+        window.removeEventListener('resize', resize)
+        window.visualViewport?.removeEventListener('resize', resize)
+        window.visualViewport?.removeEventListener('scroll', resize)
+      }
     }
 
     return () => {
@@ -270,7 +421,7 @@ export function OrigamiAviaryBackground() {
   return (
     <div className="origami-aviary-background" aria-hidden>
       <div ref={mountRef} className="origami-aviary-background__canvas-host" />
-      <div className="origami-aviary-background__readability" />
+      <div ref={readabilityRef} className="origami-aviary-background__readability" />
     </div>
   )
 }

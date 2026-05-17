@@ -110,8 +110,8 @@ export const DEFAULT_AVIARY_TUNING: OrigamiAviaryTuning = {
   latticePanelCount: 3,
   suspendedLineCount: 8,
   vineConnectionCount: 5,
-  particleCount: 300,
-  particleIntensity: 0.48,
+  particleCount: 220,
+  particleIntensity: 0.34,
   lightColumnCount: 4,
   ceilingArcCount: 8,
   portalFrameCount: 4,
@@ -193,6 +193,14 @@ export const CAT_TREE_TUNING = {
   leapDurationMin: 0.4,
   leapDurationMax: 0.55,
   leapArcHeight: 0.38,
+  /** Sideways jump off the tree after a climb (not straight down). */
+  sideDismountDistanceMin: 0.95,
+  sideDismountDistanceMax: 1.72,
+  sideDismountArcHeight: 0.44,
+  /** Root pitch (rad) when fully on the trunk — negative tilts nose up. */
+  climbPitchRad: 0.82,
+  climbWalkCycleSpeed: 2.9,
+  climbLegStride: 0.56,
   /** Hard ceiling on cat root Y per viewport — climb/leap/sanitize never exceed this (keeps cat on-camera). */
   catVisibleMaxY: {
     narrow: 2.52,
@@ -286,13 +294,13 @@ export function getResponsiveAviaryTuning(): OrigamiAviaryTuning {
       flockBirdEdgeOpacityMul: phone ? 0.88 : 0.92,
       flockBirdFillOpacityMul: phone ? 0.86 : 0.9,
       posterFlockZPush: phone ? -1.45 : -1.05,
-      parallaxIntensity: phone ? 0.18 : 0.24,
-      scrollDriftIntensity: phone ? 0.18 : 0.24,
-      scrollRotateIntensity: phone ? 0.18 : 0.26,
+      parallaxIntensity: touchPrimary ? (phone ? 0.14 : 0.18) : phone ? 0.18 : 0.24,
+      scrollDriftIntensity: touchPrimary ? 0.1 : phone ? 0.18 : 0.24,
+      scrollRotateIntensity: touchPrimary ? (phone ? 0.14 : 0.18) : phone ? 0.18 : 0.26,
       animationIntensity: phone ? 0.48 : 0.56,
       wingFlutterIntensity: phone ? 0.38 : 0.46,
       pointerInfluence: phone ? 0.42 : 0.46,
-      scrollSmoothing: phone ? 7.5 : 7,
+      scrollSmoothing: touchPrimary ? 8 : phone ? 7.5 : 7,
       baseFov: phone ? 44 : 43.5,
       cameraOffsetZ: phone ? -0.95 : -0.72,
       cameraOffsetY: phone ? 0.12 : 0.08,
@@ -301,9 +309,9 @@ export function getResponsiveAviaryTuning(): OrigamiAviaryTuning {
       viewerApproachEnabled: false,
       heroPerchMinCenterFraction: phone ? 0.32 : 0.28,
       heroSilhouetteBoost: phone ? 1.16 : 1.12,
-      pointerParallaxScale: touchPrimary ? 0.14 : 0.55,
-      layerPointerRotationScale: touchPrimary ? 0 : 0.35,
-      touchScrollScale: touchPrimary ? 0.5 : 0.72,
+      pointerParallaxScale: touchPrimary ? 0.18 : 0.55,
+      layerPointerRotationScale: touchPrimary ? 0.22 : 0.35,
+      touchScrollScale: touchPrimary ? 0.44 : 0.72,
     })
 
     if (reducedData) {

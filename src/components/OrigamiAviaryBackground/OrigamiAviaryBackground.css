@@ -11,6 +11,7 @@
   --origami-aviary-vignette-mid: 0.22;
   --origami-aviary-vignette-edge: 0.62;
   --origami-aviary-vignette-accent: 0.04;
+  --origami-surface-vis: 1;
 }
 
 .origami-aviary-background__canvas-host {
@@ -38,20 +39,44 @@
   background:
     radial-gradient(
       ellipse 62% 42% at 50% 22%,
-      rgba(10, 10, 11, var(--origami-aviary-vignette-title)) 0%,
+      rgba(
+        10,
+        10,
+        11,
+        calc(var(--origami-aviary-vignette-title) * var(--origami-surface-vis, 1))
+      )
+        0%,
       transparent 68%
     ),
     radial-gradient(
       ellipse 70% 45% at 50% 18%,
-      rgba(122, 154, 110, var(--origami-aviary-vignette-accent)) 0%,
+      rgba(
+        122,
+        154,
+        110,
+        calc(var(--origami-aviary-vignette-accent) * var(--origami-surface-vis, 1))
+      )
+        0%,
       transparent 55%
     ),
     radial-gradient(
       ellipse 100% 88% at 50% 40%,
       transparent 0%,
       transparent 36%,
-      rgba(10, 10, 11, var(--origami-aviary-vignette-mid)) 66%,
-      rgba(10, 10, 11, var(--origami-aviary-vignette-edge)) 100%
+      rgba(
+        10,
+        10,
+        11,
+        calc(var(--origami-aviary-vignette-mid) * var(--origami-surface-vis, 1))
+      )
+        66%,
+      rgba(
+        10,
+        10,
+        11,
+        calc(var(--origami-aviary-vignette-edge) * var(--origami-surface-vis, 1))
+      )
+        100%
     );
 }
 

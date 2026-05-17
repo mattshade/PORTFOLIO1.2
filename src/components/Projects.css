@@ -6,6 +6,20 @@
   padding: 5rem 1.5rem;
 }
 
+@media (max-width: 768px) {
+  #projects {
+    margin-bottom: clamp(3rem, 12vw, 6rem);
+  }
+
+  .projects {
+    padding: 3.25rem 1rem;
+  }
+
+  .project-card-wide {
+    grid-column: auto;
+  }
+}
+
 .projects-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
@@ -15,12 +29,6 @@
 
 .project-card-wide {
   grid-column: span 2;
-}
-
-@media (max-width: 768px) {
-  .project-card-wide {
-    grid-column: auto;
-  }
 }
 
 .project-card {

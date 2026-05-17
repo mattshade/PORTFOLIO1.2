@@ -140,6 +140,7 @@ function addPartMesh(
     depthWrite: false,
     toneMapped: false,
   })
+  edgeMat.userData.baseOpacity = edgeOpacity
   parent.add(new THREE.LineSegments(new THREE.EdgesGeometry(geo, creaseAngle), edgeMat))
   return edgeMat
 }

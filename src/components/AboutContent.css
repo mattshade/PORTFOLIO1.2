@@ -1,0 +1,292 @@
+.about-descent-marker {
+  display: block;
+  height: 1px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  pointer-events: none;
+}
+
+.about-vine-region {
+  position: relative;
+  isolation: isolate;
+  /* Keep transparent through inversion — solid fill hid the cavern flip */
+  background: transparent;
+}
+
+.about-vine-region .footer {
+  position: relative;
+  z-index: 4;
+  margin-top: 0;
+  border-top-color: rgba(94, 196, 220, 0.22);
+  background: linear-gradient(
+    180deg,
+    rgba(8, 12, 16, 0.55) 0%,
+    rgba(8, 12, 16, 0.92) 28%,
+    #080c10 52%
+  );
+}
+
+.about-transition-spacer {
+  position: relative;
+  min-height: clamp(80vh, 125vh, 150vh);
+  pointer-events: none;
+}
+
+.about-transition-spacer::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: clamp(18vh, 28vh, 36vh);
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(8, 12, 16, 0.03) 45%,
+    rgba(8, 12, 16, 0.14) 100%
+  );
+}
+
+.about-journey {
+  position: relative;
+  z-index: 2;
+  padding: clamp(10rem, 26vh, 14rem) 0 clamp(8rem, 18vh, 12rem);
+  min-height: 220vh;
+  /* Stay light — a darkening gradient behind the fixed vine made the stalk fade on scroll */
+  background: linear-gradient(
+    180deg,
+    rgba(8, 12, 16, 0.08) 0%,
+    rgba(8, 12, 16, 0.1) 40%,
+    rgba(8, 12, 16, 0.12) 100%
+  );
+}
+
+.about-journey__edge-fade {
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.about-journey__edge-fade--top {
+  top: 0;
+  height: clamp(32vh, 42vh, 52vh);
+  z-index: 1;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    transparent 28%,
+    rgba(8, 12, 16, 0.1) 48%,
+    rgba(8, 12, 16, 0.24) 72%,
+    rgba(8, 12, 16, 0.38) 100%
+  );
+}
+
+.about-journey__scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1; /* below vine canvas (z-index 2) */
+  pointer-events: none;
+  /* Softens DNA helix canvas behind the reading column */
+  background:
+    radial-gradient(
+      ellipse 52% 38% at 50% 44%,
+      rgba(8, 12, 16, 0.32) 0%,
+      rgba(8, 12, 16, 0.14) 48%,
+      transparent 72%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(8, 12, 16, 0.1) 0%,
+      rgba(8, 12, 16, 0.22) 50%,
+      rgba(8, 12, 16, 0.28) 100%
+    );
+  -webkit-mask-image: linear-gradient(
+    180deg,
+    transparent 0%,
+    transparent 28%,
+    rgba(0, 0, 0, 0.35) 40%,
+    #000 50%,
+    #000 100%
+  );
+  mask-image: linear-gradient(
+    180deg,
+    transparent 0%,
+    transparent 28%,
+    rgba(0, 0, 0, 0.35) 40%,
+    #000 50%,
+    #000 100%
+  );
+}
+
+.about-journey__column {
+  position: relative;
+  z-index: 3;
+  max-width: 50rem;
+  margin: 0 auto;
+  padding: clamp(2rem, 6vh, 4rem) clamp(1rem, 4vw, 2rem) 0;
+}
+
+.about-journey__article {
+  position: relative;
+}
+
+/* Resume-style document (ATSv6 / site resume) — JetBrains Mono, single column */
+.about-journey .about-resume-doc {
+  text-shadow:
+    0 0 1px rgba(0, 0, 0, 0.9),
+    0 1px 14px rgba(0, 0, 0, 0.75),
+    0 2px 28px rgba(0, 0, 0, 0.45);
+}
+
+.about-resume-doc {
+  --about-cyan: #5ec4dc;
+  font-family: "JetBrains Mono", var(--font-mono);
+  font-size: 0.9375rem;
+  font-weight: 400;
+  line-height: 1.55;
+  color: var(--text);
+}
+
+.about-journey .about-resume-doc ::selection {
+  background-color: var(--about-cyan);
+  color: #0a0a0b;
+}
+
+.about-journey .about-resume-doc ::-moz-selection {
+  background-color: var(--about-cyan);
+  color: #0a0a0b;
+}
+
+.about-resume-doc__body {
+  margin: 0;
+  padding: 0;
+}
+
+.about-resume-doc__para {
+  margin: 0 0 0.5rem;
+  color: var(--text-muted);
+  white-space: pre-line;
+  max-width: none;
+}
+
+.about-resume-doc__para--lead {
+  color: var(--text);
+  margin-bottom: 0.65rem;
+}
+
+.about-resume-doc__quote-cyan {
+  color: var(--about-cyan);
+}
+
+.about-resume-doc__para--pull {
+  color: var(--about-cyan);
+  font-weight: 500;
+  margin: 0.35rem 0 0.65rem;
+}
+
+.about-resume-doc__role {
+  margin: 1.75rem 0 0.35rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+
+.about-resume-doc__role::before {
+  content: '// ';
+  color: var(--about-cyan);
+  font-weight: 500;
+}
+
+.about-resume-doc__role:first-of-type {
+  margin-top: 1.25rem;
+}
+
+.about-resume-doc__list {
+  margin: 0.2rem 0 0.65rem;
+  padding: 0;
+  list-style: none;
+}
+
+.about-resume-doc__list li {
+  margin-bottom: 0.35rem;
+  color: var(--text-muted);
+  padding-left: 0;
+}
+
+@media (max-width: 768px) {
+  .about-journey {
+    min-height: 180vh;
+    padding-top: clamp(7rem, 20vh, 10rem);
+    padding-bottom: 5rem;
+  }
+
+  .about-journey__edge-fade--top {
+    height: clamp(14vh, 20vh, 26vh);
+  }
+
+  .about-journey__scrim {
+    -webkit-mask-image: linear-gradient(
+      180deg,
+      transparent 0%,
+      transparent 42%,
+      #000 58%,
+      #000 86%,
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      180deg,
+      transparent 0%,
+      transparent 42%,
+      #000 58%,
+      #000 86%,
+      transparent 100%
+    );
+  }
+
+  .about-journey__column {
+    padding-top: clamp(1.25rem, 4vh, 2.5rem);
+  }
+
+  .about-journey__scrim {
+    background:
+      radial-gradient(
+        ellipse 58% 42% at 50% 44%,
+        rgba(8, 12, 16, 0.42) 0%,
+        rgba(8, 12, 16, 0.2) 50%,
+        transparent 74%
+      ),
+      linear-gradient(
+        180deg,
+        rgba(8, 12, 16, 0.32) 0%,
+        rgba(6, 10, 14, 0.58) 100%
+      );
+  }
+
+  .about-resume-doc {
+    font-size: 0.875rem;
+    line-height: 1.52;
+  }
+
+  .about-resume-doc__role {
+    font-size: 1.0625rem;
+    margin-top: 1.5rem;
+  }
+
+  .about-resume-doc__para,
+  .about-resume-doc__list li {
+    color: rgba(243, 244, 246, 0.88);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .about-journey__scrim {
+    background: rgba(8, 12, 16, 0.55);
+    mask-image: none;
+  }
+}

@@ -1,14 +1,16 @@
 .hero {
   position: relative;
+  /* dvh avoids mobile toolbar clipping; fallback vh for older browsers */
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 2rem 1.5rem 4rem;
+  padding: 2rem 1rem 4rem;
   overflow: hidden;
   /* Extend hero background under the fixed nav to remove black gap */
-  margin-top: -72px;
-  padding-top: calc(72px + 2rem);
+  margin-top: calc(-4.5rem - env(safe-area-inset-top, 0px));
+  padding-top: calc(4.5rem + env(safe-area-inset-top, 0px) + 2rem);
 }
 
 .hero-bg {
@@ -74,20 +76,6 @@
     radial-gradient(ellipse 70% 40% at 50% 0%, rgba(190, 242, 100, 0.04), transparent 50%),
     radial-gradient(ellipse 60% 30% at 80% 80%, rgba(190, 242, 100, 0.03), transparent 45%);
   pointer-events: none;
-}
-
-/* Same .bird-wire as sections — positioned in hero for boids */
-.hero-phone-line {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: clamp(5.5rem, 14vh, 9.5rem);
-  z-index: 2;
-  pointer-events: none;
-}
-
-.hero-phone-line .bird-wire {
-  margin: 0;
 }
 
 /* Cursor-following ambient glow — strong, responsive */
@@ -177,6 +165,11 @@
 
 .hero-name {
   display: inline-block;
+  font-family: var(--font-name-mono);
+  font-weight: 200;
+  font-synthesis: none;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
   color: var(--accent);
   background: none;
   -webkit-background-clip: unset;
@@ -298,8 +291,10 @@
 
 @media (max-width: 480px) {
   .hero {
-    align-items: flex-start;
-    padding: 20vh 1rem 3rem;
+    align-items: center;
+    padding: 2rem 1rem 3rem;
+    min-height: 100svh;
+    min-height: 100dvh;
   }
 
   .hero-title {

@@ -197,6 +197,7 @@ export function applyBirdDepthCue(
   sceneDepth: number,
   depthSmooth: number,
   delta: number,
+  surfaceVis = 1,
 ) {
   const norm = THREE.MathUtils.clamp((-worldZ - 1.5) / sceneDepth, 0, 1)
   const targetLayer = norm
@@ -206,15 +207,20 @@ export function applyBirdDepthCue(
   rig.root.renderOrder = Math.round(4 + near * 10)
   rig.root.scale.setScalar(rig.root.userData.baseScale as number * scaleMul)
 
-  const fillMul = THREE.MathUtils.lerp(0.72, 1, near)
+  const fillMul = THREE.MathUtils.lerp(0.72, 1, near) * surfaceVis
+  const edgeMul = THREE.MathUtils.lerp(0.75, 1.08, near) * surfaceVis
   rig.root.traverse((o) => {
     if (o instanceof THREE.Mesh && o.material instanceof THREE.MeshBasicMaterial) {
-      const base = o.userData.baseFill as number | undefined
-      if (base !== undefined) o.material.opacity = base * fillMul
+      if (o.userData.baseFill === undefined) o.userData.baseFill = o.material.opacity
+      const base = o.userData.baseFill as number
+      o.material.opacity = surfaceVis <= 0 ? 0 : base * fillMul
     }
     if (o instanceof THREE.LineSegments && o.material instanceof THREE.LineBasicMaterial) {
-      const base = o.material.userData.baseOpacity as number | undefined
-      if (base !== undefined) o.material.opacity = base * THREE.MathUtils.lerp(0.75, 1.08, near)
+      if (o.material.userData.baseOpacity === undefined && o.material.opacity > 0.001) {
+        o.material.userData.baseOpacity = o.material.opacity
+      }
+      const base = o.material.userData.baseOpacity as number
+      o.material.opacity = surfaceVis <= 0 ? 0 : base * edgeMul
     }
   })
 

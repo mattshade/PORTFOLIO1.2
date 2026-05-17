@@ -4,10 +4,26 @@
   background: transparent;
 }
 
+@media (max-width: 768px) {
+  .bio {
+    padding: 3rem 1rem;
+  }
+
+  .leadership-pillars {
+    margin-top: 4rem;
+  }
+}
+
 .bio-inner {
   max-width: 860px;
   margin: 0 auto 300px;
   padding: 0;
+}
+
+@media (max-width: 768px) {
+  .bio-inner {
+    margin-bottom: clamp(3rem, 14vw, 6rem);
+  }
 }
 
 .bio-section-title {

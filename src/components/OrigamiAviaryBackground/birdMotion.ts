@@ -488,6 +488,7 @@ function updateBird(
   pointerNdc: THREE.Vector2,
   camera: THREE.PerspectiveCamera,
   scrollLift: number,
+  surfaceVis: number,
 ) {
   const rig = b.rig
   b.stateTime += delta
@@ -630,7 +631,14 @@ function updateBird(
     }
   }
 
-  b.depthSmooth = applyBirdDepthCue(rig, rig.root.position.z, tuning.sceneDepth, b.depthSmooth, delta)
+  b.depthSmooth = applyBirdDepthCue(
+    rig,
+    rig.root.position.z,
+    tuning.sceneDepth,
+    b.depthSmooth,
+    delta,
+    surfaceVis,
+  )
 }
 
 export function updateAviaryBirds(
@@ -644,6 +652,7 @@ export function updateAviaryBirds(
   pointerNdc: THREE.Vector2,
   camera: THREE.PerspectiveCamera,
   scrollNorm: number,
+  surfaceVis = 1,
 ) {
   const ai = tuning.animationIntensity
   const scrollLift = scrollParallaxDrive(scrollNorm) * tuning.scrollDriftIntensity * 0.02
@@ -651,7 +660,7 @@ export function updateAviaryBirds(
   for (const b of birds) {
     if (b.rig.edgeMats[0] && b.rig.edgeMats[0].userData.baseOpacity === undefined) {
       b.rig.edgeMats.forEach((m) => {
-        m.userData.baseOpacity = m.opacity
+        if (m.opacity > 0.001) m.userData.baseOpacity = m.opacity
       })
     }
 
@@ -659,11 +668,31 @@ export function updateAviaryBirds(
       const p = perches[b.perchIndex]
       placeOnPerch(b.rig, p, scrollLift, b.perchRestZOffset)
       applyPerchPose(b.rig, p)
-      b.depthSmooth = applyBirdDepthCue(b.rig, b.rig.root.position.z, tuning.sceneDepth, b.depthSmooth, delta)
+      b.depthSmooth = applyBirdDepthCue(
+        b.rig,
+        b.rig.root.position.z,
+        tuning.sceneDepth,
+        b.depthSmooth,
+        delta,
+        surfaceVis,
+      )
       continue
     }
 
-    updateBird(b, birds, perches, elapsed, delta, rng, ai, tuning, pointerNdc, camera, scrollLift)
+    updateBird(
+      b,
+      birds,
+      perches,
+      elapsed,
+      delta,
+      rng,
+      ai,
+      tuning,
+      pointerNdc,
+      camera,
+      scrollLift,
+      surfaceVis,
+    )
   }
 }
 

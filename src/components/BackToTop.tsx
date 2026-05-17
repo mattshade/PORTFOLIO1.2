@@ -3,20 +3,31 @@ import './BackToTop.css'
 
 export function BackToTop() {
   const [isVisible, setIsVisible] = useState(false)
+  const [inAbout, setInAbout] = useState(false)
   const [isAnimating, setIsAnimating] = useState(false)
   const [isBlinking, setIsBlinking] = useState(false)
 
   useEffect(() => {
     const toggleVisibility = () => {
-      // Show when scrolled down a bit
       if (window.pageYOffset > 400) {
         setIsVisible(true)
       } else {
         setIsVisible(false)
       }
+
+      const about = document.getElementById('about')
+      if (about) {
+        const top = about.getBoundingClientRect().top
+        setInAbout(top < window.innerHeight * 0.82)
+      }
     }
+    toggleVisibility()
     window.addEventListener('scroll', toggleVisibility, { passive: true })
-    return () => window.removeEventListener('scroll', toggleVisibility)
+    window.addEventListener('resize', toggleVisibility)
+    return () => {
+      window.removeEventListener('scroll', toggleVisibility)
+      window.removeEventListener('resize', toggleVisibility)
+    }
   }, [])
 
   const handleClick = () => {
@@ -45,7 +56,7 @@ export function BackToTop() {
 
   return (
     <button 
-      className={`back-to-top ${isVisible ? 'visible' : ''} ${isAnimating ? 'is-flying' : ''} ${isBlinking ? 'is-blinking' : ''}`}
+      className={`back-to-top ${isVisible ? 'visible' : ''} ${inAbout ? 'back-to-top--cavern' : ''} ${isAnimating ? 'is-flying' : ''} ${isBlinking ? 'is-blinking' : ''}`}
       onClick={handleClick}
       aria-label="Back to top"
     >
@@ -56,24 +67,25 @@ export function BackToTop() {
           xmlns="http://www.w3.org/2000/svg"
         >
           {/* Architectural wireframe boid */}
-          <path 
+          <path
             className="boid-wire"
             d="M 12 2 L 20 18 L 12 14 L 4 18 Z"
-            fill="var(--accent-dim)"
-            stroke="var(--accent)"
+            fill="currentColor"
+            fillOpacity="0.12"
+            stroke="currentColor"
             strokeWidth="1.2"
             strokeLinejoin="round"
           />
-          <path 
+          <path
             d="M 12 2 L 12 14"
-            stroke="var(--accent)"
+            stroke="currentColor"
             strokeWidth="0.8"
             opacity="0.6"
           />
-          <circle cx="12" cy="2" r="1" fill="var(--accent)" />
-          <circle cx="20" cy="18" r="0.8" fill="var(--accent)" />
-          <circle cx="4" cy="18" r="0.8" fill="var(--accent)" />
-          <circle cx="12" cy="14" r="0.8" fill="var(--accent)" />
+          <circle cx="12" cy="2" r="1" fill="currentColor" />
+          <circle cx="20" cy="18" r="0.8" fill="currentColor" />
+          <circle cx="4" cy="18" r="0.8" fill="currentColor" />
+          <circle cx="12" cy="14" r="0.8" fill="currentColor" />
         </svg>
         
         {/* Trail effects for flight */}

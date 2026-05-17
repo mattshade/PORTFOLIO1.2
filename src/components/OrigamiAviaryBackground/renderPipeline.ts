@@ -11,6 +11,7 @@ export type AviaryComposer = {
   resize: (width: number, height: number) => void
   render: () => void
   setBloomEnabled: (enabled: boolean) => void
+  setBloomStrength: (strength: number) => void
   dispose: () => void
 }
 
@@ -44,12 +45,18 @@ export function createAviaryComposer(
     bloomPass.strength = enabled ? tuning.bloomStrength : 0
   }
 
+  const setBloomStrength = (strength: number) => {
+    bloomPass.enabled = strength > 0.001
+    bloomPass.strength = strength
+  }
+
   return {
     composer,
     bloomPass,
     resize,
     render: () => composer.render(),
     setBloomEnabled,
+    setBloomStrength,
     dispose: () => composer.dispose(),
   }
 }

@@ -43,11 +43,12 @@ export function buildAviaryEnvironment(
   rng: Rng,
   tuning: OrigamiAviaryTuning,
   accent: THREE.Color,
+  options?: { includeCat?: boolean },
 ): {
   roots: THREE.Object3D[]
   perches: Perch[]
   depthLayers: THREE.Group[]
-  cat: OrigamiCatSystem
+  cat: OrigamiCatSystem | null
 } {
   const roots: THREE.Object3D[] = []
   const lineMuted = new THREE.Color(AVIARY_COLORS.lineMuted)
@@ -65,6 +66,7 @@ export function buildAviaryEnvironment(
     const line = m as THREE.LineBasicMaterial
     line.transparent = true
     line.opacity = tuning.gridOpacity
+    line.userData.baseOpacity = tuning.gridOpacity
     line.depthWrite = false
     line.fog = true
     line.toneMapped = false
@@ -88,6 +90,7 @@ export function buildAviaryEnvironment(
       opacity: tuning.gridOpacity * 0.42,
       depthWrite: false,
       toneMapped: false,
+      userData: { baseOpacity: tuning.gridOpacity * 0.42 },
     }),
   )
   backPlane.position.set(0, 1.5, -tuning.sceneDepth * 0.72)
@@ -103,6 +106,7 @@ export function buildAviaryEnvironment(
       opacity: tuning.lineOpacity * 0.25,
       depthWrite: false,
       toneMapped: false,
+      userData: { baseOpacity: tuning.lineOpacity * 0.25 },
     }),
   )
   horizon.position.set(0, 0.01, -tuning.sceneDepth * 0.35)
@@ -110,9 +114,8 @@ export function buildAviaryEnvironment(
   world.add(horizon)
   roots.push(horizon)
 
-  // Cat lives on `world` (same as birds), not a parallax depth layer — layer transforms were
-  // moving the rig while clamps assumed world Z, so the silhouette often sat off-frustum / in heavy fog.
-  const cat = createOrigamiCat(world, rng, tuning, accent, lineMuted, roots)
+  const includeCat = options?.includeCat !== false
+  const cat = includeCat ? createOrigamiCat(world, rng, tuning, accent, lineMuted, roots) : null
 
   return { roots, perches, depthLayers, cat }
 }

@@ -62,13 +62,22 @@ export function Nav() {
 
         <div className={`nav-links ${isMenuOpen ? 'open' : ''}`}>
           {isHome ? (
-            <>
-              <a href="#projects" className="nav-link bird-perch" onClick={() => setIsMenuOpen(false)}>Case Studies and Projects</a>
-            </>
+            <a href="#about" className="nav-link bird-perch" onClick={() => setIsMenuOpen(false)}>
+              About
+            </a>
           ) : (
-            <>
-              <Link to="/#projects" className="nav-link bird-perch" onClick={() => setIsMenuOpen(false)}>Case Studies and Projects</Link>
-            </>
+            <Link to="/#about" className="nav-link bird-perch" onClick={() => setIsMenuOpen(false)}>
+              About
+            </Link>
+          )}
+          {isHome ? (
+            <a href="#projects" className="nav-link bird-perch" onClick={() => setIsMenuOpen(false)}>
+              Case Studies and Projects
+            </a>
+          ) : (
+            <Link to="/#projects" className="nav-link bird-perch" onClick={() => setIsMenuOpen(false)}>
+              Case Studies and Projects
+            </Link>
           )}
           {isHome ? (
             <a

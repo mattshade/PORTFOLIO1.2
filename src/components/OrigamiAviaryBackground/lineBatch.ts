@@ -30,7 +30,7 @@ export function clearLineMaterialRegistry() {
   lineMaterials.length = 0
 }
 
-function depthOpacityFactor(positions: number[], sceneDepth: number) {
+function depthOpacityFactor(positions: number[], sceneDepth: number, depthFade = 1) {
   let zSum = 0
   let count = 0
   for (let i = 2; i < positions.length; i += 3) {
@@ -39,7 +39,16 @@ function depthOpacityFactor(positions: number[], sceneDepth: number) {
   }
   if (count === 0) return 1
   const norm = THREE.MathUtils.clamp((-zSum / count - 1.8) / sceneDepth, 0, 1)
-  return THREE.MathUtils.lerp(1.08, 0.52, norm)
+  const minMul = THREE.MathUtils.lerp(0.52, 0.78, depthFade)
+  return THREE.MathUtils.lerp(1.08, minMul, norm)
+}
+
+export type LineBatchFlushOptions = {
+  /** 0 = no depth-based opacity falloff (e.g. cavern vines). */
+  depthFade?: number
+  fog?: boolean
+  worldUnits?: boolean
+  alphaToCoverage?: boolean
 }
 
 export function flushLineBatch(
@@ -49,26 +58,33 @@ export function flushLineBatch(
   roots: THREE.Object3D[],
   sceneDepth: number,
   lineWidth = 1.1,
-) {
-  if (batch.positions.length < 6) return
+  options: LineBatchFlushOptions = {},
+): Line2 | null {
+  const depthFade = options.depthFade ?? 1
+  const useFog = options.fog ?? true
+  const worldUnits = options.worldUnits ?? false
+  const alphaToCoverage = options.alphaToCoverage ?? !worldUnits
+  if (batch.positions.length < 6) return null
 
   const geo = new LineGeometry()
   geo.setPositions(batch.positions)
 
   const width = batch.lineWidth ?? lineWidth
-  const depthMul = depthOpacityFactor(batch.positions, sceneDepth)
+  const depthMul = depthOpacityFactor(batch.positions, sceneDepth, depthFade)
+  const opacity = batch.opacity * depthMul
   const mat = new LineMaterial({
     color: color.getHex(),
     linewidth: width,
     transparent: true,
-    opacity: batch.opacity * depthMul,
+    opacity,
     depthWrite: false,
     depthTest: true,
-    fog: true,
-    worldUnits: false,
-    alphaToCoverage: true,
+    fog: useFog,
+    worldUnits,
+    alphaToCoverage,
     toneMapped: false,
   })
+  mat.userData.baseOpacity = opacity
   registerLineMaterial(mat)
 
   const line = new Line2(geo, mat)
@@ -77,6 +93,7 @@ export function flushLineBatch(
   parent.add(line)
   roots.push(line)
   batch.positions = []
+  return line
 }
 
 export function isLine2Object(obj: THREE.Object3D): obj is Line2 {
