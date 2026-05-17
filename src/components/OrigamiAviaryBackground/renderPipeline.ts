@@ -4,10 +4,9 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js'
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js'
 import type { OrigamiAviaryTuning } from './constants'
+import { shouldUseAviaryPostProcessing } from './webglCapabilities'
 
 export type AviaryComposer = {
-  composer: EffectComposer
-  bloomPass: UnrealBloomPass
   resize: (width: number, height: number) => void
   render: () => void
   setBloomEnabled: (enabled: boolean) => void
@@ -22,6 +21,16 @@ export function createAviaryComposer(
   tuning: OrigamiAviaryTuning,
 ): AviaryComposer {
   renderer.toneMapping = THREE.NoToneMapping
+
+  if (!shouldUseAviaryPostProcessing(tuning)) {
+    return {
+      resize: () => {},
+      render: () => renderer.render(scene, camera),
+      setBloomEnabled: () => {},
+      setBloomStrength: () => {},
+      dispose: () => {},
+    }
+  }
 
   const composer = new EffectComposer(renderer)
   composer.addPass(new RenderPass(scene, camera))
@@ -51,8 +60,6 @@ export function createAviaryComposer(
   }
 
   return {
-    composer,
-    bloomPass,
     resize,
     render: () => composer.render(),
     setBloomEnabled,

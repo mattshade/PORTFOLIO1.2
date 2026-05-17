@@ -1,3 +1,5 @@
+import { isFragileWebGLDevice } from './webglCapabilities'
+
 /**
  * Tunable aviary atmosphere — aligned with site `--bg` / muted green blueprint language.
  */
@@ -239,6 +241,7 @@ export function getResponsiveAviaryTuning(): OrigamiAviaryTuning {
   if (typeof window === 'undefined') return { ...DEFAULT_AVIARY_TUNING }
 
   const w = window.innerWidth
+  const fragileGpu = isFragileWebGLDevice()
   const h = window.innerHeight
   const dpr = window.devicePixelRatio ?? 1
   const reducedData = window.matchMedia('(prefers-reduced-data: reduce)').matches
@@ -347,6 +350,14 @@ export function getResponsiveAviaryTuning(): OrigamiAviaryTuning {
     t.particleIntensity *= 0.45
     t.bloomStrength = Math.min(t.bloomStrength, 0.1)
     t.atmosphereDrift = 0
+  }
+
+  if (fragileGpu) {
+    t.maxPixelRatio = Math.min(t.maxPixelRatio, 1)
+    t.bloomStrength = 0
+    t.particleCount = Math.min(t.particleCount, narrowPoster ? 64 : 180)
+    t.scrollRotateIntensity = Math.min(t.scrollRotateIntensity, narrowPoster ? 0.12 : 0.2)
+    t.animationIntensity = Math.min(t.animationIntensity, 0.5)
   }
 
   return t

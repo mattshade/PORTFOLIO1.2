@@ -6,7 +6,7 @@
   z-index: 1;
   pointer-events: none;
   overflow: hidden;
-  transition: opacity 0.5s ease, filter 0.5s ease;
+  transition: opacity 0.5s ease;
   --origami-aviary-vignette-title: 0.52;
   --origami-aviary-vignette-mid: 0.22;
   --origami-aviary-vignette-edge: 0.62;
@@ -89,6 +89,18 @@
   }
 }
 
+/* Static fallback when WebGL context is lost (common on Android Chrome). */
+.origami-aviary-background--degraded .origami-aviary-background__canvas-host {
+  opacity: 0;
+}
+
+.origami-aviary-background--degraded {
+  background:
+    radial-gradient(ellipse 70% 50% at 50% 18%, rgba(122, 154, 110, 0.12) 0%, transparent 55%),
+    radial-gradient(ellipse 100% 80% at 50% 100%, rgba(10, 10, 11, 0.92) 0%, #0a0a0b 70%),
+    #0a0a0b;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .origami-aviary-background {
     transition: none;
@@ -97,5 +109,10 @@
 
 body.modal-open .origami-aviary-background {
   opacity: 0.18;
-  filter: blur(10px);
+}
+
+@media (min-width: 769px) {
+  body.modal-open .origami-aviary-background {
+    filter: blur(10px);
+  }
 }

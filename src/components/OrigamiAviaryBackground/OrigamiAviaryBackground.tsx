@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
 import './OrigamiAviaryBackground.css'
 import { AVIARY_COLORS, getResponsiveAviaryTuning } from './constants'
@@ -38,6 +38,7 @@ import {
 } from '../OrigamiAboutBackground/aboutTransition'
 import type { CavernAtmosphereSystem } from '../OrigamiAboutBackground/cavernAtmosphere'
 import { readAboutScrollJourney } from '../OrigamiAboutBackground/homeDescentProgress'
+import { getWebGLRendererOptions } from './webglCapabilities'
 import {
   disposeAboutBats,
   populateAboutBats,
@@ -61,13 +62,15 @@ function disposeObject3D(root: THREE.Object3D) {
 }
 
 export function OrigamiAviaryBackground() {
+  const rootRef = useRef<HTMLDivElement>(null)
   const mountRef = useRef<HTMLDivElement>(null)
   const readabilityRef = useRef<HTMLDivElement>(null)
   const reducedMotionRef = useRef(false)
-  const rendererRef = useRef<THREE.WebGLRenderer | null>(null)
   const scrollNormRef = useRef(0)
   const journeyRef = useRef({ entry: 0, depth: 0 })
   const journeySmoothRef = useRef({ entry: 0, depth: 0 })
+  const [webglEpoch, setWebglEpoch] = useState(0)
+  const [gpuDegraded, setGpuDegraded] = useState(false)
 
   useEffect(() => {
     const mount = mountRef.current
@@ -107,9 +110,14 @@ export function OrigamiAviaryBackground() {
     mq.addEventListener('change', onMq)
 
     const tabHiddenRef = { v: document.hidden }
-    document.addEventListener('visibilitychange', () => {
+    let rendererForVis: THREE.WebGLRenderer | undefined
+    const onVisibility = () => {
       tabHiddenRef.v = document.hidden
-    })
+      if (!document.hidden && rendererForVis?.getContext().isContextLost()) {
+        setWebglEpoch((n) => n + 1)
+      }
+    }
+    document.addEventListener('visibilitychange', onVisibility)
 
     const onPointer = (e: PointerEvent) => {
       const vv = window.visualViewport
@@ -132,15 +140,9 @@ export function OrigamiAviaryBackground() {
 
     let resize: (() => void) | undefined
     let teardownScene: (() => void) | null = null
-
-    const onPageHide = () => {
-      const r = rendererRef.current
-      if (!r) return
-      r.dispose()
-      rendererRef.current = null
-      if (r.domElement.parentNode) r.domElement.parentNode.removeChild(r.domElement)
-    }
-    window.addEventListener('pagehide', onPageHide)
+    let contextLost = false
+    let onContextLost: ((e: Event) => void) | undefined
+    let onContextRestored: (() => void) | undefined
 
     try {
       const tuning = getResponsiveAviaryTuning()
@@ -173,15 +175,29 @@ export function OrigamiAviaryBackground() {
       camera.position.copy(baseCam)
       camera.lookAt(baseLook)
 
-      const renderer =
-        rendererRef.current ??
-        new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' })
-      if (!rendererRef.current) rendererRef.current = renderer
+      const renderer = new THREE.WebGLRenderer(getWebGLRendererOptions(tuning))
+      rendererForVis = renderer
       renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, tuning.maxPixelRatio))
       renderer.setClearColor(AVIARY_COLORS.background, 1)
       renderer.outputColorSpace = THREE.SRGBColorSpace
-      if (renderer.domElement.parentNode !== mount) mount.appendChild(renderer.domElement)
+      mount.appendChild(renderer.domElement)
+
+      const canvas = renderer.domElement
+      onContextLost = (e: Event) => {
+        e.preventDefault()
+        contextLost = true
+        setGpuDegraded(true)
+      }
+      onContextRestored = () => {
+        contextLost = false
+        setGpuDegraded(false)
+        setWebglEpoch((n) => n + 1)
+      }
+      canvas.addEventListener('webglcontextlost', onContextLost, false)
+      canvas.addEventListener('webglcontextrestored', onContextRestored, false)
+
       pipeline = createAviaryComposer(renderer, scene, camera, tuning)
+      setGpuDegraded(false)
 
       const accent = new THREE.Color(tuning.accentColor)
       const env = buildAviaryEnvironment(surfaceWorld, rng, tuning, accent)
@@ -238,7 +254,9 @@ export function OrigamiAviaryBackground() {
         if (disposed || !renderer || !scene || !camera || !world || !surfaceWorld || !stage || !fog || !cavern)
           return
         raf = requestAnimationFrame(animate)
-        if (tabHiddenRef.v) return
+        if (tabHiddenRef.v || contextLost) return
+        const gl = renderer.getContext()
+        if (gl.isContextLost()) return
         try {
           const delta = Math.min(clock.getDelta(), 0.05)
           const elapsed = clock.getElapsedTime()
@@ -368,6 +386,11 @@ export function OrigamiAviaryBackground() {
       teardownScene = () => {
         disposed = true
         cancelAnimationFrame(raf)
+        if (onContextLost) canvas.removeEventListener('webglcontextlost', onContextLost)
+        if (onContextRestored) canvas.removeEventListener('webglcontextrestored', onContextRestored)
+        rendererForVis = undefined
+        renderer.dispose()
+        if (renderer.domElement.parentNode === mount) mount.removeChild(renderer.domElement)
         mq.removeEventListener('change', onMq)
         window.removeEventListener('pointermove', onPointer)
         window.removeEventListener('scroll', onScroll)
@@ -401,6 +424,7 @@ export function OrigamiAviaryBackground() {
       }
     } catch (e) {
       console.error('[OrigamiAviaryBackground] init failed', e)
+      setGpuDegraded(true)
       mq.removeEventListener('change', onMq)
       window.removeEventListener('pointermove', onPointer)
       window.removeEventListener('scroll', onScroll)
@@ -414,12 +438,16 @@ export function OrigamiAviaryBackground() {
 
     return () => {
       teardownScene?.()
-      window.removeEventListener('pagehide', onPageHide)
+      document.removeEventListener('visibilitychange', onVisibility)
     }
-  }, [])
+  }, [webglEpoch])
 
   return (
-    <div className="origami-aviary-background" aria-hidden>
+    <div
+      ref={rootRef}
+      className={`origami-aviary-background${gpuDegraded ? ' origami-aviary-background--degraded' : ''}`}
+      aria-hidden
+    >
       <div ref={mountRef} className="origami-aviary-background__canvas-host" />
       <div ref={readabilityRef} className="origami-aviary-background__readability" />
     </div>
