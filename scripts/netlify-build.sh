@@ -54,7 +54,7 @@ clone_if_missing \
 
 clone_if_missing \
   "$SHADCN_BLOCKS_ROOT" \
-  "${SHADCN_BLOCKS_REPO:-}" \
+  "${SHADCN_BLOCKS_REPO:-https://github.com/mattshade/shadcnBlocks.git}" \
   "${SHADCN_BLOCKS_REF:-main}"
 
 if ! command -v pnpm >/dev/null 2>&1; then

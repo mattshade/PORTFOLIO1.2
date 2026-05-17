@@ -4,7 +4,7 @@
 
 - [ ] `npm run build` completes successfully locally (or `bash scripts/netlify-build.sh` on CI)
 - [ ] Case-study repos are reachable (public, or `GITHUB_TOKEN` set for private clones)
-- [ ] `SHADCN_BLOCKS_REPO` is set in Netlify (required — no default clone URL)
+- [ ] shadcnBlocks clones from `https://github.com/mattshade/shadcnBlocks.git` (default in `netlify-build.sh`)
 - [ ] No secrets committed (`.env` is gitignored)
 - [ ] Resume PDF exists in `public/Matt_Shade_Resume.pdf` (or path in `resume.ts`)
 
@@ -23,20 +23,9 @@
 
 Set in **Site configuration → Environment variables** (scopes: **Build** unless noted).
 
-### Required for full case-study builds
-
-| Variable | Value | Notes |
-|----------|--------|--------|
-| `SHADCN_BLOCKS_REPO` | `https://github.com/<your-org>/shadcnBlocks.git` | **Required.** Clone URL for the shadcnBlocks app; build skips this project if unset and source is missing. |
-| `SHADCN_BLOCKS_REF` | `main` | Branch or tag to clone. |
-
-### Recommended (private repos or authenticated clones)
-
-| Variable | Value | Notes |
-|----------|--------|--------|
-| `GITHUB_TOKEN` | `ghp_…` or fine-grained PAT | **Secret.** Used only at build time to clone private GitHub repos. Mark **Sensitive** in Netlify. |
-
 ### Optional — clone URLs and refs (defaults shown)
+
+All case-study repos are public; no `GITHUB_TOKEN` is required unless you switch to private repos.
 
 | Variable | Default value | Notes |
 |----------|----------------|--------|
@@ -44,6 +33,14 @@ Set in **Site configuration → Environment variables** (scopes: **Build** unles
 | `AGENT_OP_REF` | `main` | |
 | `AI_ADOPTION_OS_REPO` | `https://github.com/mattshade/AI-Adoption-OS.git` | AI Adoption CRM monorepo |
 | `AI_ADOPTION_OS_REF` | `main` | |
+| `SHADCN_BLOCKS_REPO` | `https://github.com/mattshade/shadcnBlocks.git` | shadcnBlocks app |
+| `SHADCN_BLOCKS_REF` | `main` | |
+
+### Optional — private repos only
+
+| Variable | Value | Notes |
+|----------|--------|--------|
+| `GITHUB_TOKEN` | `ghp_…` or fine-grained PAT | **Secret.** Only needed if clone repos are private. |
 
 ### Optional — local paths on the build machine
 
@@ -74,20 +71,13 @@ Only if you build those apps into `RECENT-PROJECTS/*/dist` before deploy, or set
 
 ## Copy-paste (Netlify UI)
 
-Minimal setup for public `Agent-Op` and `AI-Adoption-OS` plus your shadcnBlocks repo:
+No environment variables are required for deploy — `scripts/netlify-build.sh` clones public repos by default:
 
-```
-SHADCN_BLOCKS_REPO=https://github.com/<your-org>/shadcnBlocks.git
-SHADCN_BLOCKS_REF=main
-```
+- `https://github.com/mattshade/Agent-Op.git`
+- `https://github.com/mattshade/AI-Adoption-OS.git`
+- `https://github.com/mattshade/shadcnBlocks.git`
 
-If any clone repo is **private**, also add (sensitive):
-
-```
-GITHUB_TOKEN=ghp_your_token_here
-```
-
-Defaults apply without setting `AGENT_OP_*` or `AI_ADOPTION_OS_*` unless you use different repos or branches.
+Override `*_REPO` / `*_REF` only if you use forks or non-`main` branches. Add `GITHUB_TOKEN` only for private repos.
 
 ## Project routes
 
