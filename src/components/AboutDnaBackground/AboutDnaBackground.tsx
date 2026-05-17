@@ -3,7 +3,11 @@ import * as THREE from 'three'
 import { disposeLine2, isLine2Object, setLineResolution } from '../OrigamiAviaryBackground/lineBatch'
 import { getAviaryViewportProfile } from '../OrigamiAviaryBackground/constants'
 import {
-  readAboutTransitionEntry,
+  getLightWebGLRendererOptions,
+  setAboutVineSceneActive,
+  shouldUseAboutDnaWebGL,
+} from '../OrigamiAviaryBackground/webglCapabilities'
+import {
   readAboutVineFadeOpacity,
   readAboutVineScrollT,
 } from '../OrigamiAboutBackground/homeDescentProgress'
@@ -14,7 +18,6 @@ import {
   disposeAboutDnaBats,
   populateAboutDnaBats,
   updateAboutDnaBats,
-  type VineBatPerch,
 } from './aboutDnaBats'
 import {
   getAboutDnaConfig,
@@ -27,7 +30,6 @@ import { buildSpineSamples } from './spinePath'
 import { buildAboutVinePlant, getPlantCrossSectionRadius } from './vineFoliage'
 import './AboutDnaBackground.css'
 
-const BG = 0x080c10
 const CAMERA_FOV = 38
 const CAMERA_LOOK_Y = -0.38
 
@@ -40,7 +42,6 @@ function computeStalkPanY(cfg: AboutDnaConfig, progress: number): number {
   const { yMin, yMax } = getStalkVerticalBounds(cfg)
   const halfH = getCameraHalfHeight(cfg)
   const viewSpan = halfH * 2
-  // Slide a full-height window along the stalk so the vine always fills the viewport
   const windowBottom = THREE.MathUtils.lerp(
     Math.max(yMin, yMax - viewSpan) + cfg.stalkPanStartBias,
     yMin,
@@ -81,15 +82,51 @@ function disposeGroup(root: THREE.Object3D) {
   })
 }
 
+function bindAboutVineVisibility(host: HTMLElement) {
+  const updateVisibility = () => {
+    const region = document.getElementById('about-vine-region')
+    if (!region) return
+    const rect = region.getBoundingClientRect()
+    const vh = window.innerHeight
+    const regionInView = rect.bottom > 0 && rect.top < vh * 1.02
+    const vineFade = readAboutVineFadeOpacity()
+    const show = regionInView && vineFade > 0.02
+    host.classList.toggle('about-dna-background--visible', show)
+    host.style.setProperty('--about-vine-opacity', String(vineFade))
+    setAboutVineSceneActive(show)
+  }
+
+  const onScroll = () => updateVisibility()
+
+  updateVisibility()
+  window.addEventListener('scroll', onScroll, { passive: true })
+  window.visualViewport?.addEventListener('scroll', onScroll, { passive: true })
+  window.addEventListener('resize', onScroll)
+
+  return () => {
+    setAboutVineSceneActive(false)
+    window.removeEventListener('scroll', onScroll)
+    window.visualViewport?.removeEventListener('scroll', onScroll)
+    window.removeEventListener('resize', onScroll)
+  }
+}
+
 export function AboutDnaBackground() {
   const hostRef = useRef<HTMLDivElement>(null)
+  const useWebGL = shouldUseAboutDnaWebGL()
 
   useEffect(() => {
     const host = hostRef.current
     if (!host) return
 
+    if (!useWebGL) {
+      host.classList.add('about-dna-background--static')
+      return bindAboutVineVisibility(host)
+    }
+
     let disposed = false
     let raf = 0
+    let isVisible = false
     const roots: THREE.Object3D[] = []
     const clock = new THREE.Clock()
 
@@ -100,11 +137,15 @@ export function AboutDnaBackground() {
     }
     mq.addEventListener('change', onMq)
 
-    const scene = new THREE.Scene()
+    const tabHiddenRef = { v: document.hidden }
+    const onVisibility = () => {
+      tabHiddenRef.v = document.hidden
+    }
+    document.addEventListener('visibilitychange', onVisibility)
 
+    const scene = new THREE.Scene()
     const cfg = getAboutDnaConfig(getAviaryViewportProfile(window.innerWidth) === 'narrow')
     const camera = new THREE.PerspectiveCamera(CAMERA_FOV, 1, 0.1, 120)
-
     const world = new THREE.Group()
     scene.add(world)
 
@@ -131,16 +172,26 @@ export function AboutDnaBackground() {
     const batPerches = buildVineBatPerches(cfg, batRng, spine)
     const bats = populateAboutDnaBats(batLayer, batRng, cfg, batPerches, accent, muted, roots)
 
-    const renderer = new THREE.WebGLRenderer({
-      antialias: true,
-      alpha: true,
-      powerPreference: 'high-performance',
-    })
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5))
-    renderer.setClearColor(0x000000, 0)
+    const renderer = new THREE.WebGLRenderer(getLightWebGLRendererOptions())
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1))
+    renderer.setClearColor(0x080c10, 1)
     renderer.outputColorSpace = THREE.SRGBColorSpace
     host.appendChild(renderer.domElement)
     renderer.domElement.className = 'about-dna-background__canvas'
+
+    let contextLost = false
+    const onContextLost = (e: Event) => {
+      e.preventDefault()
+      contextLost = true
+      setAboutVineSceneActive(false)
+      host.classList.add('about-dna-background--static')
+    }
+    const onContextRestored = () => {
+      contextLost = false
+      host.classList.remove('about-dna-background--static')
+    }
+    renderer.domElement.addEventListener('webglcontextlost', onContextLost, false)
+    renderer.domElement.addEventListener('webglcontextrestored', onContextRestored, false)
 
     const resize = () => {
       if (disposed) return
@@ -151,7 +202,7 @@ export function AboutDnaBackground() {
       fitAboutDnaCamera(camera, cfg, w / h)
       camera.updateProjectionMatrix()
       setLineResolution(w, h)
-      const pr = Math.min(window.devicePixelRatio || 1, 1.5)
+      const pr = Math.min(window.devicePixelRatio || 1, 1)
       if (vine.stalkDots?.material instanceof THREE.ShaderMaterial) {
         vine.stalkDots.material.uniforms.uPixelRatio.value = pr
       }
@@ -165,8 +216,10 @@ export function AboutDnaBackground() {
       const regionInView = rect.bottom > 0 && rect.top < vh * 1.02
       const vineFade = readAboutVineFadeOpacity()
       const show = regionInView && vineFade > 0.02
+      isVisible = show
       host.classList.toggle('about-dna-background--visible', show)
       host.style.setProperty('--about-vine-opacity', String(vineFade))
+      setAboutVineSceneActive(show && !contextLost)
     }
 
     const onScroll = () => {
@@ -179,6 +232,9 @@ export function AboutDnaBackground() {
     const animate = () => {
       if (disposed) return
       raf = requestAnimationFrame(animate)
+      if (tabHiddenRef.v || contextLost || !isVisible) return
+      const gl = renderer.getContext()
+      if (gl.isContextLost()) return
 
       const delta = Math.min(clock.getDelta(), 0.05)
       const elapsed = clock.getElapsedTime()
@@ -203,7 +259,6 @@ export function AboutDnaBackground() {
         cfg,
         readAboutVineFadeOpacity(),
       )
-      updateVisibility()
 
       renderer.render(scene, camera)
     }
@@ -221,16 +276,26 @@ export function AboutDnaBackground() {
       disposed = true
       cancelAnimationFrame(raf)
       mq.removeEventListener('change', onMq)
+      document.removeEventListener('visibilitychange', onVisibility)
       window.removeEventListener('scroll', onScroll)
       window.visualViewport?.removeEventListener('scroll', onScroll)
       window.removeEventListener('resize', resize)
       window.visualViewport?.removeEventListener('resize', resize)
+      renderer.domElement.removeEventListener('webglcontextlost', onContextLost)
+      renderer.domElement.removeEventListener('webglcontextrestored', onContextRestored)
+      setAboutVineSceneActive(false)
       disposeAboutDnaBats(bats, batLayer)
       disposeGroup(world)
       renderer.dispose()
       if (renderer.domElement.parentNode === host) host.removeChild(renderer.domElement)
     }
-  }, [])
+  }, [useWebGL])
 
-  return <div ref={hostRef} className="about-dna-background" aria-hidden />
+  return (
+    <div
+      ref={hostRef}
+      className={`about-dna-background${useWebGL ? '' : ' about-dna-background--static'}`}
+      aria-hidden
+    />
+  )
 }

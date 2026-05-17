@@ -24,6 +24,7 @@ import {
   applyWideForestCamera,
   BOTTOM_ANCHOR_CAMERA,
   BOTTOM_ANCHOR_LOOK,
+  scrollParallaxDrive,
 } from './sceneAnchor'
 import { clearLineMaterialRegistry, isLine2Object, disposeLine2, setLineResolution } from './lineBatch'
 import { createAviaryComposer, type AviaryComposer } from './renderPipeline'
@@ -38,7 +39,12 @@ import {
 } from '../OrigamiAboutBackground/aboutTransition'
 import type { CavernAtmosphereSystem } from '../OrigamiAboutBackground/cavernAtmosphere'
 import { readAboutScrollJourney } from '../OrigamiAboutBackground/homeDescentProgress'
-import { getWebGLRendererOptions } from './webglCapabilities'
+import {
+  getWebGLRendererOptions,
+  shouldBuildAviaryCavern,
+  shouldPauseAviaryWhileAboutVine,
+  shouldUseAboutCavernInversion,
+} from './webglCapabilities'
 import {
   disposeAboutBats,
   populateAboutBats,
@@ -209,23 +215,30 @@ export function OrigamiAviaryBackground() {
       atmosphere = buildAviaryAtmosphere(stage, rng, tuning, accent)
       seedSurfaceOpacityBaselines(surfaceWorld, atmosphere.glowLayer, atmosphere.arcParent)
 
-      const cavernRng = createMulberry32(0xab0f4e75)
-      const cavernLayer = buildCavernLayer(world, cavernRng, aboutProfile, tuning.sceneDepth, envRoots)
-      cavern = cavernLayer.cavern
-      batPerches = cavernLayer.batPerches
-      cavernAtmosphere = cavernLayer.cavernAtmosphere
-      const cyan = new THREE.Color(aboutProfile.cavern.accentColor)
-      const cyanMuted = new THREE.Color(0x3d6a78)
-      bats = populateAboutBats(
-        cavern,
-        cavernRng,
-        batPerches,
-        aboutProfile.cavern,
-        cyan,
-        cyanMuted,
-        tuning.sceneDepth,
-        envRoots,
-      )
+      if (shouldBuildAviaryCavern()) {
+        const cavernRng = createMulberry32(0xab0f4e75)
+        const cavernLayer = buildCavernLayer(world, cavernRng, aboutProfile, tuning.sceneDepth, envRoots)
+        cavern = cavernLayer.cavern
+        batPerches = cavernLayer.batPerches
+        cavernAtmosphere = cavernLayer.cavernAtmosphere
+        const cyan = new THREE.Color(aboutProfile.cavern.accentColor)
+        const cyanMuted = new THREE.Color(0x3d6a78)
+        bats = populateAboutBats(
+          cavern,
+          cavernRng,
+          batPerches,
+          aboutProfile.cavern,
+          cyan,
+          cyanMuted,
+          tuning.sceneDepth,
+          envRoots,
+        )
+      } else {
+        cavern = new THREE.Group()
+        cavern.name = 'about-cavern-empty'
+        cavern.visible = false
+        world.add(cavern)
+      }
 
       const clock = new THREE.Clock()
 
@@ -257,6 +270,7 @@ export function OrigamiAviaryBackground() {
         if (tabHiddenRef.v || contextLost) return
         const gl = renderer.getContext()
         if (gl.isContextLost()) return
+        const aboutVinePause = shouldPauseAviaryWhileAboutVine()
         try {
           const delta = Math.min(clock.getDelta(), 0.05)
           const elapsed = clock.getElapsedTime()
@@ -314,7 +328,7 @@ export function OrigamiAviaryBackground() {
           if (rm) {
             stage.rotation.set(0, 0, 0)
             stage.position.set(0, 0, 0)
-          } else {
+          } else if (shouldUseAboutCavernInversion()) {
             applyCavernInversionMotion(
               stage,
               interaction.scrollSmooth,
@@ -323,6 +337,14 @@ export function OrigamiAviaryBackground() {
               depth,
               aboutProfile,
             )
+          } else {
+            const drive = scrollParallaxDrive(interaction.scrollSmooth)
+            const ri = aboutProfile.scrollRotateIntensity * 0.22
+            stage.rotation.x = drive * ri * 0.35
+            stage.rotation.y = drive * ri * 0.5
+            stage.rotation.z = drive * ri * 0.12
+            stage.position.y = drive * ri * 0.06
+            stage.position.z = drive * ri * 0.14
           }
           applyBottomAnchor(camera, world, camera.aspect, scrollForParallax, tuning.scrollDriftIntensity)
           applyEnvironmentInteraction(depthLayers, interaction, tuning, rm)
@@ -373,6 +395,7 @@ export function OrigamiAviaryBackground() {
             )
           }
           applyAboutSurfaceFade(transitionTargets, surfaceVis)
+          if (aboutVinePause) return
           const bloomOn = !rm && tuning.viewportProfile !== 'narrow'
           pipeline?.setBloomStrength(bloomOn ? tuning.bloomStrength * surfaceVis : 0)
           pipeline?.render()

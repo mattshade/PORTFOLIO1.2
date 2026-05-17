@@ -14,6 +14,18 @@
   background: transparent;
 }
 
+@media (max-width: 768px) {
+  .about-vine-region {
+    background: linear-gradient(
+      180deg,
+      transparent 0%,
+      rgba(8, 12, 16, 0.35) 18%,
+      rgba(8, 12, 16, 0.55) 55%,
+      #080c10 100%
+    );
+  }
+}
+
 .about-vine-region .footer {
   position: relative;
   z-index: 4;

@@ -10,14 +10,48 @@ export function isFragileWebGLDevice(): boolean {
   return w <= 768 || coarse || android
 }
 
-export function getWebGLRendererOptions(tuning: OrigamiAviaryTuning): WebGLRendererParameters {
-  const light = isFragileWebGLDevice() || tuning.viewportProfile === 'narrow'
+/** Second WebGL canvas (About DNA vine) — skip on fragile devices; use CSS fallback. */
+export function shouldUseAboutDnaWebGL(): boolean {
+  return !isFragileWebGLDevice()
+}
+
+/** Heavy cavern geometry in the main aviary — skip on fragile devices. */
+export function shouldBuildAviaryCavern(): boolean {
+  return !isFragileWebGLDevice()
+}
+
+/** Full stage inversion during About descent — too heavy for mobile GPUs. */
+export function shouldUseAboutCavernInversion(): boolean {
+  return !isFragileWebGLDevice()
+}
+
+let aboutVineSceneActive = false
+
+/** True while the About DNA canvas is visible and rendering (main aviary should pause). */
+export function setAboutVineSceneActive(active: boolean): void {
+  aboutVineSceneActive = active
+}
+
+export function shouldPauseAviaryWhileAboutVine(): boolean {
+  return aboutVineSceneActive
+}
+
+function lightWebGLRendererOptions(forceLight?: boolean): WebGLRendererParameters {
+  const light = forceLight ?? isFragileWebGLDevice()
   return {
     antialias: !light,
     alpha: false,
     powerPreference: light ? 'default' : 'high-performance',
     stencil: false,
   }
+}
+
+export function getWebGLRendererOptions(tuning: OrigamiAviaryTuning): WebGLRendererParameters {
+  return lightWebGLRendererOptions(isFragileWebGLDevice() || tuning.viewportProfile === 'narrow')
+}
+
+export function getLightWebGLRendererOptions(): WebGLRendererParameters {
+  return lightWebGLRendererOptions()
 }
 
 /** Post-processing framebuffers are a common cause of context loss on mobile GPUs. */
