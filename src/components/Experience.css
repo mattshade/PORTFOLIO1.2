@@ -36,6 +36,40 @@
   box-shadow: 0 10px 25px -10px var(--accent-dim);
 }
 
+.experience-impact-wrap {
+  margin: 2.5rem 0 4rem;
+  width: 100%;
+}
+
+.experience-impact-card {
+  cursor: pointer;
+  animation: fadeUp 0.55s ease-out backwards;
+}
+
+@media (hover: hover) {
+  .experience-impact-wrap .experience-impact-card:hover,
+  .experience-impact-wrap .experience-impact-card:focus-visible {
+    width: 100%;
+    padding: 0.85rem 1.5rem 1.15rem 0;
+  }
+
+  .experience-impact-wrap .experience-impact-card:hover .project-card__details,
+  .experience-impact-wrap .experience-impact-card:focus-visible .project-card__details {
+    align-self: start;
+    padding-top: 0.15rem;
+  }
+}
+
+.experience-impact-card__title {
+  margin: 0 0 0.85rem;
+  font-size: clamp(0.875rem, 1.5vw, 1rem);
+}
+
+.experience-impact-card__list {
+  margin: 0;
+  padding-left: 1.15rem;
+}
+
 .experience-list {
   display: flex;
   flex-direction: column;

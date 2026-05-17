@@ -21,6 +21,24 @@
   letter-spacing: -0.02em;
 }
 
+.section-title--mono,
+.skills-title.section-title--mono {
+  font-family: var(--font-name-mono);
+  font-weight: 200;
+  font-synthesis: none;
+  font-size: clamp(0.9375rem, 2vw, 1.1875rem);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+.section-title--mono::before,
+.skills-title.section-title--mono::before {
+  content: '// ';
+  color: var(--accent);
+  font-weight: 200;
+}
+
 .section-desc {
   margin: 1rem 0 0;
   font-size: 1rem;

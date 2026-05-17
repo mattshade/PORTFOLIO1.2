@@ -1,7 +1,50 @@
-import { useState, useRef, useCallback, useEffect } from 'react'
+import { useState, useRef, useCallback } from 'react'
 import { resume } from '../data/resume'
 import { SkillPop } from './SkillPop'
+import { ProjectIcon } from './Projects'
+import './Projects.css'
 import './Experience.css'
+
+function SelectedImpactCard({ items }: { items: string[] }) {
+  const cardRef = useRef<HTMLDivElement>(null)
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
+    if (!cardRef.current) return
+    const rect = cardRef.current.getBoundingClientRect()
+    cardRef.current.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`)
+    cardRef.current.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`)
+  }
+
+  return (
+    <div className="experience-impact-wrap">
+      <article
+        ref={cardRef}
+        className="project-card glass bird-perch-card experience-impact-card"
+        onMouseMove={handleMouseMove}
+        tabIndex={0}
+        aria-label="Selected Impact — hover or focus to expand"
+      >
+        <div className="project-card__inner">
+          <div className="project-card__icon" aria-hidden>
+            <ProjectIcon type="trending-up" />
+          </div>
+          <div className="project-card__details">
+            <div className="project-card__details-inner">
+              <h3 className="experience-impact-card__title section-title--mono">Selected Impact</h3>
+              <ul className="experience-highlights experience-impact-card__list">
+                {items.map((item, i) => (
+                  <li key={i} className="experience-highlight">
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </article>
+    </div>
+  )
+}
 
 const PULL_STRENGTH = 2.5
 
@@ -10,30 +53,8 @@ export function Experience() {
   const [hoverColor, setHoverColor] = useState<string>('#93C572')
   const [pull, setPull] = useState({ x: 0, y: 0 })
   const [popPos, setPopPos] = useState<{ x: number; y: number; color: string } | null>(null)
-  const [visibleCards, setVisibleCards] = useState<Set<number>>(new Set())
   const [clickedSkill, setClickedSkill] = useState<string | null>(null)
   const [clickColor, setClickColor] = useState<string>('#93C572')
-
-  const cardRefs = useRef<(HTMLDivElement | null)[]>([])
-
-  useEffect(() => {
-    const observers = cardRefs.current.map((el, i) => {
-      if (!el) return null
-      const observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              setVisibleCards((prev) => new Set(prev).add(i))
-            }
-          })
-        },
-        { threshold: 0.12, rootMargin: '0px 0px -40px 0px' }
-      )
-      observer.observe(el)
-      return observer
-    })
-    return () => observers.forEach((o) => o?.disconnect())
-  }, [resume.experience.length])
 
   const handleSkillMouseMove = useCallback(
     (skill: string) => (e: React.MouseEvent<HTMLElement>) => {
@@ -86,7 +107,7 @@ export function Experience() {
       {popPos && <SkillPop x={popPos.x} y={popPos.y} color={popPos.color} />}
       <div className="section-inner" style={{ position: 'relative' }}>
         <div className="section-header-flex">
-          <h2 className="section-title">Experience</h2>
+          <h2 className="section-title section-title--mono">Experience</h2>
           {resume.resumePdf && (
             <a href={resume.resumePdf} download className="experience-download-btn">
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -100,49 +121,12 @@ export function Experience() {
         </div>
 
         {resume.selectedImpact && resume.selectedImpact.length > 0 && (
-          <div className="experience-impact" style={{ marginTop: '2.5rem', marginBottom: '4rem' }}>
-            <h3 className="skills-title" style={{ marginBottom: '1.25rem' }}>Selected Impact</h3>
-            <ul className="experience-highlights" style={{ margin: 0, paddingLeft: '1.25rem' }}>
-              {resume.selectedImpact.map((item, i) => (
-                <li key={i} className="experience-highlight">{item}</li>
-              ))}
-            </ul>
-          </div>
+          <SelectedImpactCard items={resume.selectedImpact} />
         )}
-
-        <div className="experience-list">
-          {resume.experience.map((job, i) => (
-            <div
-              key={i}
-              ref={(el) => { cardRefs.current[i] = el }}
-              className={`experience-item glass bird-perch-card ${visibleCards.has(i) ? 'in-view' : ''}`}
-              style={{ transitionDelay: visibleCards.has(i) ? `${i * 80}ms` : '0ms' }}
-            >
-              <div className="experience-header">
-                <h3 className="experience-role">{job.role}</h3>
-                <span className="experience-company">{job.company}</span>
-                {(job as { location?: string | null }).location && (
-                  <span className="experience-location">{(job as { location: string }).location}</span>
-                )}
-                <span className="experience-period">{job.period}</span>
-              </div>
-              {(job as { description?: string }).description && (
-                <p className="experience-desc">{(job as { description: string }).description}</p>
-              )}
-              {(job as { highlights?: string[] }).highlights?.length ? (
-                <ul className="experience-highlights">
-                  {(job as { highlights: string[] }).highlights.map((h, j) => (
-                    <li key={j} className="experience-highlight">{h}</li>
-                  ))}
-                </ul>
-              ) : null}
-            </div>
-          ))}
-        </div>
 
         <div className="experience-footer-grid">
           <div className="skills-wrap">
-            <h3 className="skills-title">Technical Proficiencies</h3>
+            <h3 className="skills-title section-title--mono">Technical Proficiencies</h3>
             <ul className="skills-list">
               {resume.skills.map((s) => {
                 const isHovered = hoveredSkill === s
@@ -169,7 +153,7 @@ export function Experience() {
 
           {resume.education && resume.education.length > 0 && (
             <div className="education-wrap">
-              <h3 className="skills-title">Education</h3>
+              <h3 className="skills-title section-title--mono">Education</h3>
               <div className="education-list">
                 {resume.education.map((edu, i) => (
                   <div key={i} className="education-item">

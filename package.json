@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "node scripts/build-projects.cjs && vite build && npm run build-storybook && mkdir -p dist/storybook && cp -r storybook-static/* dist/storybook/ && node scripts/copy-projects.cjs",
+    "build": "node scripts/build-portfolio-projects.cjs && vite build && npm run build-storybook && mkdir -p dist/storybook && cp -r storybook-static/* dist/storybook/ && node scripts/copy-projects.cjs",
+    "build:projects": "node scripts/build-portfolio-projects.cjs",
     "build:portfolio": "vite build && node scripts/copy-projects.cjs",
     "preview": "vite preview",
     "generate:resume-ats": "tsx scripts/generate-ats-resume.ts",

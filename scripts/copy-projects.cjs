@@ -1,30 +1,18 @@
 /**
- * After `vite build`, copy built outputs from RECENT-PROJECTS into dist/projects/
- * so internal project links work on Netlify. Run builds for each project first:
- *
- *   cd RECENT-PROJECTS/chatgpt-dashboard && npm ci && npm run build && cd ../..
- *   cd RECENT-PROJECTS/dev-agents-dashboard && npm ci && npm run build && cd ../..
- *   etc.
- *
- * Or copy pre-built dist/out folders into RECENT-PROJECTS/<name>/ before running this.
+ * After `vite build`, copy built outputs into dist/projects/
  */
 
 const fs = require('fs')
 const path = require('path')
+const {
+  ROOT,
+  RECENT,
+  PORTFOLIO_PROJECTS,
+  LEGACY_RECENT_PROJECTS,
+  getBuiltOutputDir,
+} = require('./portfolio-projects.cjs')
 
-const ROOT = path.resolve(__dirname, '..')
 const DIST = path.join(ROOT, 'dist')
-const RECENT = path.join(ROOT, 'RECENT-PROJECTS')
-
-const PROJECT_SOURCES = [
-  { slug: 'chatgpt-dashboard', dir: 'chatgpt-dashboard', output: 'dist' },
-  { slug: 'github-copilot-dashboard', dir: 'github-copilot-dashboard', output: 'dist' },
-  { slug: 'dev-agents-dashboard', dir: 'dev-agents-dashboard', output: 'out' },
-  { slug: 'executive-ai-dashboard', dir: 'Executive AI Usage Dashboard', output: 'dist' },
-  { slug: 'ai-data-hub', dir: 'ai-data-hub', output: null }, // copy root HTML + assets
-  { slug: 'cfr-dashboard-bugz', dir: 'cfr-dashboard-bugz', output: null }, // static HTML, mock data
-]
-
 const SKIP_DIRS = new Set(['.git', 'node_modules', '.next'])
 
 function copyDir(src, dest) {
@@ -42,6 +30,23 @@ function copyDir(src, dest) {
   }
 }
 
+function copyEntry(slug, from, label) {
+  const destDir = path.join(DIST, 'projects', slug)
+  if (!fs.existsSync(from)) {
+    console.warn('Skip (no output):', slug, label || from)
+    return
+  }
+  copyDir(from, destDir)
+  if (slug === 'ai-data-hub') {
+    const aspxPath = path.join(destDir, 'index.aspx')
+    const indexPath = path.join(destDir, 'index.html')
+    if (fs.existsSync(aspxPath)) {
+      fs.copyFileSync(aspxPath, indexPath)
+    }
+  }
+  console.log('Copied:', slug, '<-', label || from)
+}
+
 const projectsDir = path.join(DIST, 'projects')
 if (!fs.existsSync(DIST)) {
   console.warn('dist/ not found; run vite build first.')
@@ -49,34 +54,18 @@ if (!fs.existsSync(DIST)) {
 }
 fs.mkdirSync(projectsDir, { recursive: true })
 
-for (const { slug, dir, output } of PROJECT_SOURCES) {
-  const srcDir = path.join(RECENT, dir)
-  if (!fs.existsSync(srcDir)) {
-    console.warn('Skip (missing):', dir)
-    continue
-  }
+for (const entry of PORTFOLIO_PROJECTS) {
+  const from = getBuiltOutputDir(entry)
+  copyEntry(entry.slug, from, entry.slug)
+}
 
-  const destDir = path.join(projectsDir, slug)
+for (const { slug, dir, output } of LEGACY_RECENT_PROJECTS) {
+  const srcDir = path.join(RECENT, dir)
+  if (!fs.existsSync(srcDir)) continue
   if (output) {
-    const from = path.join(srcDir, output)
-    if (fs.existsSync(from)) {
-      copyDir(from, destDir)
-      console.log('Copied:', slug, '<-', path.join(dir, output))
-    } else {
-      console.warn('Skip (no build output):', dir, output)
-    }
+    copyEntry(slug, path.join(srcDir, output), path.join(dir, output))
   } else {
-    // Static projects (ai-data-hub, cfr-dashboard-bugz): copy root HTML and assets
-    copyDir(srcDir, destDir)
-    // Detail pages link to index.html; always sync from index.aspx so updates (e.g. click handlers) apply
-    const indexPath = path.join(destDir, 'index.html')
-    const aspxPath = path.join(destDir, 'index.aspx')
-    if (fs.existsSync(aspxPath)) {
-      fs.copyFileSync(aspxPath, indexPath)
-      console.log('Copied:', slug, '<-', dir, '(index.html from index.aspx)')
-    } else {
-      console.log('Copied:', slug, '<-', dir)
-    }
+    copyEntry(slug, srcDir, dir)
   }
 }
 

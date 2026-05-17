@@ -1,7 +1,7 @@
 # Build the portfolio and optionally copy pre-built projects into dist/projects/
 # To include project demos: build each app in RECENT-PROJECTS (dist/ or out/), then run this build.
 [build]
-  command = "npm run build"
+  command = "bash scripts/netlify-build.sh"
   publish = "dist"
 
 [build.environment]
@@ -15,6 +15,18 @@
 [[redirects]]
   from = "/projects/executive-ai-dashboard/*"
   to = "/projects/executive-ai-dashboard/index.html"
+  status = 200
+[[redirects]]
+  from = "/projects/agentops-index/*"
+  to = "/projects/agentops-index/index.html"
+  status = 200
+[[redirects]]
+  from = "/projects/ai-adoption-crm/*"
+  to = "/projects/ai-adoption-crm/index.html"
+  status = 200
+[[redirects]]
+  from = "/projects/shadcn-blocks/*"
+  to = "/projects/shadcn-blocks/index.html"
   status = 200
 [[redirects]]
   from = "/projects/dev-agents-dashboard/*"

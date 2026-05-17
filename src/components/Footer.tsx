@@ -19,7 +19,7 @@ export function Footer() {
               <a href={resume.github} target="_blank" rel="noopener noreferrer" className="footer-link">GitHub</a>
             )}
             <a href="/#experience" className="footer-link">Experience</a>
-            <a href="/storybook/" className="footer-link">Storybook</a>
+            <Link to="/project/system-design-lab" className="footer-link">System Design Lab</Link>
           </div>
           <p className="footer-copy">© {new Date().getFullYear()} {resume.name}</p>
         </div>

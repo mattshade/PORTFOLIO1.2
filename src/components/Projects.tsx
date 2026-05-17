@@ -1,10 +1,11 @@
 import { projects, type Project } from '../data/projects'
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useRef } from 'react'
+import { Link } from 'react-router-dom'
 import './Projects.css'
 
-function ProjectIcon({ type }: { type?: string }) {
+export function ProjectIcon({ type }: { type?: string }) {
   if (!type) return null
-  
+
   const icons: Record<string, React.ReactNode> = {
     cpu: (
       <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -95,7 +96,7 @@ function ProjectIcon({ type }: { type?: string }) {
       <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/>
       </svg>
-    )
+    ),
   }
 
   return (
@@ -105,8 +106,14 @@ function ProjectIcon({ type }: { type?: string }) {
   )
 }
 
-export function ProjectCard({ p, i, onSelect }: { p: Project; i: number; onSelect: (p: Project) => void }) {
-  const cardRef = useRef<HTMLElement>(null)
+function projectCardClass(p: Project) {
+  return `project-card glass bird-perch-card${p.wide ? ' project-card--wide' : ''}`
+}
+
+export function ProjectCard({ p, i }: { p: Project; i: number }) {
+  const cardRef = useRef<HTMLAnchorElement | null>(null)
+  const className = projectCardClass(p)
+  const style = { animationDelay: `${i * 60}ms` } as React.CSSProperties
 
   const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
     if (!cardRef.current) return
@@ -117,177 +124,81 @@ export function ProjectCard({ p, i, onSelect }: { p: Project; i: number; onSelec
     cardRef.current.style.setProperty('--mouse-y', `${y}px`)
   }
 
-  const handleMouseEnter = () => {
-    if (p.modalHero) {
-      // Preload the high-res hero image so it's ready instantly when clicked
-      const img = new Image()
-      img.src = p.modalHero
-    }
+  const content = (
+    <div className="project-card__inner">
+      <div className="project-card__icon" aria-hidden>
+        <ProjectIcon type={p.icon} />
+      </div>
+      <div className="project-card__details">
+        <div className="project-card__details-inner">
+          <div className="project-header">
+            <div className="project-title-wrapper">
+              <h3 className="project-title">{p.title}</h3>
+              {p.subtitle && <p className="project-subtitle">{p.subtitle}</p>}
+            </div>
+          </div>
+          <p className="project-desc">{p.description}</p>
+          {p.highlights && p.highlights.length > 0 && (
+            <ul className="project-card-highlights">
+              {p.highlights.slice(0, 2).map((h, idx) => (
+                <li key={idx}>{h}</li>
+              ))}
+            </ul>
+          )}
+          <ul className="project-tech">
+            {p.tech.map((t) => (
+              <li key={t}>{t}</li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </div>
+  )
+
+  if (p.external) {
+    return (
+      <a
+        ref={cardRef}
+        href={p.href}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={className}
+        style={style}
+        onMouseMove={handleMouseMove}
+        title={p.title}
+      aria-label={`Open ${p.title} (new tab)`}
+      >
+        {content}
+      </a>
+    )
   }
 
   return (
-    <article
+    <Link
       ref={cardRef}
+      to={p.href}
+      className={className}
+      style={style}
       onMouseMove={handleMouseMove}
-      onMouseEnter={handleMouseEnter}
-      className={`project-card glass bird-perch-card${p.wide ? ' project-card-wide' : ''}`}
-      style={{ 
-        animationDelay: `${i * 60}ms`,
-      } as React.CSSProperties}
-      onClick={() => onSelect(p)}
+      title={p.title}
+      aria-label={`Open ${p.title}`}
     >
-      {p.thumbnail && (
-        <div className="project-thumb-wrap">
-          <img src={p.thumbnail} alt="" className="project-thumb" loading="lazy" />
-        </div>
-      )}
-      <div className="project-header">
-        <ProjectIcon type={p.icon} />
-        <div className="project-title-wrapper">
-          <h3 className="project-title">{p.title}</h3>
-          {p.subtitle && (
-            <p className="project-subtitle">{p.subtitle}</p>
-          )}
-        </div>
-      </div>
-      <p className="project-desc">{p.description}</p>
-      {p.highlights && p.highlights.length > 0 && (
-         <ul className="project-card-highlights">
-           {p.highlights.slice(0, 2).map((h, i) => <li key={i}>{h}</li>)}
-         </ul>
-      )}
-      <ul className="project-tech">
-        {p.tech.map((t) => (
-          <li key={t}>{t}</li>
-        ))}
-      </ul>
-    </article>
-  )
-}
-
-export function ProjectDetail({ p, onClose }: { p: Project; onClose: () => void }) {
-  useLayoutEffect(() => {
-    document.body.style.overflow = 'hidden'
-    document.body.classList.add('modal-open')
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
-    }
-    window.addEventListener('keydown', onKeyDown)
-    return () => {
-      document.body.style.overflow = ''
-      document.body.classList.remove('modal-open')
-      window.removeEventListener('keydown', onKeyDown)
-    }
-  }, [onClose])
-
-  return (
-    <div className="project-detail-overlay">
-      <div className="project-detail-backdrop" onClick={onClose} />
-      <div className="project-detail-content glass" role="dialog" aria-label={p.title}>
-        <div className="detail-inner">
-          
-          {p.modalHero && (
-            <div className="detail-hero">
-              <img src={p.modalHero} alt="" className="detail-hero-img" fetchPriority="high" decoding="async" />
-              <div className="detail-hero-overlay" />
-            </div>
-          )}
-
-          <div className="detail-layout">
-            <aside className="detail-sidebar">
-              <div className="detail-title-block">
-                <ProjectIcon type={p.icon} />
-                <div className="detail-title-text">
-                  <span className="detail-subtitle">{p.subtitle}</span>
-                  <h2 className="detail-title">{p.title}</h2>
-                </div>
-              </div>
-              
-              <div className="detail-meta">
-                <div className="detail-meta-item">
-                  <span className="label">Role</span>
-                  <span className="value">{p.role}</span>
-                </div>
-                
-                <div className="detail-meta-item">
-                  <span className="label">Stack</span>
-                  <div className="detail-tech-tags">
-                    {p.tech.map(t => <span key={t} className="tech-tag">{t}</span>)}
-                  </div>
-                </div>
-              </div>
-
-
-            </aside>
-
-            <main className="detail-main">
-              <section className="detail-section">
-                <h3>My Contribution</h3>
-                <div className="detail-text-block">
-                  <p>{p.contribution}</p>
-                </div>
-              </section>
-
-              <section className="detail-section">
-                <h3>The Outcome</h3>
-                <div className="detail-text-block detail-text-block--outcome">
-                  <p>{p.outcome}</p>
-                </div>
-              </section>
-
-              {p.highlights && p.highlights.length > 0 && (
-                <section className="detail-section">
-                  <h3>Key Deliverables</h3>
-                  <ul className="detail-highlights-list">
-                    {p.highlights.map((h, i) => <li key={i}>{h}</li>)}
-                  </ul>
-                </section>
-              )}
-            </main>
-          </div>
-        </div>
-        {p.href && (
-          <a 
-            href={p.href} 
-            target={p.external ? "_blank" : undefined}
-            rel={p.external ? "noopener noreferrer" : undefined}
-            className="detail-top-cta"
-            aria-label="View Live Site"
-          >
-            Visit Site {p.external && '↗'}
-          </a>
-        )}
-        <button type="button" className="project-detail-close" onClick={onClose} aria-label="Close">×</button>
-      </div>
-    </div>
+      {content}
+    </Link>
   )
 }
 
 export function Projects() {
-  const [selectedProject, setSelectedProject] = useState<Project | null>(null)
-
   return (
     <section id="projects" className="section projects">
       <div className="section-inner" style={{ position: 'relative' }}>
-        <h2 className="section-title">Case Studies and Projects</h2>
+        <h2 className="section-title section-title--mono">Case Studies and Projects</h2>
         <div className="projects-grid">
           {projects.map((p, i) => (
-            <ProjectCard 
-              key={p.id} 
-              p={p} 
-              i={i} 
-              onSelect={setSelectedProject} 
-            />
+            <ProjectCard key={p.id} p={p} i={i} />
           ))}
         </div>
       </div>
-
-      {selectedProject && (
-        <ProjectDetail 
-          p={selectedProject} 
-          onClose={() => setSelectedProject(null)} 
-        />
-      )}
     </section>
   )
 }

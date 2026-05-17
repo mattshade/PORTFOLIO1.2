@@ -3,43 +3,87 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 import fs from 'fs';
-
-/** Same mapping as scripts/copy-projects.cjs — used when dist/projects/ is missing in dev */
+import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import { storybookTest } from '@storybook/addon-vitest/vitest-plugin';
 import { playwright } from '@vitest/browser-playwright';
+
+const require = createRequire(import.meta.url);
+const portfolio = require('./scripts/portfolio-projects.cjs');
+
 const dirname = typeof __dirname !== 'undefined' ? __dirname : path.dirname(fileURLToPath(import.meta.url));
 
-// More info at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon
-const PROJECT_SLUG_MAP: Record<string, {
-  dir: string;
-  output: string | null;
-}> = {
-  'chatgpt-dashboard': {
-    dir: 'chatgpt-dashboard',
-    output: 'dist'
-  },
-  'github-copilot-dashboard': {
-    dir: 'github-copilot-dashboard',
-    output: 'dist'
-  },
-  'dev-agents-dashboard': {
-    dir: 'dev-agents-dashboard',
-    output: 'out'
-  },
-  'executive-ai-dashboard': {
-    dir: 'Executive AI Usage Dashboard',
-    output: 'dist'
-  },
-  'ai-data-hub': {
-    dir: 'ai-data-hub',
-    output: null
-  },
-  'cfr-dashboard-bugz': {
-    dir: 'cfr-dashboard-bugz',
-    output: null
+/** @deprecated legacy RECENT-PROJECTS slugs */
+const LEGACY_SLUG_MAP: Record<string, { dir: string; output: string | null }> = Object.fromEntries(
+  portfolio.LEGACY_RECENT_PROJECTS.map((p: { slug: string; dir: string; output: string | null }) => [
+    p.slug,
+    { dir: p.dir, output: p.output },
+  ]),
+);
+
+function resolveBuiltProjectRoot(slug: string): string | null {
+  const entry = portfolio.PORTFOLIO_PROJECTS.find((p: { slug: string }) => p.slug === slug);
+  if (entry) {
+    return portfolio.getBuiltOutputDir(entry);
   }
-};
+  const legacy = LEGACY_SLUG_MAP[slug];
+  if (!legacy) return null;
+  const projectRoot = path.join(portfolio.RECENT, legacy.dir);
+  if (legacy.output) {
+    return path.join(projectRoot, legacy.output);
+  }
+  return projectRoot;
+}
+
+const extraFsAllow = [
+  portfolio.RECENT,
+  ...portfolio.PORTFOLIO_PROJECTS.flatMap((p: { monorepoRoot?: string; projectRoot?: string }) =>
+    [p.monorepoRoot, p.projectRoot].filter(Boolean),
+  ),
+].map((p: string) => path.resolve(p));
+function serveStorybookPlugin() {
+  const storybookDir = path.resolve(process.cwd(), 'storybook-static');
+  const types: Record<string, string> = {
+    '.html': 'text/html',
+    '.js': 'application/javascript',
+    '.mjs': 'application/javascript',
+    '.css': 'text/css',
+    '.json': 'application/json',
+    '.png': 'image/png',
+    '.jpg': 'image/jpeg',
+    '.svg': 'image/svg+xml',
+    '.ico': 'image/x-icon',
+    '.woff': 'font/woff',
+    '.woff2': 'font/woff2',
+    '.map': 'application/json',
+  };
+  return {
+    name: 'serve-storybook',
+    enforce: 'pre' as const,
+    configureServer(server: import('vite').ViteDevServer) {
+      if (!fs.existsSync(storybookDir)) return;
+      server.middlewares.use((req, res, next) => {
+        const raw = req.url?.split('?')[0] ?? '';
+        if (!raw.startsWith('/storybook')) return next();
+        const sub = raw.replace(/^\/storybook\/?/, '') || 'index.html';
+        let file = path.join(storybookDir, sub);
+        if (fs.existsSync(file) && fs.statSync(file).isDirectory()) {
+          file = path.join(file, 'index.html');
+        }
+        if (!fs.existsSync(file) || !fs.statSync(file).isFile()) {
+          const fallback = path.join(storybookDir, 'index.html');
+          if (fs.existsSync(fallback)) file = fallback;
+          else return next();
+        }
+        const ext = path.extname(file);
+        res.setHeader('Content-Type', types[ext] || 'application/octet-stream');
+        res.setHeader('Cache-Control', 'no-cache');
+        res.end(fs.readFileSync(file));
+      });
+    },
+  };
+}
+
 function serveProjectsPlugin() {
   return {
     name: 'serve-projects',
@@ -85,24 +129,34 @@ function serveProjectsPlugin() {
           candidates.push(path.join(distProjects, slug, requestFile));
           if (!rest) candidates.push(path.join(distProjects, slug, 'index.html'));
         }
-        const map = PROJECT_SLUG_MAP[slug];
-        if (!map) {
+        const builtRoot = resolveBuiltProjectRoot(slug);
+        if (builtRoot) {
+          candidates.push(path.join(builtRoot, requestFile));
+          if (!rest) {
+            candidates.push(path.join(builtRoot, 'index.html'));
+            candidates.push(path.join(builtRoot, 'index.aspx'));
+          }
+        }
+        const map = LEGACY_SLUG_MAP[slug];
+        if (map && !builtRoot) {
+          const projectRoot = path.join(recentRoot, map.dir);
+          if (map.output) {
+            const buildDir = path.join(projectRoot, map.output);
+            candidates.push(path.join(buildDir, requestFile));
+            if (!rest) candidates.push(path.join(buildDir, 'index.html'));
+          } else {
+            candidates.push(path.join(projectRoot, requestFile));
+            if (!rest) {
+              candidates.push(path.join(projectRoot, 'index.html'));
+              candidates.push(path.join(projectRoot, 'index.aspx'));
+            }
+          }
+        }
+        if (!builtRoot && !map) {
           for (const p of candidates) {
             if (fs.existsSync(p) && fs.statSync(p).isFile()) return p;
           }
           return null;
-        }
-        const projectRoot = path.join(recentRoot, map.dir);
-        if (map.output) {
-          const buildDir = path.join(projectRoot, map.output);
-          candidates.push(path.join(buildDir, requestFile));
-          if (!rest) candidates.push(path.join(buildDir, 'index.html'));
-        } else {
-          candidates.push(path.join(projectRoot, requestFile));
-          if (!rest) {
-            candidates.push(path.join(projectRoot, 'index.html'));
-            candidates.push(path.join(projectRoot, 'index.aspx'));
-          }
         }
         for (const p of candidates) {
           if (fs.existsSync(p) && fs.statSync(p).isFile()) return p;
@@ -151,11 +205,16 @@ function injectSiteUrlPlugin() {
   };
 }
 export default defineConfig({
-  plugins: [injectSiteUrlPlugin(), serveProjectsPlugin(), react()],
+  plugins: [injectSiteUrlPlugin(), serveStorybookPlugin(), serveProjectsPlugin(), react()],
   base: '/',
   server: {
     fs: {
-      allow: [path.resolve(process.cwd(), 'dist'), path.resolve(process.cwd(), 'RECENT-PROJECTS')],
+      allow: [
+        path.resolve(process.cwd(), 'dist'),
+        path.resolve(process.cwd(), 'RECENT-PROJECTS'),
+        path.resolve(process.cwd(), 'storybook-static'),
+        ...extraFsAllow,
+      ],
       strict: false
     },
     hmr: true,
