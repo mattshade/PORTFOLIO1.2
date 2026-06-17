@@ -165,8 +165,7 @@ export function ProjectCard({ p, i }: { p: Project; i: number }) {
         className={className}
         style={style}
         onMouseMove={handleMouseMove}
-        title={p.title}
-      aria-label={`Open ${p.title} (new tab)`}
+        aria-label={`Open ${p.title} (new tab)`}
       >
         {content}
       </a>
@@ -180,7 +179,6 @@ export function ProjectCard({ p, i }: { p: Project; i: number }) {
       className={className}
       style={style}
       onMouseMove={handleMouseMove}
-      title={p.title}
       aria-label={`Open ${p.title}`}
     >
       {content}

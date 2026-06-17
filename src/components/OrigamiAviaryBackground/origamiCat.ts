@@ -11,10 +11,18 @@ import type { createMulberry32 } from './seededRandom'
 
 type Rng = ReturnType<typeof createMulberry32>
 
+export type CatPreyFocus = {
+  perchIndex: number
+  elevated: boolean
+  distanceXZ: number
+}
+
 export type CatTickContext = {
   perches: Perch[]
   /** Finds a bird in leap range, scares via shared flee path, writes aim point for the leap arc. */
   attemptTreeLeapStrike: (catPos: THREE.Vector3, leapAimOut: THREE.Vector3) => boolean
+  /** Nearest resting bird to stalk; writes ground intercept into `outGround`. */
+  findPreyFocus?: (catPos: THREE.Vector3, outGround: THREE.Vector3) => CatPreyFocus | null
 }
 
 function seg(batch: { positions: number[] }, ax: number, ay: number, az: number, bx: number, by: number, bz: number) {
@@ -72,6 +80,22 @@ type CatState =
 
 function easeInOut(t: number) {
   return t * t * (3 - 2 * t)
+}
+
+function lerpAngle(a: number, b: number, t: number) {
+  let d = b - a
+  while (d > Math.PI) d -= Math.PI * 2
+  while (d < -Math.PI) d += Math.PI * 2
+  return a + d * t
+}
+
+function smoothYaw(current: number, target: number, dt: number, rate: number) {
+  if (dt <= 0) return current
+  return lerpAngle(current, target, 1 - Math.exp(-rate * dt))
+}
+
+function catBaseSpeed(t: OrigamiAviaryTuning) {
+  return (0.34 + t.animationIntensity * 0.28) * (t.viewportProfile === 'narrow' ? 1.08 : 1)
 }
 
 function buildCatLines(rig: CatRig, color: THREE.Color, opacity: number, lineWidth: number, roots: THREE.Object3D[], sceneDepth: number) {
@@ -242,9 +266,13 @@ export function createOrigamiCat(
   let walkPhase = rng() * Math.PI * 2
   let tailPhase = rng() * Math.PI * 2
   let headPhase = rng() * Math.PI * 2
-  let nextPounceAllowedAt = 5 + rng() * 8
+  let nextPounceAllowedAt = 1.5 + rng() * 3.5
   let pounceCount = 0
   let stalkCreep = false
+  let huntMode = false
+  let huntPreyPerch = -1
+  let preyCheckAccum = 0
+  let lastPreyTreeClimbAt = -999
 
   let climbPerchIndex = -1
   let climbEvaluateAccum = 0
@@ -252,7 +280,7 @@ export function createOrigamiCat(
   let climbStartY = CAT_TREE_TUNING.catSpawnGroundY
   let climbTargetY = 1.2
   let climbTreeYaw = 0
-  let nextTreeClimbAllowedAt = 14 + rng() * 24
+  let nextTreeClimbAllowedAt = 4 + rng() * 8
 
   const beginSideDismount = (perch: Perch, t: OrigamiAviaryTuning, r: Rng) => {
     _pounceFrom.copy(rig.root.position)
@@ -295,18 +323,32 @@ export function createOrigamiCat(
     randomGroundPoint(_target, t)
   }
 
-  const tryPickTreeClimb = (ctx: CatTickContext, _t: OrigamiAviaryTuning) => {
+  const tryPickTreeClimb = (ctx: CatTickContext, _t: OrigamiAviaryTuning, preferredPerch = -1) => {
     const cx = rig.root.position.x
     const cz = rig.root.position.z
     const candidates: number[] = []
-    for (let i = 0; i < ctx.perches.length; i++) {
-      if (ctx.perches[i].surface !== 'tree') continue
-      const p = ctx.perches[i].position
-      const h = Math.hypot(p.x - cx, p.z - cz)
-      if (h > CAT_TREE_TUNING.minPerchPickDistanceXZ && h < CAT_TREE_TUNING.maxPerchPickDistanceXZ) {
-        candidates.push(i)
+
+    if (preferredPerch >= 0) {
+      const p = ctx.perches[preferredPerch]
+      if (p?.surface === 'tree') {
+        const h = Math.hypot(p.position.x - cx, p.position.z - cz)
+        if (h <= CAT_TREE_TUNING.maxPerchPickDistanceXZ) {
+          candidates.push(preferredPerch)
+        }
       }
     }
+
+    if (candidates.length === 0) {
+      for (let i = 0; i < ctx.perches.length; i++) {
+        if (ctx.perches[i].surface !== 'tree') continue
+        const p = ctx.perches[i].position
+        const h = Math.hypot(p.x - cx, p.z - cz)
+        if (h > CAT_TREE_TUNING.minPerchPickDistanceXZ && h < CAT_TREE_TUNING.maxPerchPickDistanceXZ) {
+          candidates.push(i)
+        }
+      }
+    }
+
     if (candidates.length === 0) return false
     climbPerchIndex = candidates[Math.floor(rng() * candidates.length)]!
     const perch = ctx.perches[climbPerchIndex]
@@ -314,9 +356,34 @@ export function createOrigamiCat(
     state = 'approach_tree'
     stateTime = 0
     stalkCreep = false
+    huntMode = false
     climbHoldTime = 0
     rig.root.rotation.y = Math.atan2(perch.position.x - cx, perch.position.z - cz)
     return true
+  }
+
+  const refreshPreyFocus = (ctx: CatTickContext, t: OrigamiAviaryTuning) => {
+    if (!ctx.findPreyFocus) {
+      huntMode = false
+      huntPreyPerch = -1
+      return
+    }
+    const focus = ctx.findPreyFocus(rig.root.position, _target)
+    if (!focus || focus.distanceXZ > CAT_TREE_TUNING.huntAwarenessXZ) {
+      huntMode = false
+      huntPreyPerch = -1
+      return
+    }
+    huntMode = true
+    huntPreyPerch = focus.perchIndex
+    stalkCreep = focus.distanceXZ < CAT_TREE_TUNING.huntStalkRadiusXZ
+    const perch = ctx.perches[focus.perchIndex]
+    if (focus.elevated && perch?.surface === 'tree') {
+      _target.set(perch.position.x, CAT_TREE_TUNING.catSpawnGroundY, perch.position.z)
+    }
+    const halfX = catWanderHalfX(t)
+    _target.x = THREE.MathUtils.clamp(_target.x, -halfX, halfX)
+    _target.z = clampCatZ(_target.z, t.sceneDepth, t.viewportProfile)
   }
 
   const pickPreyAhead = (out: THREE.Vector3, t: OrigamiAviaryTuning) => {
@@ -390,8 +457,6 @@ export function createOrigamiCat(
   stateTime = 0
   sanitizeCatRoot(rig, state, tuning)
 
-  const speed = 0.2
-
   const tick = (
     elapsed: number,
     delta: number,
@@ -401,6 +466,15 @@ export function createOrigamiCat(
   ) => {
     stateTime += delta
     const dt = reducedMotion ? 0 : delta
+    const speed = catBaseSpeed(t)
+
+    if (ctx && state === 'stalking' && dt > 0) {
+      preyCheckAccum += delta
+      if (preyCheckAccum >= 0.38) {
+        preyCheckAccum = 0
+        refreshPreyFocus(ctx, t)
+      }
+    }
 
     // First moments after load: keep root Y pinned to ground so the rig never reads as floating
     // before stalking / idle motion runs (large first-frame delta or collision edge cases).
@@ -418,6 +492,11 @@ export function createOrigamiCat(
 
     if (state === 'approach_tree' && ctx && climbPerchIndex >= 0) {
       const perch = ctx.perches[climbPerchIndex]
+      if (!perch) {
+        state = 'stalking'
+        climbPerchIndex = -1
+        pickWaypoint(t)
+      } else {
       _dir.set(perch.position.x - rig.root.position.x, 0, perch.position.z - rig.root.position.z)
       const dist = Math.hypot(_dir.x, _dir.z)
       if (dist < CAT_TREE_TUNING.approachXZThreshold) {
@@ -434,16 +513,18 @@ export function createOrigamiCat(
         rig.root.rotation.x = 0
       } else if (dt > 0) {
         _dir.normalize()
-        const step = speed * dt * 0.92
+        const approachMul = huntMode ? 1.12 : 0.92
+        const step = speed * dt * approachMul
         rig.root.position.x += _dir.x * step
         rig.root.position.z += _dir.z * step
-        rig.root.rotation.y = Math.atan2(_dir.x, _dir.z)
+        rig.root.rotation.y = smoothYaw(rig.root.rotation.y, Math.atan2(_dir.x, _dir.z), dt, 5.8)
       }
       rig.root.position.y = THREE.MathUtils.lerp(
         rig.root.position.y,
         CAT_TREE_TUNING.catSpawnGroundY,
         Math.min(1, dt * 5),
       )
+      }
     } else if (state === 'climbing' && ctx && climbPerchIndex >= 0) {
       const perch = ctx.perches[climbPerchIndex]
       const topY = climbTargetY
@@ -499,9 +580,9 @@ export function createOrigamiCat(
       }
 
       if (!struck && dt > 0) {
-        if (rig.root.position.y >= topY - 0.028) {
+          if (rig.root.position.y >= topY - 0.028) {
           climbHoldTime += delta
-          if (climbHoldTime > 2.05) {
+          if (climbHoldTime > 1.15) {
             beginSideDismount(perch, t, rng)
             climbHoldTime = 0
             climbPerchIndex = -1
@@ -516,52 +597,99 @@ export function createOrigamiCat(
       _dir.subVectors(_target, rig.root.position)
       _dir.y = 0
       const dist = _dir.length()
-      stalkCreep = dist < 2.8 && dist > 0.4
+      stalkCreep = huntMode && dist < CAT_TREE_TUNING.huntStalkRadiusXZ && dist > 0.35
 
-      if (dist < 0.4) {
-        const pounceChance = pounceCount === 0 ? 0.72 : 0.4
+      if (dist < 0.35) {
+        const pounceChance = huntMode ? 0.82 : pounceCount === 0 ? 0.68 : 0.52
         if (elapsed >= nextPounceAllowedAt && rng() < pounceChance) {
-          beginPounce(t)
-          nextPounceAllowedAt = elapsed + 38 + rng() * 42
+          if (huntMode && ctx?.findPreyFocus?.(rig.root.position, _pounceTo)) {
+            aimPounce(_pounceTo, stalkCreep ? 0.55 + rng() * 0.35 : 0.72 + rng() * 0.45, t)
+          } else {
+            beginPounce(t)
+          }
+          nextPounceAllowedAt = elapsed + 22 + rng() * 28
         } else {
           const roll = rng()
-          if (roll < 0.48) {
+          if (huntMode && roll < 0.62) {
+            stateTime = 0
+            stalkCreep = true
+          } else if (roll < 0.24) {
             state = 'watching'
-            stateDuration = 2.5 + rng() * 4
-          } else if (roll < 0.68) {
+            stateDuration = 1.4 + rng() * 2.4
+            stateTime = 0
+            stalkCreep = false
+          } else if (roll < 0.38) {
             state = 'paused'
-            stateDuration = 2 + rng() * 3.5
-          } else if (roll < 0.82) {
+            stateDuration = 0.9 + rng() * 1.8
+            stateTime = 0
+            stalkCreep = false
+          } else if (roll < 0.52) {
             state = 'grooming'
-            stateDuration = 1.8 + rng() * 2.2
-          } else {
+            stateDuration = 1.1 + rng() * 1.6
+            stateTime = 0
+            stalkCreep = false
+          } else if (roll < 0.68) {
             state = 'stretching'
-            stateDuration = 1.6 + rng() * 1.4
+            stateDuration = 1.2 + rng() * 1.1
+            stateTime = 0
+            stalkCreep = false
+          } else {
+            pickWaypoint(t)
+            stateTime = 0
+            stalkCreep = false
+            huntMode = false
           }
-          stateTime = 0
-          stalkCreep = false
         }
       } else {
         _dir.normalize()
-        const step = speed * dt * (stalkCreep ? 0.48 : 1)
+        const moveMul = stalkCreep ? 0.38 : huntMode ? 0.78 : 1
+        const step = speed * dt * moveMul
         rig.root.position.x += _dir.x * step
         rig.root.position.z += _dir.z * step
-        rig.root.rotation.y = Math.atan2(_dir.x, _dir.z)
+        const turnRate = stalkCreep ? 3.4 : huntMode ? 4.8 : 5.2
+        rig.root.rotation.y = smoothYaw(rig.root.rotation.y, Math.atan2(_dir.x, _dir.z), dt, turnRate)
 
-        if (stalkCreep && elapsed >= nextPounceAllowedAt && dist < 2.2 && rng() < 0.018) {
-          beginPounce(t)
-          nextPounceAllowedAt = elapsed + 38 + rng() * 42
+        if ((stalkCreep || huntMode) && elapsed >= nextPounceAllowedAt && dist < 2.8 && rng() < (huntMode ? 0.045 : 0.028)) {
+          if (huntMode && ctx?.findPreyFocus?.(rig.root.position, _pounceTo)) {
+            aimPounce(_pounceTo, 0.42 + rng() * 0.28, t)
+          } else {
+            beginPounce(t)
+          }
+          nextPounceAllowedAt = elapsed + 22 + rng() * 28
         }
 
-        if (ctx && !reducedMotion && elapsed >= nextTreeClimbAllowedAt && dt > 0) {
-          climbEvaluateAccum += delta
-          if (climbEvaluateAccum >= CAT_TREE_TUNING.climbEvaluatePeriod) {
-            climbEvaluateAccum = 0
-            if (rng() < CAT_TREE_TUNING.climbPickChance && tryPickTreeClimb(ctx, t)) {
-              nextTreeClimbAllowedAt =
-                elapsed +
-                CAT_TREE_TUNING.climbCooldownMin +
-                rng() * (CAT_TREE_TUNING.climbCooldownMax - CAT_TREE_TUNING.climbCooldownMin)
+        if (ctx && !reducedMotion && dt > 0) {
+          const preyTree =
+            huntMode && huntPreyPerch >= 0 && ctx.perches[huntPreyPerch]?.surface === 'tree'
+          if (preyTree) {
+            const pp = ctx.perches[huntPreyPerch]?.position
+            if (pp) {
+              const treeDist = Math.hypot(pp.x - rig.root.position.x, pp.z - rig.root.position.z)
+              if (treeDist < 2.85 && elapsed - lastPreyTreeClimbAt > 0.45) {
+                if (tryPickTreeClimb(ctx, t, huntPreyPerch)) {
+                  lastPreyTreeClimbAt = elapsed
+                  nextTreeClimbAllowedAt =
+                    elapsed +
+                    CAT_TREE_TUNING.climbCooldownMin * 0.55 +
+                    rng() * (CAT_TREE_TUNING.climbCooldownMax * 0.45)
+                }
+              }
+            }
+          }
+
+          if (elapsed >= nextTreeClimbAllowedAt) {
+            climbEvaluateAccum += delta
+            if (climbEvaluateAccum >= CAT_TREE_TUNING.climbEvaluatePeriod) {
+              climbEvaluateAccum = 0
+              const pickChance = preyTree
+                ? CAT_TREE_TUNING.climbPickChanceWithPrey
+                : CAT_TREE_TUNING.climbPickChance
+              if (rng() < pickChance && tryPickTreeClimb(ctx, t, preyTree ? huntPreyPerch : -1)) {
+                nextTreeClimbAllowedAt =
+                  elapsed +
+                  CAT_TREE_TUNING.climbCooldownMin +
+                  rng() * (CAT_TREE_TUNING.climbCooldownMax - CAT_TREE_TUNING.climbCooldownMin)
+              }
             }
           }
         }
@@ -605,32 +733,35 @@ export function createOrigamiCat(
       if (stateTime >= stateDuration) {
         state = 'paused'
         stateTime = 0
-        stateDuration = 1.2 + rng() * 2
-        pickWaypoint(t)
+        stateDuration = 0.7 + rng() * 1.4
+        if (ctx?.findPreyFocus) refreshPreyFocus(ctx, t)
+        else pickWaypoint(t)
       }
     } else if (state === 'stretching') {
       if (stateTime >= stateDuration) {
         state = 'stalking'
-        pickWaypoint(t)
+        if (ctx?.findPreyFocus) refreshPreyFocus(ctx, t)
+        else pickWaypoint(t)
         stateTime = 0
       }
     } else if (stateTime >= stateDuration) {
       const roll = rng()
-      if (roll < 0.58) {
+      if (roll < 0.74) {
         state = 'stalking'
-        pickWaypoint(t)
+        if (ctx?.findPreyFocus) refreshPreyFocus(ctx, t)
+        else pickWaypoint(t)
         stateTime = 0
-      } else if (roll < 0.76) {
+      } else if (roll < 0.86) {
         state = 'grooming'
-        stateDuration = 2 + rng() * 2.5
+        stateDuration = 1.4 + rng() * 1.8
         stateTime = 0
-      } else if (roll < 0.9) {
+      } else if (roll < 0.95) {
         state = 'watching'
-        stateDuration = 3 + rng() * 5
+        stateDuration = 1.8 + rng() * 2.8
         stateTime = 0
       } else {
         state = 'stretching'
-        stateDuration = 1.4 + rng() * 1.6
+        stateDuration = 1.1 + rng() * 1.3
         stateTime = 0
       }
     }
@@ -644,28 +775,25 @@ export function createOrigamiCat(
     sanitizeCatRoot(rig, state, t, { climbTopY })
     applyCatFrustumEdgeNudge(rig, state, t, dt)
 
-    const moving = state === 'stalking' && !stalkCreep
+    const moving = state === 'stalking' && !stalkCreep && !huntMode
+    const trotting = state === 'stalking' && huntMode && !stalkCreep
     const creeping = state === 'stalking' && stalkCreep
     const treeWalk = state === 'approach_tree'
     const treeClimbPose = state === 'climbing'
-    walkPhase += dt * (moving ? 3.2 : creeping ? 1.6 : treeWalk ? 2.35 : treeClimbPose ? CAT_TREE_TUNING.climbWalkCycleSpeed : 0.45)
-    tailPhase += dt * (state === 'windup' ? 4.5 : state === 'pounce' || state === 'tree_leap' ? 2.2 : 1.1)
-    headPhase += dt * 0.65
+    const gaitRate = trotting ? 4.6 : moving ? 3.45 : creeping ? 1.85 : treeWalk ? 2.55 : treeClimbPose ? CAT_TREE_TUNING.climbWalkCycleSpeed : 0.55
+    walkPhase += dt * gaitRate
+    tailPhase += dt * (state === 'windup' ? 5.2 : state === 'pounce' || state === 'tree_leap' ? 2.6 : creeping ? 1.45 : huntMode ? 1.65 : 1.15)
+    headPhase += dt * (creeping ? 0.42 : trotting ? 0.82 : 0.68)
 
-    const stride = moving
-      ? Math.sin(walkPhase)
-      : creeping || treeWalk
-        ? Math.sin(walkPhase) * 0.2
-        : treeClimbPose
-          ? Math.sin(walkPhase)
-          : Math.sin(walkPhase * 0.35) * 0.22
-    const strideOpp = moving
-      ? Math.sin(walkPhase + Math.PI)
-      : creeping || treeWalk
-        ? Math.sin(walkPhase + Math.PI) * 0.2
-        : treeClimbPose
-          ? Math.sin(walkPhase + Math.PI)
-          : 0
+    const swing = (p: number) => Math.max(0, Math.sin(p))
+    const stance = (p: number) => Math.max(0, -Math.sin(p))
+    const stride = swing(walkPhase)
+    const strideOpp = swing(walkPhase + Math.PI)
+    const stanceA = stance(walkPhase)
+    const stanceB = stance(walkPhase + Math.PI)
+    const bobAmp =
+      trotting ? 0.028 : moving ? 0.022 : creeping ? 0.008 : treeClimbPose ? 0.034 : treeWalk ? 0.012 : 0.006
+    const bodyBob = Math.abs(Math.sin(walkPhase * (trotting ? 2 : 2))) * bobAmp
 
     if (state === 'crouch' || state === 'windup' || state === 'recover') {
       rig.body.position.y = 0.005
@@ -701,64 +829,71 @@ export function createOrigamiCat(
       rig.legBR.rotation.x = s * 0.2
     } else {
       rig.body.position.y =
-        0.02 +
-        (moving
-          ? Math.abs(Math.sin(walkPhase * 2)) * 0.018
-          : creeping || treeWalk
-            ? 0.005
-            : treeClimbPose
-              ? Math.abs(Math.sin(walkPhase * 2)) * 0.032
-              : 0.006)
+        0.018 +
+        bodyBob +
+        (creeping ? -0.006 + Math.sin(walkPhase * 0.85) * 0.004 : treeClimbPose ? Math.abs(Math.sin(walkPhase * 2)) * 0.012 : 0)
       rig.body.rotation.x =
-        creeping || treeWalk
-          ? 0.13 + Math.sin(walkPhase * 1.5) * 0.02
-          : treeClimbPose
-            ? 0.22 + Math.sin(walkPhase * 1.7) * 0.04
-            : moving
-              ? 0.06 + Math.sin(walkPhase * 2) * 0.02
-              : 0.1
+        creeping
+          ? 0.18 + Math.sin(walkPhase * 1.2) * 0.028
+          : treeWalk
+            ? 0.12 + Math.sin(walkPhase * 1.35) * 0.022
+            : treeClimbPose
+              ? 0.24 + Math.sin(walkPhase * 1.55) * 0.038
+              : trotting
+                ? 0.04 + Math.sin(walkPhase * 2.1) * 0.018
+                : moving
+                  ? 0.05 + Math.sin(walkPhase * 2) * 0.016
+                  : 0.09
       rig.body.rotation.z =
         creeping || treeWalk
-          ? Math.sin(walkPhase * 0.8) * 0.015
+          ? Math.sin(walkPhase * 0.75) * 0.018
           : treeClimbPose
-            ? Math.sin(walkPhase * 0.55) * 0.022
-            : 0
+            ? Math.sin(walkPhase * 0.6) * 0.026
+            : trotting || moving
+              ? (stride - strideOpp) * 0.035
+              : Math.sin(walkPhase * 0.35) * 0.008
 
+      const legLift = (sw: number, st: number, mul: number) => -0.08 * st + sw * mul
       if (treeClimbPose) {
         const legMul = CAT_TREE_TUNING.climbLegStride
-        const s1 = stride * legMul
-        const s2 = strideOpp * legMul
-        rig.legFL.rotation.x = s1
-        rig.legBR.rotation.x = s1
-        rig.legFR.rotation.x = s2
-        rig.legBL.rotation.x = s2
-        rig.head.rotation.x = 0.18 + Math.sin(walkPhase * 0.9) * 0.06
-        rig.head.rotation.y = Math.sin(headPhase * 0.25) * 0.05
+        rig.legFL.rotation.x = legLift(stride, stanceA, legMul)
+        rig.legBR.rotation.x = legLift(stride, stanceA, legMul)
+        rig.legFR.rotation.x = legLift(strideOpp, stanceB, legMul)
+        rig.legBL.rotation.x = legLift(strideOpp, stanceB, legMul)
+        rig.head.rotation.x = 0.2 + Math.sin(walkPhase * 0.95) * 0.055
+        rig.head.rotation.y = Math.sin(headPhase * 0.22) * 0.045
       } else {
-        const legMul = creeping || treeWalk ? 0.22 : 0.35
-        rig.legFL.rotation.x = stride * legMul
-        rig.legBR.rotation.x = stride * legMul
-        rig.legFR.rotation.x = strideOpp * legMul
-        rig.legBL.rotation.x = strideOpp * legMul
+        const legMul = creeping ? 0.28 : treeWalk ? 0.32 : trotting ? 0.52 : moving ? 0.42 : 0.18
+        rig.legFL.rotation.x = legLift(stride, stanceA, legMul)
+        rig.legBR.rotation.x = legLift(stride, stanceA, legMul)
+        rig.legFR.rotation.x = legLift(strideOpp, stanceB, legMul)
+        rig.legBL.rotation.x = legLift(strideOpp, stanceB, legMul)
       }
 
-      rig.tail.rotation.y = Math.sin(tailPhase) * (moving ? 0.22 : creeping || treeWalk ? 0.45 : treeClimbPose ? 0.48 : 0.38)
+      rig.tail.rotation.y =
+        Math.sin(tailPhase) *
+        (trotting ? 0.28 : moving ? 0.24 : creeping || treeWalk ? 0.52 : treeClimbPose ? 0.5 : 0.34)
       rig.tail.rotation.x =
-        0.12 + Math.sin(tailPhase * 0.7) * (creeping || treeWalk ? 0.14 : treeClimbPose ? 0.22 : 0.08)
+        0.1 +
+        Math.sin(tailPhase * 0.65) * (creeping || treeWalk ? 0.16 : treeClimbPose ? 0.24 : trotting ? 0.1 : 0.07) -
+        (creeping ? 0.08 : 0)
 
       if (!treeClimbPose) {
         if (state === 'watching') {
-          rig.head.rotation.y = Math.sin(headPhase * 0.5) * 0.35
-          rig.head.rotation.x = 0.05 + Math.sin(headPhase * 0.35) * 0.06
+          rig.head.rotation.y = Math.sin(headPhase * 0.55) * 0.42
+          rig.head.rotation.x = 0.04 + Math.sin(headPhase * 0.42) * 0.07
         } else if (state === 'grooming') {
-          rig.head.rotation.x = 0.35 + Math.sin(headPhase * 2) * 0.08
-          rig.head.rotation.y = Math.sin(headPhase) * 0.12
+          rig.head.rotation.x = 0.38 + Math.sin(headPhase * 2.2) * 0.09
+          rig.head.rotation.y = Math.sin(headPhase * 1.1) * 0.14
         } else if (state === 'paused') {
-          rig.head.rotation.y = Math.sin(headPhase * 0.4) * 0.22
-          rig.head.rotation.x = 0.06 + Math.sin(headPhase * 1.8) * 0.04
+          rig.head.rotation.y = Math.sin(headPhase * 0.45) * 0.26
+          rig.head.rotation.x = 0.05 + Math.sin(headPhase * 1.6) * 0.045
+        } else if (creeping || huntMode) {
+          rig.head.rotation.x = 0.14 + Math.sin(walkPhase * 0.65) * 0.035
+          rig.head.rotation.y = Math.sin(headPhase * 0.18) * 0.12
         } else {
-          rig.head.rotation.x = 0.04 + Math.sin(walkPhase) * 0.04
-          rig.head.rotation.y = Math.sin(headPhase * 0.3) * 0.08
+          rig.head.rotation.x = 0.035 + Math.sin(walkPhase) * 0.045
+          rig.head.rotation.y = Math.sin(headPhase * 0.32) * 0.09
         }
       }
     }

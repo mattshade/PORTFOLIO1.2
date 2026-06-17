@@ -1,24 +1,25 @@
 .about-dna-background {
-  position: fixed;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 5; /* above .about-journey (2) + column (3); was hidden under full-width section */
+  /* Position/size/z-index owned by .about-vine-stack in AboutContent.css */
+  position: relative;
   pointer-events: none;
-  overflow: hidden;
+  /* Allow shifted canvas to extend past the right edge without clipping the stalk */
+  overflow: visible;
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+.about-dna-background--static {
   -webkit-mask-image: linear-gradient(
     180deg,
     transparent 0%,
-    #000 10%,
+    #000 4%,
     #000 100%
   );
   mask-image: linear-gradient(
     180deg,
     transparent 0%,
-    #000 10%,
+    #000 4%,
     #000 100%
   );
   mask-size: 100% 100%;
@@ -30,49 +31,61 @@
   visibility: visible;
 }
 
-/* Atmospheric glow behind SVG stalk (mobile / fragile). */
+/* CSS-only vine on mobile / Android — avoids a second WebGL context. */
 .about-dna-background--static.about-dna-background--visible {
   background:
     radial-gradient(
-      ellipse 38% 70% at 74% 42%,
-      rgba(94, 196, 220, 0.14) 0%,
-      rgba(94, 196, 220, 0.04) 48%,
-      transparent 72%
+      ellipse 28% 72% at 78% 42%,
+      rgba(94, 196, 220, 0.2) 0%,
+      rgba(94, 196, 220, 0.06) 42%,
+      transparent 68%
     ),
     radial-gradient(
-      ellipse 22% 45% at 68% 62%,
-      rgba(61, 106, 120, 0.1) 0%,
-      transparent 65%
+      ellipse 18% 55% at 74% 58%,
+      rgba(61, 106, 120, 0.14) 0%,
+      transparent 62%
+    ),
+    linear-gradient(
+      105deg,
+      transparent 52%,
+      rgba(94, 196, 220, 0.05) 68%,
+      rgba(94, 196, 220, 0.12) 76%,
+      rgba(61, 106, 120, 0.08) 84%,
+      transparent 94%
     );
+}
+
+@media (max-width: 768px) {
+  .about-dna-background--static.about-dna-background--visible {
+    background:
+      radial-gradient(
+        ellipse 34% 68% at 72% 44%,
+        rgba(94, 196, 220, 0.22) 0%,
+        rgba(94, 196, 220, 0.07) 45%,
+        transparent 70%
+      ),
+      linear-gradient(
+        100deg,
+        transparent 48%,
+        rgba(94, 196, 220, 0.08) 70%,
+        rgba(61, 106, 120, 0.1) 82%,
+        transparent 96%
+      );
+  }
+}
+
+.about-dna-background__viewport {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
 }
 
 .about-dna-background__canvas {
   display: block;
   width: 100%;
   height: 100%;
-  transform: translateX(200px);
-}
-
-@media (max-width: 768px) {
-  .about-dna-background__canvas {
-    transform: translateX(96px);
-  }
-
-  /* Match taller static vine on the right */
-  .about-dna-background--static.about-dna-background--visible {
-    background:
-      radial-gradient(
-        ellipse 44% 72% at 92% 88%,
-        rgba(94, 196, 220, 0.14) 0%,
-        rgba(94, 196, 220, 0.04) 48%,
-        transparent 76%
-      ),
-      radial-gradient(
-        ellipse 28% 48% at 88% 92%,
-        rgba(61, 106, 120, 0.1) 0%,
-        transparent 65%
-      );
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
