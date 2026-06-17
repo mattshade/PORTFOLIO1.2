@@ -49,8 +49,8 @@ export function readAboutTransitionEntry(): number {
 }
 
 /**
- * Single 0→1 progress for the vine: inversion complete through bottom of footer.
- * Viewport center is the probe so twist/pan track what the reader actually sees.
+ * Single 0→1 progress for the vine: top of About through bottom of footer.
+ * Maps scroll distance to stalk pan so the vine stays visible for the full section.
  */
 export function readAboutVineScrollT(): number {
   const region = document.getElementById('about-vine-region')
@@ -58,16 +58,15 @@ export function readAboutVineScrollT(): number {
   if (!region || !about) return 0
 
   const vh = window.visualViewport?.height ?? window.innerHeight
-  const probe = pageScrollY() + vh * 0.5
+  const probe = pageScrollY() + vh * 0.42
 
-  const descentEnd = document.getElementById('about-descent-end')
-  const start = descentEnd ? docTop(descentEnd) : docTop(about) - vh * 0.1
+  const start = docTop(about) - vh * 0.08
 
   const footer = region.querySelector<HTMLElement>('.footer')
   const regionEnd = footer ? docBottom(footer) : docBottom(region)
 
-  const finish = regionEnd - vh * 0.22
-  const travel = Math.max(vh * 4, finish - start)
+  const finish = regionEnd - vh * 0.12
+  const travel = Math.max(vh * 2.5, finish - start)
   return THREE.MathUtils.clamp((probe - start) / travel, 0, 1)
 }
 

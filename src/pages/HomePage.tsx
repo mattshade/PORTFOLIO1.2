@@ -23,16 +23,20 @@ export function HomePage() {
           <div className="about-transition-spacer" aria-hidden />
           <div id="about-descent-end" className="about-descent-marker" aria-hidden />
           <div id="about-vine-region" className="about-vine-region">
-            <AboutDnaBackground />
-            <section id="about" className="about-journey" aria-label="About Matt Shade">
-              <div className="about-journey__edge-fade about-journey__edge-fade--top" aria-hidden />
-              <div className="about-journey__scrim" aria-hidden />
-              <div className="about-journey__column">
-                <AboutContent />
+            <div className="about-vine-stack">
+              <AboutDnaBackground />
+              <div className="about-vine-stack__content">
+                <section id="about" className="about-journey" aria-label="About Matt Shade">
+                  <div className="about-journey__edge-fade about-journey__edge-fade--top" aria-hidden />
+                  <div className="about-journey__scrim" aria-hidden />
+                  <div className="about-journey__column">
+                    <AboutContent />
+                  </div>
+                  <div id="about-journey-end" className="about-descent-marker" aria-hidden />
+                </section>
+                <Footer />
               </div>
-              <div id="about-journey-end" className="about-descent-marker" aria-hidden />
-            </section>
-            <Footer />
+            </div>
             <div id="about-vine-end" className="about-descent-marker" aria-hidden />
           </div>
         </main>

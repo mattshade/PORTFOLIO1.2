@@ -1,24 +1,25 @@
 .about-dna-background {
-  position: fixed;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 5; /* above .about-journey (2) + column (3); was hidden under full-width section */
+  /* Position/size/z-index owned by .about-vine-stack in AboutContent.css */
+  position: relative;
   pointer-events: none;
-  overflow: hidden;
+  /* Allow shifted canvas to extend past the right edge without clipping the stalk */
+  overflow: visible;
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+.about-dna-background--static {
   -webkit-mask-image: linear-gradient(
     180deg,
     transparent 0%,
-    #000 10%,
+    #000 4%,
     #000 100%
   );
   mask-image: linear-gradient(
     180deg,
     transparent 0%,
-    #000 10%,
+    #000 4%,
     #000 100%
   );
   mask-size: 100% 100%;
@@ -73,17 +74,18 @@
   }
 }
 
+.about-dna-background__viewport {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
 .about-dna-background__canvas {
   display: block;
   width: 100%;
   height: 100%;
-  transform: translateX(200px);
-}
-
-@media (max-width: 768px) {
-  .about-dna-background__canvas {
-    transform: translateX(96px);
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {

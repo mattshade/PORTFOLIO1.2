@@ -15,6 +15,7 @@ import {
   updateAviaryBirds,
   disposeAviaryBirds,
   handleCatBirdCollisions,
+  findCatPreyFocus,
   type AviaryBird,
 } from './birdMotion'
 import { captureTreeLeapStrike } from './catTreeStrike'
@@ -215,8 +216,8 @@ export function OrigamiAviaryBackground() {
       atmosphere = buildAviaryAtmosphere(stage, rng, tuning, accent)
       seedSurfaceOpacityBaselines(surfaceWorld, atmosphere.glowLayer, atmosphere.arcParent)
 
+      const cavernRng = createMulberry32(0xab0f4e75)
       if (shouldBuildAviaryCavern()) {
-        const cavernRng = createMulberry32(0xab0f4e75)
         const cavernLayer = buildCavernLayer(world, cavernRng, aboutProfile, tuning.sceneDepth, envRoots)
         cavern = cavernLayer.cavern
         batPerches = cavernLayer.batPerches
@@ -369,39 +370,56 @@ export function OrigamiAviaryBackground() {
             rm,
           )
           atmosphere?.tick(elapsed, delta, interaction, tuning, rm, surfaceVis)
-          cat?.tick(
-            elapsed,
-            delta,
-            tuning,
-            rm,
-            cat && !rm
-              ? {
-                  perches,
-                  attemptTreeLeapStrike: (pos, out) => captureTreeLeapStrike(pos, birds, perches, rng, elapsed, out),
-                }
-              : undefined,
-          )
-          if (cat && !rm) {
-            const activeCat = cat
-            handleCatBirdCollisions(
-              activeCat.getPosition(catPosScratch),
-              (target) => activeCat.pounceAt(target, elapsed),
-              activeCat.isPouncing,
-              birds,
-              perches,
-              rng,
+          try {
+            cat?.tick(
               elapsed,
-              { suppress: activeCat.suppressCatBirdHandling() },
+              delta,
+              tuning,
+              rm,
+              cat && !rm
+                ? {
+                    perches,
+                    attemptTreeLeapStrike: (pos, out) => captureTreeLeapStrike(pos, birds, perches, rng, elapsed, out),
+                    findPreyFocus: (pos, out) => findCatPreyFocus(birds, perches, pos, elapsed, out),
+                  }
+                : undefined,
             )
+          } catch (e) {
+            console.error('[OrigamiAviaryBackground] cat tick error', e)
+          }
+          if (cat && !rm) {
+            try {
+              const activeCat = cat
+              handleCatBirdCollisions(
+                activeCat.getPosition(catPosScratch),
+                (target) => activeCat.pounceAt(target, elapsed),
+                activeCat.isPouncing,
+                birds,
+                perches,
+                rng,
+                elapsed,
+                { suppress: activeCat.suppressCatBirdHandling() },
+              )
+            } catch (e) {
+              console.error('[OrigamiAviaryBackground] cat collision error', e)
+            }
           }
           applyAboutSurfaceFade(transitionTargets, surfaceVis)
-          if (aboutVinePause) return
-          const bloomOn = !rm && tuning.viewportProfile !== 'narrow'
+          const bloomOn = !rm && tuning.viewportProfile !== 'narrow' && !aboutVinePause
           pipeline?.setBloomStrength(bloomOn ? tuning.bloomStrength * surfaceVis : 0)
-          pipeline?.render()
         } catch (e) {
           console.error('[OrigamiAviaryBackground] frame error', e)
-          disposed = true
+        }
+        try {
+          // DNA vine shares LineMaterial registry — restore aviary resolution every frame.
+          const canvasEl = renderer.domElement
+          setLineResolution(
+            Math.max(1, canvasEl.clientWidth || canvasEl.width),
+            Math.max(1, canvasEl.clientHeight || canvasEl.height),
+          )
+          pipeline?.render()
+        } catch (e) {
+          console.error('[OrigamiAviaryBackground] render error', e)
         }
       }
       animate()

@@ -3,6 +3,7 @@ import { createArticulatedOrigamiBird, type BirdRig } from './birdGeometry'
 import type { OrigamiAviaryTuning, PosterHeroBirdSlot } from './constants'
 import { AVIARY_COLORS } from './constants'
 import type { Perch } from './environment'
+import type { CatPreyFocus } from './origamiCat'
 import { pointerOnPlaneZ } from './interaction'
 import { BOTTOM_ANCHOR_CAMERA, scrollParallaxDrive } from './sceneAnchor'
 import type { createMulberry32 } from './seededRandom'
@@ -709,12 +710,51 @@ function pickFleePerch(rng: Rng, perches: Perch[], avoid: number, catPos: THREE.
   return pool[Math.floor(rng() * pool.length)].i
 }
 
+function birdStrikeReach(b: AviaryBird): number {
+  const scale = b.rig.root.scale.x
+  return 0.92 + (b.kind === 'sculptural' ? 1.1 : 0.72) * scale
+}
+
 /** True when bird is within strike range of the cat (3D), including elevated climbs. */
 export function birdNearCat(b: AviaryBird, catPos: THREE.Vector3): boolean {
+  if (b.state === 'flying' || b.state === 'takeoff') return false
   const bp = b.rig.root.position
-  const scale = b.rig.root.scale.x
-  const reach = 0.92 + (b.kind === 'sculptural' ? 1.1 : 0.72) * scale
-  return bp.distanceTo(catPos) < reach
+  const reach = birdStrikeReach(b)
+  const dy = Math.abs(bp.y - catPos.y)
+  if (dy > 0.42) return bp.distanceTo(catPos) < reach
+  const xz = Math.hypot(bp.x - catPos.x, bp.z - catPos.z)
+  return xz < reach && bp.distanceTo(catPos) < reach + 0.12
+}
+
+/** Nearest resting bird the cat can stalk; writes ground intercept into `outGround`. */
+export function findCatPreyFocus(
+  birds: AviaryBird[],
+  perches: Perch[],
+  catPos: THREE.Vector3,
+  elapsed: number,
+  outGround: THREE.Vector3,
+): CatPreyFocus | null {
+  let best: AviaryBird | null = null
+  let bestXZ = Infinity
+  const maxXZ = 16
+
+  for (const b of birds) {
+    if (elapsed < b.catScareCooldownUntil) continue
+    if (b.state === 'flying' || b.state === 'takeoff') continue
+    const bp = b.rig.root.position
+    const xz = Math.hypot(bp.x - catPos.x, bp.z - catPos.z)
+    if (xz > maxXZ || xz >= bestXZ) continue
+    bestXZ = xz
+    best = b
+  }
+
+  if (!best) return null
+
+  const bp = best.rig.root.position
+  const perch = perches[best.perchIndex]
+  const elevated = bp.y > catPos.y + 0.32 || perch?.surface === 'tree'
+  outGround.set(bp.x, catPos.y, bp.z)
+  return { perchIndex: best.perchIndex, elevated, distanceXZ: bestXZ }
 }
 
 function scareBirdFromCat(

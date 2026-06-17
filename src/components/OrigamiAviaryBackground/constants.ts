@@ -181,20 +181,22 @@ export const AVIARY_COLORS = {
 
 /** Origami cat tree climb / leap strike (see `origamiCat` states `approach_tree`, `climbing`, `tree_leap`). */
 export const CAT_TREE_TUNING = {
-  climbCooldownMin: 36,
-  climbCooldownMax: 82,
-  climbEvaluatePeriod: 3.4,
-  climbPickChance: 0.4,
-  maxPerchPickDistanceXZ: 11,
-  minPerchPickDistanceXZ: 1.15,
-  approachXZThreshold: 0.38,
-  climbRate: 0.52,
+  climbCooldownMin: 14,
+  climbCooldownMax: 38,
+  climbEvaluatePeriod: 1.6,
+  climbPickChance: 0.68,
+  /** When a bird is visible on a tree, climb evaluation uses this higher pick chance. */
+  climbPickChanceWithPrey: 0.88,
+  maxPerchPickDistanceXZ: 13,
+  minPerchPickDistanceXZ: 0.85,
+  approachXZThreshold: 0.42,
+  climbRate: 0.72,
   climbBelowPerch: 0.13,
-  climbXZPull: 0.16,
-  leapTriggerDistance: 1.02,
-  leapDurationMin: 0.4,
-  leapDurationMax: 0.55,
-  leapArcHeight: 0.38,
+  climbXZPull: 0.22,
+  leapTriggerDistance: 1.35,
+  leapDurationMin: 0.38,
+  leapDurationMax: 0.52,
+  leapArcHeight: 0.42,
   /** Sideways jump off the tree after a climb (not straight down). */
   sideDismountDistanceMin: 0.95,
   sideDismountDistanceMax: 1.72,
@@ -221,6 +223,10 @@ export const CAT_TREE_TUNING = {
   /** When |x|/halfX exceeds this, gently pull toward center (narrow profile only). */
   catFrustumEdgeNudgeStart: 0.86,
   catFrustumEdgeNudgeSpeed: 1.15,
+  /** Max XZ distance at which the cat will orient and walk toward resting birds. */
+  huntAwarenessXZ: 15,
+  /** XZ distance to begin low stalk toward prey. */
+  huntStalkRadiusXZ: 4.6,
 } as const
 
 export function catVisibleMaxYForProfile(vp: AviaryViewportProfile): number {
