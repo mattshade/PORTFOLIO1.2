@@ -64,12 +64,16 @@
   .experience-impact-wrap .experience-impact-card {
     width: 100%;
     max-width: 100%;
-    padding: 0.75rem 1rem 0.95rem 0;
     transform: none;
   }
 
+  .experience-impact-card__title {
+    margin: 0 0 0.65rem;
+  }
+
   .experience-impact-card__list {
-    padding-left: 1rem;
+    padding-left: 1.1rem;
+    margin: 0;
   }
 
   .experience-highlight {
@@ -277,7 +281,12 @@
 
 @media (max-width: 768px) {
   .experience {
-    padding: 3rem 1rem;
+    padding: 3rem 1.5rem;
+  }
+
+  .experience .section-inner {
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
   }
 
   .section-header-flex {
@@ -341,7 +350,7 @@
 
 @media (max-width: 480px) {
   .experience {
-    padding: 2.5rem 1rem;
+    padding: 2.5rem 1.25rem;
   }
 
   .experience-item {

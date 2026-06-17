@@ -348,6 +348,8 @@
   }
 
   .about-journey__column {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
     padding-top: clamp(1.25rem, 4vh, 2.5rem);
   }
 
@@ -383,6 +385,11 @@
 }
 
 @media (max-width: 480px) {
+  .about-journey__column {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
+
   .about-portrait {
     width: min(7rem, 40vw);
   }
