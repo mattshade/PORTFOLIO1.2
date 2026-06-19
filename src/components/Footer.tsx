@@ -1,4 +1,5 @@
 import { resume } from '../data/resume'
+import { buildProjectRouteState } from '../utils/projectNavigation'
 import { Link, useLocation } from 'react-router-dom'
 import './Footer.css'
 
@@ -21,7 +22,7 @@ export function Footer() {
               <a href={resume.github} target="_blank" rel="noopener noreferrer" className="footer-link">GitHub</a>
             )}
             <a href="/#experience" className="footer-link">Experience</a>
-            <Link to="/project/system-design-lab" state={{ background: location }} className="footer-link">
+            <Link to="/project/system-design-lab" state={buildProjectRouteState(location)} className="footer-link">
               System Design Lab
             </Link>
           </div>

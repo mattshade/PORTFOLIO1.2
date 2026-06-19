@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { buildProjectRouteState } from '../utils/projectNavigation'
 import { projects, type Project } from '../data/projects'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import './Projects.css'
@@ -12,7 +13,7 @@ function useOpenProject() {
       window.open(p.href, '_blank', 'noopener,noreferrer')
       return
     }
-    navigate(`/project/${p.id}`, { state: { background: location } })
+    navigate(`/project/${p.id}`, { state: buildProjectRouteState(location) })
   }, [navigate, location])
 }
 
@@ -139,7 +140,7 @@ function ProjectPreviewPanel({ p }: { p: Project }) {
   ) : (
     <Link
       to={`/project/${p.id}`}
-      state={{ background: location }}
+      state={buildProjectRouteState(location)}
       className="projects-preview__action"
     >
       {actionLabel}

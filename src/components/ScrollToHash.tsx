@@ -1,11 +1,22 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useLocation } from 'react-router-dom'
 
 export function ScrollToHash() {
   const { pathname, hash } = useLocation()
+  const prevPathRef = useRef(pathname)
 
   useEffect(() => {
+    if (pathname.startsWith('/project/')) {
+      prevPathRef.current = pathname
+      return
+    }
+
+    const prevPath = prevPathRef.current
+    prevPathRef.current = pathname
+    const returningFromProject = prevPath.startsWith('/project/')
+
     if (!hash) {
+      if (returningFromProject) return
       window.scrollTo(0, 0)
       return
     }

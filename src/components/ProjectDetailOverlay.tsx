@@ -1,45 +1,62 @@
 import { useCallback, useEffect, useLayoutEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { Navigate, useLocation, useNavigate, useParams } from 'react-router-dom'
+import { restoreScrollPosition, type ProjectRouteState } from '../utils/projectNavigation'
 import { projects } from '../data/projects'
 import { ProjectIcon } from './Projects'
 import './Projects.css'
 
-type BackgroundLocation = ReturnType<typeof useLocation>
-
-function useProjectOverlayLifecycle(onClose: () => void) {
+function useProjectOverlayLifecycle(savedScrollY: number) {
   useLayoutEffect(() => {
+    const scrollY = savedScrollY
+    const { style } = document.body
+
     document.body.classList.add('modal-open')
+    style.position = 'fixed'
+    style.top = `-${scrollY}px`
+    style.left = '0'
+    style.right = '0'
+    style.width = '100%'
+
     return () => {
       document.body.classList.remove('modal-open')
+      style.position = ''
+      style.top = ''
+      style.left = ''
+      style.right = ''
+      style.width = ''
+      restoreScrollPosition(scrollY)
     }
-  }, [])
-
-  useEffect(() => {
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
-    }
-    window.addEventListener('keydown', onKeyDown)
-    return () => window.removeEventListener('keydown', onKeyDown)
-  }, [onClose])
+  }, [savedScrollY])
 }
 
 export function ProjectDetailOverlay() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const location = useLocation()
-  const background = (location.state as { background?: BackgroundLocation } | null)?.background
+  const routeState = location.state as ProjectRouteState | null
+  const background = routeState?.background
+  const savedScrollY = routeState?.scrollY ?? 0
   const project = projects.find((p) => p.id === id)
 
   const close = useCallback(() => {
     if (background) {
       navigate(`${background.pathname}${background.search}${background.hash}`)
+      requestAnimationFrame(() => restoreScrollPosition(savedScrollY))
       return
     }
     navigate('/#projects', { replace: true })
-  }, [background, navigate])
+  }, [background, navigate, savedScrollY])
 
-  useProjectOverlayLifecycle(close)
+  useProjectOverlayLifecycle(savedScrollY)
+
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') close()
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [close])
 
   useEffect(() => {
     if (!project) return
