@@ -6,6 +6,11 @@ import {
 } from './aboutText'
 
 function renderLeadIntro(text: string) {
+  const trimmed = text.trim()
+  if (trimmed === ABOUT_INTRO_QUOTE) {
+    return <span className="about-resume-doc__quote-cyan">“{ABOUT_INTRO_QUOTE}”</span>
+  }
+
   const idx = text.indexOf(ABOUT_INTRO_QUOTE)
   if (idx === -1) return text
   const before = text.slice(0, idx)
@@ -101,75 +106,88 @@ function buildBlocks(raw: string): Block[] {
 
 const ABOUT_BLOCKS = buildBlocks(ABOUT_MATT_SHADE_TEXT)
 
+function firstHeadingIndex(blocks: Block[]) {
+  return blocks.findIndex((block) => block.kind === 'heading')
+}
+
+function AboutPortrait() {
+  return (
+    <div className="about-portrait">
+      <img
+        src="/images/matt-shade-profile.png"
+        alt="Matt Shade"
+        width={124}
+        height={124}
+        loading="lazy"
+        decoding="async"
+      />
+    </div>
+  )
+}
+
+function renderBlock(block: Block, index: number, isLead: boolean) {
+  const key = `about-block-${index}`
+
+  if (block.kind === 'sep') {
+    return null
+  }
+
+  if (block.kind === 'heading') {
+    return (
+      <h3 key={key} className="about-resume-doc__role">
+        {block.line}
+      </h3>
+    )
+  }
+
+  if (block.kind === 'pull') {
+    return (
+      <p key={key} className="about-resume-doc__para about-resume-doc__para--pull">
+        {block.line}
+      </p>
+    )
+  }
+
+  if (block.kind === 'bullets') {
+    return (
+      <ul key={key} className="about-resume-doc__list">
+        {block.lines.map((l, j) => (
+          <li key={j}>{l}</li>
+        ))}
+      </ul>
+    )
+  }
+
+  const text = isLead ? renderLeadIntro(block.lines.join('\n')) : block.lines.join('\n')
+  const paraClass = `about-resume-doc__para${isLead ? ' about-resume-doc__para--lead' : ''}`
+
+  return (
+    <p key={key} className={paraClass}>
+      {text}
+    </p>
+  )
+}
+
 export function AboutTextBody() {
-  let beforeFirstHeading = true
-  let portraitPlaced = false
+  const headingIndex = firstHeadingIndex(ABOUT_BLOCKS)
+  const introBlocks = headingIndex === -1 ? ABOUT_BLOCKS : ABOUT_BLOCKS.slice(0, headingIndex)
+  const bodyBlocks = headingIndex === -1 ? [] : ABOUT_BLOCKS.slice(headingIndex)
+  const hasIntro = introBlocks.some((block) => block.kind !== 'sep')
 
   return (
     <div className="about-resume-doc__body">
-      {ABOUT_BLOCKS.map((block, index) => {
-        const key = `about-block-${index}`
+      {hasIntro && (
+        <div className="about-intro">
+          <AboutPortrait />
+          <div className="about-intro__text">
+            {introBlocks.map((block, index) => renderBlock(block, index, true))}
+          </div>
+        </div>
+      )}
 
-        if (block.kind === 'sep') {
-          return null
-        }
-
-        if (block.kind === 'heading') {
-          beforeFirstHeading = false
-          return (
-            <h3 key={key} className="about-resume-doc__role">
-              {block.line}
-            </h3>
-          )
-        }
-
-        if (block.kind === 'pull') {
-          return (
-            <p key={key} className="about-resume-doc__para about-resume-doc__para--pull">
-              {block.line}
-            </p>
-          )
-        }
-
-        if (block.kind === 'bullets') {
-          return (
-            <ul key={key} className="about-resume-doc__list">
-              {block.lines.map((l, j) => (
-                <li key={j}>{l}</li>
-              ))}
-            </ul>
-          )
-        }
-
-        const isLead = beforeFirstHeading
-        const text = isLead ? renderLeadIntro(block.lines.join('\n')) : block.lines.join('\n')
-        const paraClass = `about-resume-doc__para${isLead ? ' about-resume-doc__para--lead' : ''}`
-
-        if (isLead && !portraitPlaced) {
-          portraitPlaced = true
-          return (
-            <div key={key} className="about-intro">
-              <div className="about-portrait">
-                <img
-                  src="/images/matt-shade-profile.png"
-                  alt="Matt Shade"
-                  width={124}
-                  height={124}
-                  loading="lazy"
-                  decoding="async"
-                />
-              </div>
-              <p className={paraClass}>{text}</p>
-            </div>
-          )
-        }
-
-        return (
-          <p key={key} className={paraClass}>
-            {text}
-          </p>
-        )
-      })}
+      {bodyBlocks.map((block, index) =>
+        renderBlock(block, headingIndex + index, false),
+      )}
     </div>
   )
 }

@@ -214,15 +214,20 @@
 }
 
 .about-intro {
-  display: grid;
-  grid-template-columns: clamp(5.25rem, 13vw, 7.75rem) minmax(0, 1fr);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   gap: clamp(1rem, 2.5vw, 1.35rem);
-  align-items: start;
-  margin-bottom: 0.65rem;
+  margin-bottom: 0.85rem;
+}
+
+.about-intro__text {
+  width: 100%;
 }
 
 .about-portrait {
-  width: 100%;
+  width: clamp(5.25rem, 13vw, 7.75rem);
+  flex-shrink: 0;
   aspect-ratio: 1 / 1;
   border-radius: 10px;
   overflow: hidden;
@@ -242,9 +247,12 @@
 }
 
 .about-intro .about-resume-doc__para {
-  margin: 0;
-  align-self: center;
+  margin: 0 0 0.5rem;
   width: 100%;
+}
+
+.about-intro .about-resume-doc__para--lead:last-child {
+  margin-bottom: 0;
 }
 
 .about-resume-doc__para {
@@ -301,21 +309,9 @@
 }
 
 @media (max-width: 768px) {
-  .about-intro {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.875rem;
-  }
-
   .about-portrait {
     border-radius: 8px;
     width: min(7.75rem, 42vw);
-    flex-shrink: 0;
-  }
-
-  .about-intro .about-resume-doc__para {
-    align-self: stretch;
   }
 
   .about-journey {
