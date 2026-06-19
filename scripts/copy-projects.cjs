@@ -40,7 +40,7 @@ function copyEntry(slug, from, label) {
   if (slug === 'ai-data-hub') {
     const aspxPath = path.join(destDir, 'index.aspx')
     const indexPath = path.join(destDir, 'index.html')
-    if (fs.existsSync(aspxPath)) {
+    if (fs.existsSync(aspxPath) && !fs.existsSync(indexPath)) {
       fs.copyFileSync(aspxPath, indexPath)
     }
   }

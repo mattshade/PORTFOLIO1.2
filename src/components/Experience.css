@@ -4,7 +4,7 @@
 
 .section-header-flex {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
   gap: 2rem;
   margin-bottom: 2.5rem;
@@ -29,67 +29,43 @@
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.experience-download-btn:hover {
-  background: transparent;
-  color: var(--accent);
-  transform: translateY(-4px) scale(1.03);
-  box-shadow: 0 10px 25px -10px var(--accent-dim);
+@media (hover: hover) and (min-width: 769px) {
+  .experience-download-btn:hover {
+    background: transparent;
+    color: var(--accent);
+    transform: translateY(-4px) scale(1.03);
+    box-shadow: 0 10px 25px -10px var(--accent-dim);
+  }
 }
 
-.experience-impact-wrap {
-  margin: 2.5rem 0 4rem;
+.experience-header-interactive {
   width: 100%;
+  margin-top: 0;
+  margin-bottom: 2.5rem;
 }
 
-.experience-impact-card {
-  cursor: pointer;
-  animation: fadeUp 0.55s ease-out backwards;
+.experience-header-interactive .section-header-flex {
+  margin-bottom: 0;
 }
 
-@media (hover: hover) {
-  .experience-impact-wrap .experience-impact-card:hover,
-  .experience-impact-wrap .experience-impact-card:focus-visible {
-    width: 100%;
-    padding: 0.85rem 1.5rem 1.15rem 0;
-  }
+.experience-header-interactive .projects-heading {
+  flex: 0 1 auto;
+}
 
-  .experience-impact-wrap .experience-impact-card:hover .project-card__details,
-  .experience-impact-wrap .experience-impact-card:focus-visible .project-card__details {
-    align-self: start;
-    padding-top: 0.15rem;
-  }
+.experience-impact__list {
+  margin: 0;
+  padding-left: 1.15rem;
 }
 
 @media (hover: none), (max-width: 768px) {
-  .experience-impact-wrap .experience-impact-card {
-    width: 100%;
-    max-width: 100%;
-    transform: none;
-  }
-
-  .experience-impact-card__title {
-    margin: 0 0 0.65rem;
-  }
-
-  .experience-impact-card__list {
+  .experience-impact__list {
     padding-left: 1.1rem;
-    margin: 0;
   }
 
-  .experience-highlight {
+  .experience-impact__list .experience-highlight {
     font-size: 0.875rem;
     line-height: 1.55;
   }
-}
-
-.experience-impact-card__title {
-  margin: 0 0 0.85rem;
-  font-size: clamp(0.875rem, 1.5vw, 1rem);
-}
-
-.experience-impact-card__list {
-  margin: 0;
-  padding-left: 1.15rem;
 }
 
 .experience-list {
@@ -123,14 +99,16 @@
   transform: translateY(0);
 }
 
-.experience-item:hover {
-  transform: translateY(-6px);
-  border-color: var(--accent);
-  background: rgba(255, 255, 255, 0.07);
-  box-shadow: 
-    0 30px 60px -20px rgba(0, 0, 0, 0.7),
-    0 0 30px var(--accent-dim);
-  z-index: 5;
+@media (hover: hover) and (min-width: 769px) {
+  .experience-item:hover {
+    transform: translateY(-6px);
+    border-color: var(--accent);
+    background: rgba(255, 255, 255, 0.07);
+    box-shadow:
+      0 30px 60px -20px rgba(0, 0, 0, 0.7),
+      0 0 30px var(--accent-dim);
+    z-index: 5;
+  }
 }
 
 .experience-header {
@@ -240,6 +218,31 @@
   border-color: var(--accent);
   box-shadow: 0 0 15px var(--accent-dim);
   transform: translateY(-2px);
+}
+
+@media (hover: none), (max-width: 768px), (pointer: coarse) {
+  .experience-download-btn:active,
+  .experience-download-btn:focus-visible {
+    background: transparent;
+    color: var(--accent);
+    transform: none;
+    box-shadow: 0 0 24px var(--accent-dim);
+  }
+
+  .experience-item:active,
+  .experience-item:focus-within {
+    transform: none;
+    border-color: var(--accent);
+    background: rgba(255, 255, 255, 0.07);
+    box-shadow: 0 0 28px var(--accent-dim);
+  }
+
+  .skills-item-hovered,
+  .skills-item:active,
+  .skills-item:focus-visible {
+    transform: none;
+    box-shadow: 0 0 20px var(--accent-dim);
+  }
 }
 
 .education-wrap {

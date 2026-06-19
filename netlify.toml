@@ -40,7 +40,10 @@
   from = "/projects/cfr-dashboard-bugz/*"
   to = "/projects/cfr-dashboard-bugz/index.html"
   status = 200
-# ai-data-hub: static HTML pages — no redirect; files served directly
+[[redirects]]
+  from = "/projects/ai-data-hub/*"
+  to = "/projects/ai-data-hub/index.html"
+  status = 200
 
 # Storybook static build (copied to dist/storybook by npm run build) — must come before SPA catch-all
 [[redirects]]

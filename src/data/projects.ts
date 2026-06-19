@@ -125,6 +125,6 @@ export const projects: Project[] = [
     tech: ['HTML', 'JavaScript', 'Search UX'],
     href: '/project/ai-data-hub',
     spa: true,
-    embedSrc: '/projects/ai-data-hub/',
+    embedSrc: '/projects/ai-data-hub/index.html',
   },
 ]

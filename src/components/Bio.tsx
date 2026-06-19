@@ -1,4 +1,4 @@
-import { useRef, type ReactNode } from 'react'
+import { type ReactNode } from 'react'
 import { resume } from '../data/resume'
 import './Projects.css'
 import './Bio.css'
@@ -53,23 +53,12 @@ function LeadershipPillarCard({
   icon: ReactNode
   index: number
 }) {
-  const cardRef = useRef<HTMLElement>(null)
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
-    if (!cardRef.current) return
-    const rect = cardRef.current.getBoundingClientRect()
-    cardRef.current.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`)
-    cardRef.current.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`)
-  }
-
   return (
     <article
-      ref={cardRef}
       className="project-card glass bird-perch-card bio-pillar-card"
-      onMouseMove={handleMouseMove}
       tabIndex={0}
       style={{ animationDelay: `${index * 60}ms` }}
-      aria-label={`${title} — hover or focus to expand`}
+      aria-label={title}
     >
       <div className="project-card__inner">
         <div className="project-card__icon" aria-hidden>

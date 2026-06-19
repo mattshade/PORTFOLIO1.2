@@ -1,9 +1,9 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { disposeLine2, isLine2Object, setLineResolution } from '../OrigamiAviaryBackground/lineBatch'
 import { getAviaryViewportProfile } from '../OrigamiAviaryBackground/constants'
 import {
-  getLightWebGLRendererOptions,
+  getAboutDnaWebGLRendererOptions,
   setAboutVineSceneActive,
   shouldUseAboutDnaWebGL,
 } from '../OrigamiAviaryBackground/webglCapabilities'
@@ -28,9 +28,11 @@ import {
 } from './dnaConfig'
 import { buildSpineSamples } from './spinePath'
 import { buildAboutVinePlant, getPlantCrossSectionRadius } from './vineFoliage'
+import { AboutVineStaticArt } from './AboutVineStaticArt'
 import './AboutDnaBackground.css'
 
 const CAMERA_FOV = 38
+const ABOUT_VINE_MAX_DPR = 1.5
 const CAMERA_LOOK_Y = -0.52
 /** Stalk center target on screen (0–1). Lower = more right-side canvas margin. */
 const DESKTOP_VINE_SCREEN_X = 0.56
@@ -151,7 +153,7 @@ function bindAboutVineVisibility(host: HTMLElement) {
     const show = regionInView && vineFade > 0.02
     host.classList.toggle('about-dna-background--visible', show)
     host.style.setProperty('--about-vine-opacity', String(vineFade))
-    // CSS/static vine never owns the aviary GPU — keep forest rendering.
+    host.style.setProperty('--about-vine-scroll', String(readAboutVineScrollT()))
   }
 
   const onScroll = () => updateVisibility()
@@ -172,6 +174,7 @@ function bindAboutVineVisibility(host: HTMLElement) {
 export function AboutDnaBackground() {
   const hostRef = useRef<HTMLDivElement>(null)
   const useWebGL = shouldUseAboutDnaWebGL()
+  const [forceStaticArt, setForceStaticArt] = useState(false)
 
   useEffect(() => {
     const host = hostRef.current
@@ -241,9 +244,9 @@ export function AboutDnaBackground() {
       viewport.className = 'about-dna-background__viewport'
       host.appendChild(viewport)
 
-      const renderer = new THREE.WebGLRenderer(getLightWebGLRendererOptions())
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1))
-      renderer.setClearColor(0x080c10, 1)
+      const renderer = new THREE.WebGLRenderer(getAboutDnaWebGLRendererOptions())
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, ABOUT_VINE_MAX_DPR))
+      renderer.setClearColor(0x000000, 0)
       renderer.outputColorSpace = THREE.SRGBColorSpace
       viewport.appendChild(renderer.domElement)
       renderer.domElement.className = 'about-dna-background__canvas'
@@ -252,10 +255,12 @@ export function AboutDnaBackground() {
       const onContextLost = (e: Event) => {
         e.preventDefault()
         contextLost = true
+        setForceStaticArt(true)
         host.classList.add('about-dna-background--static')
       }
       const onContextRestored = () => {
         contextLost = false
+        setForceStaticArt(false)
         host.classList.remove('about-dna-background--static')
       }
       renderer.domElement.addEventListener('webglcontextlost', onContextLost, false)
@@ -276,7 +281,7 @@ export function AboutDnaBackground() {
         camera.aspect = w / h
         syncCamera()
         setLineResolution(w, h)
-        const pr = Math.min(window.devicePixelRatio || 1, 1)
+        const pr = Math.min(window.devicePixelRatio || 1, ABOUT_VINE_MAX_DPR)
         if (vine.stalkDots?.material instanceof THREE.ShaderMaterial) {
           vine.stalkDots.material.uniforms.uPixelRatio.value = pr
         }
@@ -353,6 +358,7 @@ export function AboutDnaBackground() {
       isVisible = show
       host.classList.toggle('about-dna-background--visible', show)
       host.style.setProperty('--about-vine-opacity', String(vineFade))
+      host.style.setProperty('--about-vine-scroll', String(readAboutVineScrollT()))
       if (aboutVineRegionNearViewport()) ensureWebGL()
     }
 
@@ -375,11 +381,15 @@ export function AboutDnaBackground() {
     }
   }, [useWebGL])
 
+  const showStaticArt = !useWebGL || forceStaticArt
+
   return (
     <div
       ref={hostRef}
-      className={`about-dna-background${useWebGL ? '' : ' about-dna-background--static'}`}
+      className={`about-dna-background${useWebGL && !forceStaticArt ? '' : ' about-dna-background--static'}`}
       aria-hidden
-    />
+    >
+      {showStaticArt && <AboutVineStaticArt />}
+    </div>
   )
 }

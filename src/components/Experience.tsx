@@ -1,37 +1,88 @@
-import { useState, useRef, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { resume } from '../data/resume'
 import { SkillPop } from './SkillPop'
 import { ProjectIcon } from './Projects'
 import './Projects.css'
 import './Experience.css'
 
-function SelectedImpactCard({ items }: { items: string[] }) {
-  const cardRef = useRef<HTMLDivElement>(null)
+const IMPACT_PREVIEW_CLOSE_MS = 440
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
-    if (!cardRef.current) return
-    const rect = cardRef.current.getBoundingClientRect()
-    cardRef.current.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`)
-    cardRef.current.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`)
-  }
+function SelectedImpactInteractive({
+  items,
+  resumePdf,
+}: {
+  items: string[]
+  resumePdf?: string
+}) {
+  const [panelOpen, setPanelOpen] = useState(false)
+  const [visible, setVisible] = useState(false)
+
+  const activate = useCallback(() => {
+    if (panelOpen) return
+
+    const openingFresh = !visible
+    setVisible(true)
+
+    if (openingFresh) {
+      setPanelOpen(false)
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => setPanelOpen(true))
+      })
+    } else {
+      setPanelOpen(true)
+    }
+  }, [panelOpen, visible])
+
+  const deactivate = useCallback(() => {
+    setPanelOpen(false)
+  }, [])
+
+  useEffect(() => {
+    if (panelOpen || !visible) return
+    const timer = window.setTimeout(() => setVisible(false), IMPACT_PREVIEW_CLOSE_MS)
+    return () => window.clearTimeout(timer)
+  }, [panelOpen, visible])
 
   return (
-    <div className="experience-impact-wrap">
-      <article
-        ref={cardRef}
-        className="project-card glass bird-perch-card experience-impact-card"
-        onMouseMove={handleMouseMove}
-        tabIndex={0}
-        aria-label="Selected Impact — hover or focus to expand"
-      >
-        <div className="project-card__inner">
-          <div className="project-card__icon" aria-hidden>
+    <div
+      className="projects-interactive experience-header-interactive"
+      onMouseLeave={deactivate}
+    >
+      <div className="section-header-flex">
+        <div className="projects-heading">
+          <h2 className="section-title section-title--mono">Experience</h2>
+          <button
+            type="button"
+            className={`project-icon-btn glass bird-perch-card${panelOpen ? ' project-icon-btn--active' : ''}`}
+            aria-pressed={panelOpen}
+            aria-label="Selected Impact"
+            onMouseEnter={activate}
+            onFocus={activate}
+            onClick={activate}
+          >
             <ProjectIcon type="trending-up" />
-          </div>
-          <div className="project-card__details">
-            <div className="project-card__details-inner">
-              <h3 className="experience-impact-card__title section-title--mono">Selected Impact</h3>
-              <ul className="experience-highlights experience-impact-card__list">
+          </button>
+        </div>
+        {resumePdf && (
+          <a href={resumePdf} download className="experience-download-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+            Download CV
+          </a>
+        )}
+      </div>
+
+      {visible && (
+        <div
+          className={`projects-preview-slot${panelOpen ? ' projects-preview-slot--open' : ''}`}
+          aria-hidden={!panelOpen}
+        >
+          <div className="projects-preview glass">
+            <div className="projects-preview__content">
+              <ul className="experience-highlights experience-impact__list">
                 {items.map((item, i) => (
                   <li key={i} className="experience-highlight">
                     {item}
@@ -41,12 +92,17 @@ function SelectedImpactCard({ items }: { items: string[] }) {
             </div>
           </div>
         </div>
-      </article>
+      )}
     </div>
   )
 }
 
 const PULL_STRENGTH = 2.5
+
+function isTouchPrimaryInteraction(): boolean {
+  if (typeof window === 'undefined') return false
+  return window.innerWidth <= 768 || window.matchMedia('(pointer: coarse)').matches
+}
 
 export function Experience() {
   const [hoveredSkill, setHoveredSkill] = useState<string | null>(null)
@@ -73,7 +129,9 @@ export function Experience() {
       }
       
       setHoveredSkill(skill)
-      setPull({ x: (dx / len) * scale, y: (dy / len) * scale })
+      if (!isTouchPrimaryInteraction()) {
+        setPull({ x: (dx / len) * scale, y: (dy / len) * scale })
+      }
     },
     [hoveredSkill]
   )
@@ -106,22 +164,22 @@ export function Experience() {
     <section id="experience" className="section experience">
       {popPos && <SkillPop x={popPos.x} y={popPos.y} color={popPos.color} />}
       <div className="section-inner" style={{ position: 'relative' }}>
-        <div className="section-header-flex">
-          <h2 className="section-title section-title--mono">Experience</h2>
-          {resume.resumePdf && (
-            <a href={resume.resumePdf} download className="experience-download-btn">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v4" />
-                <polyline points="7 10 12 15 17 10" />
-                <line x1="12" y1="15" x2="12" y2="3" />
-              </svg>
-              Download CV
-            </a>
-          )}
-        </div>
-
-        {resume.selectedImpact && resume.selectedImpact.length > 0 && (
-          <SelectedImpactCard items={resume.selectedImpact} />
+        {resume.selectedImpact && resume.selectedImpact.length > 0 ? (
+          <SelectedImpactInteractive items={resume.selectedImpact} resumePdf={resume.resumePdf} />
+        ) : (
+          <div className="section-header-flex">
+            <h2 className="section-title section-title--mono">Experience</h2>
+            {resume.resumePdf && (
+              <a href={resume.resumePdf} download className="experience-download-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v4" />
+                  <polyline points="7 10 12 15 17 10" />
+                  <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+                Download CV
+              </a>
+            )}
+          </div>
         )}
 
         <div className="experience-footer-grid">

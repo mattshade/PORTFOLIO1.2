@@ -28,11 +28,33 @@
   transform: translateY(0) scale(1);
 }
 
-.back-to-top:hover {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: var(--accent);
-  transform: translateY(-8px) scale(1.1);
-  box-shadow: 0 15px 45px rgba(0, 0, 0, 0.5), 0 0 20px var(--accent-dim);
+@media (hover: hover) and (min-width: 769px) {
+  .back-to-top:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: var(--accent);
+    transform: translateY(-8px) scale(1.1);
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.5), 0 0 20px var(--accent-dim);
+  }
+
+  .back-to-top--cavern:hover {
+    border-color: #5ec4dc;
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.5), 0 0 20px rgba(94, 196, 220, 0.28);
+  }
+}
+
+@media (hover: none), (max-width: 768px), (pointer: coarse) {
+  .back-to-top.visible:active,
+  .back-to-top.visible:focus-visible {
+    transform: translateY(0) scale(1);
+    border-color: var(--accent);
+    box-shadow: 0 0 24px var(--accent-dim);
+  }
+
+  .back-to-top--cavern.visible:active,
+  .back-to-top--cavern.visible:focus-visible {
+    border-color: #5ec4dc;
+    box-shadow: 0 0 24px rgba(94, 196, 220, 0.35);
+  }
 }
 
 .back-to-top--cavern {
@@ -41,11 +63,6 @@
 
 .back-to-top--cavern .boid-flyer {
   color: #5ec4dc;
-}
-
-.back-to-top--cavern:hover {
-  border-color: #5ec4dc;
-  box-shadow: 0 15px 45px rgba(0, 0, 0, 0.5), 0 0 20px rgba(94, 196, 220, 0.28);
 }
 
 .back-to-top--cavern.is-flying .boid-flyer {
