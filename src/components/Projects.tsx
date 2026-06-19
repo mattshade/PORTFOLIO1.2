@@ -1,7 +1,20 @@
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { projects, type Project } from '../data/projects'
-import { useRef } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import './Projects.css'
+
+function useOpenProject() {
+  const navigate = useNavigate()
+  const location = useLocation()
+
+  return useCallback((p: Project) => {
+    if (p.external) {
+      window.open(p.href, '_blank', 'noopener,noreferrer')
+      return
+    }
+    navigate(`/project/${p.id}`, { state: { background: location } })
+  }, [navigate, location])
+}
 
 export function ProjectIcon({ type }: { type?: string }) {
   if (!type) return null
@@ -106,95 +119,181 @@ export function ProjectIcon({ type }: { type?: string }) {
   )
 }
 
-function projectCardClass(p: Project) {
-  return `project-card glass bird-perch-card${p.wide ? ' project-card--wide' : ''}`
+function ProjectPreviewPanel({ p }: { p: Project }) {
+  const location = useLocation()
+  const actionLabel = p.external ? 'Open project' : 'View case study'
+
+  const action = p.external ? (
+    <a
+      href={p.href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="projects-preview__action"
+    >
+      {actionLabel}
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+        <path d="M5 12h14" />
+        <path d="m12 5 7 7-7 7" />
+      </svg>
+    </a>
+  ) : (
+    <Link
+      to={`/project/${p.id}`}
+      state={{ background: location }}
+      className="projects-preview__action"
+    >
+      {actionLabel}
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+        <path d="M5 12h14" />
+        <path d="m12 5 7 7-7 7" />
+      </svg>
+    </Link>
+  )
+
+  return (
+    <div className="projects-preview__content">
+      <div className="projects-preview__header">
+        <div className="projects-preview__icon" aria-hidden>
+          <ProjectIcon type={p.icon} />
+        </div>
+        <div className="projects-preview__titles">
+          <h3 className="project-title">{p.title}</h3>
+          {p.subtitle && <p className="project-subtitle">{p.subtitle}</p>}
+        </div>
+      </div>
+      <p className="project-desc">{p.description}</p>
+      {p.highlights && p.highlights.length > 0 && (
+        <ul className="project-card-highlights">
+          <li>{p.highlights[0]}</li>
+        </ul>
+      )}
+      <ul className="project-tech">
+        {p.tech.slice(0, 5).map((t) => (
+          <li key={t}>{t}</li>
+        ))}
+      </ul>
+      {action}
+    </div>
+  )
 }
 
+/** @deprecated Used by Storybook — portfolio section uses icon strip + preview panel. */
 export function ProjectCard({ p, i }: { p: Project; i: number }) {
-  const cardRef = useRef<HTMLAnchorElement | null>(null)
-  const className = projectCardClass(p)
-  const style = { animationDelay: `${i * 60}ms` } as React.CSSProperties
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
-    if (!cardRef.current) return
-    const rect = cardRef.current.getBoundingClientRect()
-    const x = e.clientX - rect.left
-    const y = e.clientY - rect.top
-    cardRef.current.style.setProperty('--mouse-x', `${x}px`)
-    cardRef.current.style.setProperty('--mouse-y', `${y}px`)
-  }
-
-  const content = (
-    <div className="project-card__inner">
-      <div className="project-card__icon" aria-hidden>
-        <ProjectIcon type={p.icon} />
-      </div>
-      <div className="project-card__details">
-        <div className="project-card__details-inner">
-          <div className="project-header">
-            <div className="project-title-wrapper">
-              <h3 className="project-title">{p.title}</h3>
-              {p.subtitle && <p className="project-subtitle">{p.subtitle}</p>}
-            </div>
-          </div>
-          <p className="project-desc">{p.description}</p>
-          {p.highlights && p.highlights.length > 0 && (
-            <ul className="project-card-highlights">
-              {p.highlights.slice(0, 2).map((h, idx) => (
-                <li key={idx}>{h}</li>
-              ))}
-            </ul>
-          )}
-          <ul className="project-tech">
-            {p.tech.map((t) => (
-              <li key={t}>{t}</li>
-            ))}
-          </ul>
-        </div>
+  return (
+    <div className="projects-preview-slot projects-preview-slot--open" style={{ animationDelay: `${i * 60}ms` }}>
+      <div className="projects-preview glass">
+        <ProjectPreviewPanel p={p} />
       </div>
     </div>
   )
-
-  if (p.external) {
-    return (
-      <a
-        ref={cardRef}
-        href={p.href}
-        target="_blank"
-        rel="noopener noreferrer"
-        className={className}
-        style={style}
-        onMouseMove={handleMouseMove}
-        aria-label={`Open ${p.title} (new tab)`}
-      >
-        {content}
-      </a>
-    )
-  }
-
-  return (
-    <Link
-      ref={cardRef}
-      to={p.href}
-      className={className}
-      style={style}
-      onMouseMove={handleMouseMove}
-      aria-label={`Open ${p.title}`}
-    >
-      {content}
-    </Link>
-  )
 }
 
+const PREVIEW_CLOSE_MS = 440
+const PREVIEW_CLOSE_DELAY_MS = 160
+
 export function Projects() {
+  const openProject = useOpenProject()
+  const [activeId, setActiveId] = useState<string | null>(null)
+  const [displayed, setDisplayed] = useState<Project | null>(null)
+  const [panelOpen, setPanelOpen] = useState(false)
+  const closeTimerRef = useRef<number | null>(null)
+
+  const cancelClose = useCallback(() => {
+    if (closeTimerRef.current !== null) {
+      window.clearTimeout(closeTimerRef.current)
+      closeTimerRef.current = null
+    }
+  }, [])
+
+  const activate = useCallback((id: string) => {
+    cancelClose()
+    const project = projects.find((p) => p.id === id)
+    if (!project) return
+    setActiveId(id)
+
+    if (panelOpen) {
+      setDisplayed(project)
+      return
+    }
+
+    const openingFresh = !displayed
+    setDisplayed(project)
+
+    if (openingFresh) {
+      setPanelOpen(false)
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => setPanelOpen(true))
+      })
+    } else {
+      setPanelOpen(true)
+    }
+  }, [cancelClose, displayed, panelOpen])
+
+  const deactivate = useCallback(() => {
+    setActiveId(null)
+    setPanelOpen(false)
+  }, [])
+
+  const scheduleClose = useCallback(() => {
+    cancelClose()
+    closeTimerRef.current = window.setTimeout(() => {
+      deactivate()
+      closeTimerRef.current = null
+    }, PREVIEW_CLOSE_DELAY_MS)
+  }, [cancelClose, deactivate])
+
+  useEffect(() => {
+    if (panelOpen || !displayed) return
+    const timer = window.setTimeout(() => setDisplayed(null), PREVIEW_CLOSE_MS)
+    return () => window.clearTimeout(timer)
+  }, [panelOpen, displayed])
+
+  useEffect(() => () => cancelClose(), [cancelClose])
+
   return (
     <section id="projects" className="section projects">
-      <div className="section-inner" style={{ position: 'relative' }}>
-        <h2 className="section-title section-title--mono">Case Studies and Projects</h2>
-        <div className="projects-grid">
-          {projects.map((p, i) => (
-            <ProjectCard key={p.id} p={p} i={i} />
-          ))}
+      <div className="section-inner">
+        <div
+          className="projects-interactive"
+          onMouseEnter={cancelClose}
+          onMouseLeave={scheduleClose}
+        >
+          <div className="projects-heading">
+            <h2 className="section-title section-title--mono">Case Studies and Projects</h2>
+            <div className="projects-icon-strip" role="list">
+              {projects.map((p, i) => {
+                const isActive = activeId === p.id
+                return (
+                  <button
+                    key={p.id}
+                    type="button"
+                    role="listitem"
+                    className={`project-icon-btn glass bird-perch-card${isActive ? ' project-icon-btn--active' : ''}`}
+                    style={{ animationDelay: `${i * 40}ms` }}
+                    aria-pressed={isActive}
+                    aria-label={`${p.external ? 'Open' : 'View'} ${p.title}`}
+                    onMouseEnter={() => activate(p.id)}
+                    onFocus={() => activate(p.id)}
+                    onClick={() => openProject(p)}
+                  >
+                    <ProjectIcon type={p.icon} />
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+
+          {displayed && (
+            <div
+              className={`projects-preview-slot${panelOpen ? ' projects-preview-slot--open' : ''}`}
+              aria-hidden={!panelOpen}
+              onMouseEnter={cancelClose}
+            >
+              <div className="projects-preview glass">
+                <ProjectPreviewPanel key={displayed.id} p={displayed} />
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </section>

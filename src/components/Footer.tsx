@@ -1,8 +1,10 @@
 import { resume } from '../data/resume'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import './Footer.css'
 
 export function Footer() {
+  const location = useLocation()
+
   return (
     <>
       <div className="bird-wire" aria-hidden style={{ marginBottom: 0 }} />
@@ -19,7 +21,9 @@ export function Footer() {
               <a href={resume.github} target="_blank" rel="noopener noreferrer" className="footer-link">GitHub</a>
             )}
             <a href="/#experience" className="footer-link">Experience</a>
-            <Link to="/project/system-design-lab" className="footer-link">System Design Lab</Link>
+            <Link to="/project/system-design-lab" state={{ background: location }} className="footer-link">
+              System Design Lab
+            </Link>
           </div>
           <p className="footer-copy">© {new Date().getFullYear()} {resume.name}</p>
         </div>

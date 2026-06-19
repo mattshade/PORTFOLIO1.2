@@ -94,6 +94,8 @@ function serveProjectsPlugin() {
       const recentRoot = path.resolve(cwd, 'RECENT-PROJECTS');
       const types: Record<string, string> = {
         '.html': 'text/html',
+        '.htm': 'text/html',
+        '.aspx': 'text/html',
         '.js': 'application/javascript',
         '.mjs': 'application/javascript',
         '.css': 'text/css',
