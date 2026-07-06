@@ -61,10 +61,10 @@
     <!-- Netlify Forms: hidden form for deploy-time detection (React form submits via JS) -->
     <form name="contact" method="POST" action="/" data-netlify="true" netlify-honeypot="bot-field" hidden>
       <input type="hidden" name="form-name" value="contact" />
-      <input type="text" name="name" />
-      <input type="email" name="email" />
-      <textarea name="message"></textarea>
-      <input type="text" name="bot-field" />
+      <input type="text" name="name" required maxlength="100" autocomplete="name" />
+      <input type="email" name="email" required maxlength="254" autocomplete="email" />
+      <textarea name="message" required maxlength="5000"></textarea>
+      <input type="text" name="bot-field" tabindex="-1" autocomplete="off" />
     </form>
     <div id="root">
       <main style="display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center;padding:2rem">

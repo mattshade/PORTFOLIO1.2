@@ -140,6 +140,28 @@
   min-height: 100px;
 }
 
+.sayhi-honeypot {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.sayhi-input-invalid,
+.sayhi-textarea.sayhi-input-invalid {
+  border-color: #f87171;
+}
+
+.sayhi-field-error {
+  margin: -0.5rem 0 0;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  color: #f87171;
+}
+
 .sayhi-error {
   margin: 0;
   font-family: var(--font-mono);

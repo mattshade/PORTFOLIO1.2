@@ -3,9 +3,49 @@ import { createPortal } from 'react-dom'
 import { resume } from '../data/resume'
 import './SayHiBubble.css'
 
+const FIELD_LIMITS = {
+  name: 100,
+  email: 254,
+  message: 5000,
+} as const
+
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+type FieldErrors = Partial<Record<'name' | 'email' | 'message', string>>
+
+function validateContactFields(values: { name: string; email: string; message: string }): FieldErrors {
+  const errors: FieldErrors = {}
+  const name = values.name.trim()
+  const email = values.email.trim()
+  const message = values.message.trim()
+
+  if (!name) {
+    errors.name = 'Name is required.'
+  } else if (name.length > FIELD_LIMITS.name) {
+    errors.name = `Name must be ${FIELD_LIMITS.name} characters or fewer.`
+  }
+
+  if (!email) {
+    errors.email = 'Email is required.'
+  } else if (email.length > FIELD_LIMITS.email) {
+    errors.email = `Email must be ${FIELD_LIMITS.email} characters or fewer.`
+  } else if (!EMAIL_PATTERN.test(email)) {
+    errors.email = 'Enter a valid email address.'
+  }
+
+  if (!message) {
+    errors.message = 'Message is required.'
+  } else if (message.length > FIELD_LIMITS.message) {
+    errors.message = `Message must be ${FIELD_LIMITS.message} characters or fewer.`
+  }
+
+  return errors
+}
+
 export function SayHiBubble({ isNavLink = false, standalone = false }: { isNavLink?: boolean, standalone?: boolean }) {
   const [isOpen, setIsOpen] = useState(false)
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle')
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
 
   const hasFormspree = !!resume.contactFormEndpoint
   const useNetlify = !hasFormspree && typeof window !== 'undefined' && window.location.hostname !== 'localhost'
@@ -22,6 +62,7 @@ export function SayHiBubble({ isNavLink = false, standalone = false }: { isNavLi
   const handleClose = useCallback(() => {
     setIsOpen(false)
     setStatus('idle')
+    setFieldErrors({})
   }, [])
 
   useLayoutEffect(() => {
@@ -41,11 +82,27 @@ export function SayHiBubble({ isNavLink = false, standalone = false }: { isNavLi
     e.preventDefault()
     const form = e.currentTarget
     const data = new FormData(form)
-    const name = (data.get('name') as string) || 'Someone'
-    const email = (data.get('email') as string) || ''
-    const message = (data.get('message') as string) || ''
+
+    // Honeypot: bots fill hidden fields; real users leave them empty
+    if ((data.get('bot-field') as string)?.trim()) {
+      return
+    }
+
+    const name = ((data.get('name') as string) || '').trim()
+    const email = ((data.get('email') as string) || '').trim()
+    const message = ((data.get('message') as string) || '').trim()
+
+    const errors = validateContactFields({ name, email, message })
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors)
+      return
+    }
+    setFieldErrors({})
 
     if (hasFormspree) {
+      data.set('name', name)
+      data.set('email', email)
+      data.set('message', message)
       data.set('_subject', `Portfolio message from ${name}`)
       data.set('_replyto', email)
       setStatus('submitting')
@@ -132,6 +189,16 @@ export function SayHiBubble({ isNavLink = false, standalone = false }: { isNavLi
             >
               <form className="sayhi-form" onSubmit={handleSubmit} noValidate>
                 <input type="hidden" name="form-name" value={resume.contactFormName} />
+                <div className="sayhi-honeypot" aria-hidden="true">
+                  <label htmlFor="sayhi-bot-field">Leave this empty</label>
+                  <input
+                    id="sayhi-bot-field"
+                    name="bot-field"
+                    type="text"
+                    tabIndex={-1}
+                    autoComplete="off"
+                  />
+                </div>
                 <button
                   type="button"
                   className="sayhi-close"
@@ -155,31 +222,64 @@ export function SayHiBubble({ isNavLink = false, standalone = false }: { isNavLi
                       id="sayhi-name"
                       name="name"
                       type="text"
-                      className="sayhi-input"
+                      className={`sayhi-input${fieldErrors.name ? ' sayhi-input-invalid' : ''}`}
                       placeholder="Your name"
                       required
+                      aria-required="true"
+                      aria-invalid={fieldErrors.name ? 'true' : undefined}
+                      aria-describedby={fieldErrors.name ? 'sayhi-name-error' : undefined}
+                      autoComplete="name"
+                      maxLength={FIELD_LIMITS.name}
                       disabled={status === 'submitting'}
+                      onChange={() => fieldErrors.name && setFieldErrors((prev) => ({ ...prev, name: undefined }))}
                     />
+                    {fieldErrors.name && (
+                      <p id="sayhi-name-error" className="sayhi-field-error" role="alert">
+                        {fieldErrors.name}
+                      </p>
+                    )}
                     <label htmlFor="sayhi-email" className="sayhi-label">Email</label>
                     <input
                       id="sayhi-email"
                       name="email"
                       type="email"
-                      className="sayhi-input"
+                      className={`sayhi-input${fieldErrors.email ? ' sayhi-input-invalid' : ''}`}
                       placeholder="your@email.com"
                       required
+                      aria-required="true"
+                      aria-invalid={fieldErrors.email ? 'true' : undefined}
+                      aria-describedby={fieldErrors.email ? 'sayhi-email-error' : undefined}
+                      autoComplete="email"
+                      inputMode="email"
+                      maxLength={FIELD_LIMITS.email}
                       disabled={status === 'submitting'}
+                      onChange={() => fieldErrors.email && setFieldErrors((prev) => ({ ...prev, email: undefined }))}
                     />
+                    {fieldErrors.email && (
+                      <p id="sayhi-email-error" className="sayhi-field-error" role="alert">
+                        {fieldErrors.email}
+                      </p>
+                    )}
                     <label htmlFor="sayhi-message" className="sayhi-label">Message</label>
                     <textarea
                       id="sayhi-message"
                       name="message"
-                      className="sayhi-textarea"
+                      className={`sayhi-textarea${fieldErrors.message ? ' sayhi-input-invalid' : ''}`}
                       placeholder="Say hello..."
                       rows={3}
                       required
+                      aria-required="true"
+                      aria-invalid={fieldErrors.message ? 'true' : undefined}
+                      aria-describedby={fieldErrors.message ? 'sayhi-message-error' : undefined}
+                      maxLength={FIELD_LIMITS.message}
                       disabled={status === 'submitting'}
+                      onChange={() => fieldErrors.message && setFieldErrors((prev) => ({ ...prev, message: undefined }))}
                     />
+                    {fieldErrors.message && (
+                      <p id="sayhi-message-error" className="sayhi-field-error" role="alert">
+                        {fieldErrors.message}
+                      </p>
+                    )}
                     {status === 'error' && (
                       <p className="sayhi-error">Something went wrong. Try emailing directly.</p>
                     )}
