@@ -1,5 +1,6 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { resume } from '../data/resume'
+import { GithubIcon, type GithubIconHandle } from './GithubIcon'
 import { SkillPop } from './SkillPop'
 import { ProjectIcon } from './Projects'
 import './Projects.css'
@@ -7,12 +8,54 @@ import './Experience.css'
 
 const IMPACT_PREVIEW_CLOSE_MS = 440
 
+function ExperienceHeaderActions({
+  resumePdf,
+  github,
+}: {
+  resumePdf?: string
+  github?: string
+}) {
+  const githubIconRef = useRef<GithubIconHandle>(null)
+
+  if (!resumePdf && !github) return null
+
+  return (
+    <div className="experience-header-actions">
+      {resumePdf && (
+        <a href={resumePdf} download className="experience-download-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v4" />
+            <polyline points="7 10 12 15 17 10" />
+            <line x1="12" y1="15" x2="12" y2="3" />
+          </svg>
+          Download CV
+        </a>
+      )}
+      {github && (
+        <a
+          href={github}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="experience-github-btn"
+          aria-label="GitHub profile"
+          onMouseEnter={() => githubIconRef.current?.startAnimation()}
+          onMouseLeave={() => githubIconRef.current?.stopAnimation()}
+        >
+          <GithubIcon ref={githubIconRef} size={20} />
+        </a>
+      )}
+    </div>
+  )
+}
+
 function SelectedImpactInteractive({
   items,
   resumePdf,
+  github,
 }: {
   items: string[]
   resumePdf?: string
+  github?: string
 }) {
   const [panelOpen, setPanelOpen] = useState(false)
   const [visible, setVisible] = useState(false)
@@ -63,16 +106,7 @@ function SelectedImpactInteractive({
             <ProjectIcon type="trending-up" />
           </button>
         </div>
-        {resumePdf && (
-          <a href={resumePdf} download className="experience-download-btn">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v4" />
-              <polyline points="7 10 12 15 17 10" />
-              <line x1="12" y1="15" x2="12" y2="3" />
-            </svg>
-            Download CV
-          </a>
-        )}
+        <ExperienceHeaderActions resumePdf={resumePdf} github={github} />
       </div>
 
       {visible && (
@@ -165,20 +199,15 @@ export function Experience() {
       {popPos && <SkillPop x={popPos.x} y={popPos.y} color={popPos.color} />}
       <div className="section-inner" style={{ position: 'relative' }}>
         {resume.selectedImpact && resume.selectedImpact.length > 0 ? (
-          <SelectedImpactInteractive items={resume.selectedImpact} resumePdf={resume.resumePdf} />
+          <SelectedImpactInteractive
+            items={resume.selectedImpact}
+            resumePdf={resume.resumePdf}
+            github={resume.github}
+          />
         ) : (
           <div className="section-header-flex">
             <h2 className="section-title section-title--mono">Experience</h2>
-            {resume.resumePdf && (
-              <a href={resume.resumePdf} download className="experience-download-btn">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v4" />
-                  <polyline points="7 10 12 15 17 10" />
-                  <line x1="12" y1="15" x2="12" y2="3" />
-                </svg>
-                Download CV
-              </a>
-            )}
+            <ExperienceHeaderActions resumePdf={resume.resumePdf} github={resume.github} />
           </div>
         )}
 

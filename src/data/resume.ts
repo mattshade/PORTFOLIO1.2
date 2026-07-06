@@ -28,7 +28,7 @@ export const resume = {
   linkedin: 'https://www.linkedin.com/in/matt-shade-66125515/',
   /** Portfolio / personal site — shown on resume and in structured data */
   portfolioUrl: 'https://www.mattshade.com/',
-  github: '',
+  github: 'https://github.com/mattshade',
   /** Download link — served from `public/Matt_Shade_Resume.pdf`. Bump `v=` when you replace the file so prod CDNs/browsers fetch the new PDF. */
   resumePdf: '/Matt_Shade_Resume.pdf?v=2',
 
