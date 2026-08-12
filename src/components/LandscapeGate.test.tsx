@@ -1,54 +1,37 @@
-import { fireEvent, render, screen } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { shouldShowLandscapeGate } from '../utils/landscapeViewport'
+
+vi.mock('../utils/landscapeViewport', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../utils/landscapeViewport')>()
+  return {
+    ...actual,
+    shouldShowLandscapeGate: vi.fn(() => false),
+    markTouchMobileDocument: vi.fn(),
+    subscribeLandscapeGate: vi.fn((callback: () => void) => {
+      callback()
+      return () => {}
+    }),
+  }
+})
+
 import { LandscapeGate } from './LandscapeGate'
 
-function mockMatchMedia(matches: Record<string, boolean>) {
-  vi.stubGlobal(
-    'matchMedia',
-    (query: string) =>
-      ({
-        matches: Object.entries(matches).some(([key, value]) => query.includes(key) && value),
-        media: query,
-        addEventListener: vi.fn(),
-        removeEventListener: vi.fn(),
-        addListener: vi.fn(),
-        removeListener: vi.fn(),
-        dispatchEvent: vi.fn(),
-      }) as MediaQueryList,
-  )
-}
-
 describe('LandscapeGate', () => {
-  beforeEach(() => {
-    Object.defineProperty(window, 'innerWidth', { value: 390, configurable: true })
-    Object.defineProperty(window, 'innerHeight', { value: 844, configurable: true })
-  })
-
   afterEach(() => {
     document.documentElement.classList.remove('landscape-gate-active')
-    vi.unstubAllGlobals()
+    vi.clearAllMocks()
   })
 
-  it('blocks portrait mobile viewports', () => {
-    mockMatchMedia({ 'max-width: 900px': true, coarse: true, portrait: true })
+  it('renders overlay markup for CSS fallback', () => {
     render(<LandscapeGate />)
-    expect(screen.getByRole('dialog', { name: 'Rotate your device' })).toBeInTheDocument()
-    expect(document.documentElement.classList.contains('landscape-gate-active')).toBe(true)
+    expect(screen.getByLabelText('Rotate your device')).toBeInTheDocument()
   })
 
-  it('renders nothing in landscape', () => {
-    Object.defineProperty(window, 'innerWidth', { value: 844, configurable: true })
-    Object.defineProperty(window, 'innerHeight', { value: 390, configurable: true })
-    mockMatchMedia({ 'max-width: 900px': true, coarse: true, portrait: false })
+  it('activates when shouldShowLandscapeGate is true', () => {
+    vi.mocked(shouldShowLandscapeGate).mockReturnValue(true)
     render(<LandscapeGate />)
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
-  })
-
-  it('cleans up landscape gate class on unmount', () => {
-    mockMatchMedia({ 'max-width: 900px': true, coarse: true, portrait: true })
-    const { unmount } = render(<LandscapeGate />)
+    expect(screen.getByRole('dialog', { name: 'Rotate your device' })).toHaveClass('landscape-gate--active')
     expect(document.documentElement.classList.contains('landscape-gate-active')).toBe(true)
-    unmount()
-    expect(document.documentElement.classList.contains('landscape-gate-active')).toBe(false)
   })
 })

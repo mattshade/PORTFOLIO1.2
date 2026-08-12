@@ -2,13 +2,55 @@
   position: fixed;
   inset: 0;
   z-index: 100000;
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: center;
-  padding: 1.5rem;
+  box-sizing: border-box;
+  min-height: 100vh;
+  min-height: 100dvh;
+  min-height: -webkit-fill-available;
+  padding:
+    max(1.5rem, env(safe-area-inset-top, 0px))
+    max(1.5rem, env(safe-area-inset-right, 0px))
+    max(1.5rem, env(safe-area-inset-bottom, 0px))
+    max(1.5rem, env(safe-area-inset-left, 0px));
   background: rgba(10, 10, 11, 0.96);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
+  pointer-events: none;
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: auto;
+}
+
+/* Touch phones/tablets in portrait — CSS path for Android + iOS before/without JS. */
+@media (max-width: 1024px) and (orientation: portrait) {
+  html.touch-mobile .landscape-gate,
+  .landscape-gate--active {
+    display: flex;
+    pointer-events: auto;
+  }
+}
+
+/* Pre-React fallback: narrow portrait viewports (Android Chrome). */
+@media (max-width: 1024px) and (orientation: portrait) {
+  .landscape-gate {
+    display: flex;
+    pointer-events: auto;
+  }
+}
+
+/* Hide on desktop/non-touch once JS marks the root element. */
+html:not(.touch-mobile) .landscape-gate {
+  display: none !important;
+  pointer-events: none !important;
+}
+
+/* Always release in landscape — critical for iOS + Android rotation. */
+@media (orientation: landscape) {
+  .landscape-gate {
+    display: none !important;
+    pointer-events: none !important;
+  }
 }
 
 .landscape-gate__panel {
@@ -48,6 +90,14 @@ html.landscape-gate-active,
 html.landscape-gate-active body {
   overflow: hidden;
   touch-action: none;
+  overscroll-behavior: none;
+}
+
+/* iOS Safari scroll lock while the gate is up */
+html.landscape-gate-active body {
+  position: fixed;
+  width: 100%;
+  inset: 0;
 }
 
 @keyframes landscape-gate-nudge {

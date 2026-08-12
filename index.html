@@ -7,6 +7,15 @@
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <link rel="manifest" href="/manifest.webmanifest" />
+    <script>
+      (function () {
+        var ua = navigator.userAgent || '';
+        var touch = navigator.maxTouchPoints || 0;
+        var apple = /iPhone|iPod|iPad/i.test(ua) || (touch > 1 && /Macintosh/i.test(ua));
+        var android = /Android/i.test(ua);
+        if (apple || android) document.documentElement.classList.add('touch-mobile');
+      })();
+    </script>
     <meta name="description" content="Matt Shade — Engineering &amp; Design. Creating and leading teams that craft AI-powered tools and interfaces to turn data into clarity and action." />
     <meta name="author" content="Matt Shade" />
     <meta name="keywords" content="Matt Shade, AI engineering director, engineering leadership, design engineering, NBCUniversal, CNBC, React, TypeScript, JavaScript, Node.js, Python, engineering manager, product discovery, agentic AI, design systems, hiring, New York" />
