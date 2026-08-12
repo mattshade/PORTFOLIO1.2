@@ -20,8 +20,10 @@ export function createOrigamiBat(
   lineWidth: number,
   sceneDepth: number,
   roots: THREE.Object3D[],
+  options?: { lineColor?: THREE.Color; fog?: boolean; depthFade?: number },
 ): BatRig {
-  const color = accent.clone().lerp(muted, 0.45)
+  const color = options?.lineColor ?? accent.clone().lerp(muted, 0.45)
+  const lineOpts = { depthFade: options?.depthFade ?? 0, fog: options?.fog ?? false }
   const rig: BatRig = {
     root: new THREE.Group(),
     body: new THREE.Group(),
@@ -40,7 +42,6 @@ export function createOrigamiBat(
   seg(bodyBatch, -0.07, 0.11, -0.02, 0.07, 0.11, -0.02)
   seg(bodyBatch, 0.07, 0.11, -0.02, 0, 0.05, 0.02)
   seg(bodyBatch, 0, 0.03, 0.08, 0, 0.14, 0.12)
-  const lineOpts = { depthFade: 0, fog: false }
   flushLineBatch(bodyBatch, rig.body, color, roots, sceneDepth, lineWidth * 1.05, lineOpts)
 
   const wing = (parent: THREE.Group, sx: number) => {

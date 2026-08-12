@@ -5,9 +5,9 @@ import { ContactPage } from './pages/ContactPage'
 import { DesignSystemPage } from './pages/DesignSystemPage'
 import { ScrollToHash } from './components/ScrollToHash'
 import { AtsJsonLd } from './components/AtsJsonLd'
-import { SayHiBubble } from './components/SayHiBubble'
 import { ProjectDetailOverlay } from './components/ProjectDetailOverlay'
 import { OrigamiAviaryBackground } from './components/OrigamiAviaryBackground/OrigamiAviaryBackground'
+import { LandscapeGate } from './components/LandscapeGate'
 import './App.css'
 
 function AppRoutes() {
@@ -39,11 +39,11 @@ function AppRoutes() {
 function App() {
   return (
     <>
+      <LandscapeGate />
       <OrigamiAviaryBackground />
       <AtsJsonLd />
       <ScrollToHash />
       <AppRoutes />
-      <SayHiBubble standalone />
     </>
   )
 }

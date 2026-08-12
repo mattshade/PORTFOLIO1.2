@@ -3,7 +3,6 @@ import './BackToTop.css'
 
 export function BackToTop() {
   const [isVisible, setIsVisible] = useState(false)
-  const [inAbout, setInAbout] = useState(false)
   const [isAnimating, setIsAnimating] = useState(false)
   const [isBlinking, setIsBlinking] = useState(false)
 
@@ -13,12 +12,6 @@ export function BackToTop() {
         setIsVisible(true)
       } else {
         setIsVisible(false)
-      }
-
-      const about = document.getElementById('about')
-      if (about) {
-        const top = about.getBoundingClientRect().top
-        setInAbout(top < window.innerHeight * 0.82)
       }
     }
     toggleVisibility()
@@ -56,7 +49,7 @@ export function BackToTop() {
 
   return (
     <button 
-      className={`back-to-top ${isVisible ? 'visible' : ''} ${inAbout ? 'back-to-top--cavern' : ''} ${isAnimating ? 'is-flying' : ''} ${isBlinking ? 'is-blinking' : ''}`}
+      className={`back-to-top ${isVisible ? 'visible' : ''} ${isAnimating ? 'is-flying' : ''} ${isBlinking ? 'is-blinking' : ''}`}
       onClick={handleClick}
       aria-label="Back to top"
     >

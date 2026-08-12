@@ -17,9 +17,9 @@ export function shouldUseAboutDnaWebGL(): boolean {
   return !isFragileWebGLDevice()
 }
 
-/** Mobile uses SVG static art in AboutDnaBackground instead of aviary embed. */
+/** Vine rendered inside the main aviary — one canvas, shared camera, forest context. */
 export function shouldUseEmbeddedAboutVine(): boolean {
-  return false
+  return shouldUseAboutDnaWebGL()
 }
 
 /** Heavy cavern geometry in the main aviary — skip on fragile devices. */

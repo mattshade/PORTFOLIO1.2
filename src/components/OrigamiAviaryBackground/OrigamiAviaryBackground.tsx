@@ -22,43 +22,26 @@ import { captureTreeLeapStrike } from './catTreeStrike'
 import { buildAviaryAtmosphere, type AtmosphereSystem } from './atmosphere'
 import {
   applyBottomAnchor,
+  applyScrollParallaxRotation,
   applyWideForestCamera,
   BOTTOM_ANCHOR_CAMERA,
   BOTTOM_ANCHOR_LOOK,
-  scrollParallaxDrive,
+  scrollForestYaw,
 } from './sceneAnchor'
 import { clearLineMaterialRegistry, isLine2Object, disposeLine2, setLineResolution } from './lineBatch'
 import { createAviaryComposer, type AviaryComposer } from './renderPipeline'
-import { getAboutSceneProfile, type AboutSceneProfile } from '../OrigamiAboutBackground/aboutSceneConfig'
-import { buildCavernLayer } from '../OrigamiAboutBackground/aboutEnvironment'
+import { seedSurfaceOpacityBaselines } from '../OrigamiAboutBackground/aboutTransition'
+import { applyNavRotationMotion, isNavRotationBusy } from './navRotationMotion'
+import { getWebGLRendererOptions } from './webglCapabilities'
+import type { OrigamiCatSystem } from './origamiCat'
 import {
-  applyAboutScrollTransition,
-  applyAboutSurfaceFade,
-  applyCavernDepthEffects,
-  seedSurfaceOpacityBaselines,
-  applyCavernInversionMotion,
-} from '../OrigamiAboutBackground/aboutTransition'
-import type { CavernAtmosphereSystem } from '../OrigamiAboutBackground/cavernAtmosphere'
-import { readAboutScrollJourney } from '../OrigamiAboutBackground/homeDescentProgress'
-import {
-  buildEmbeddedAboutVine,
-  disposeEmbeddedAboutVine,
-  updateEmbeddedAboutVine,
-  type EmbeddedAboutVine,
-} from '../AboutDnaBackground/aboutVineEmbed'
-import {
-  getWebGLRendererOptions,
-  shouldBuildAviaryCavern,
-  shouldPauseAviaryWhileAboutVine,
-  shouldUseAboutCavernInversion,
-  shouldUseEmbeddedAboutVine,
-} from './webglCapabilities'
-import {
-  disposeAboutBats,
-  populateAboutBats,
-  updateAboutBats,
-  type AboutBat,
-} from '../OrigamiAboutBackground/batMotion'
+  buildAviaryBatPerches,
+  disposeAviaryBats,
+  populateAviaryBats,
+  updateAviaryBats,
+  type AviaryBat,
+  type AviaryBatPerch,
+} from './aviaryBats'
 
 function disposeObject3D(root: THREE.Object3D) {
   root.traverse((obj) => {
@@ -81,8 +64,6 @@ export function OrigamiAviaryBackground() {
   const readabilityRef = useRef<HTMLDivElement>(null)
   const reducedMotionRef = useRef(false)
   const scrollNormRef = useRef(0)
-  const journeyRef = useRef({ entry: 0, depth: 0 })
-  const journeySmoothRef = useRef({ entry: 0, depth: 0 })
   const [webglEpoch, setWebglEpoch] = useState(0)
   const [gpuDegraded, setGpuDegraded] = useState(false)
 
@@ -93,26 +74,21 @@ export function OrigamiAviaryBackground() {
     let disposed = false
     let raf = 0
     let birds: AviaryBird[] = []
+    let bats: AviaryBat[] = []
+    let batPerches: AviaryBatPerch[] = []
     let envRoots: THREE.Object3D[] = []
     let depthLayers: THREE.Group[] = []
     let perches: ReturnType<typeof buildAviaryEnvironment>['perches'] = []
     let atmosphere: AtmosphereSystem | undefined
-    let cat: ReturnType<typeof buildAviaryEnvironment>['cat'] | undefined
+    let cats: OrigamiCatSystem[] = []
     let pipeline: AviaryComposer | undefined
     let scene: THREE.Scene | undefined
     let stage: THREE.Group | undefined
     let world: THREE.Group | undefined
+    let spinPivot: THREE.Group | undefined
     let surfaceWorld: THREE.Group | undefined
     let camera: THREE.PerspectiveCamera | undefined
     let fog: THREE.FogExp2 | undefined
-    let cavern: THREE.Group | undefined
-    let bats: AboutBat[] = []
-    let batPerches: ReturnType<typeof buildCavernLayer>['batPerches'] = []
-    let cavernAtmosphere: CavernAtmosphereSystem | undefined
-    let embeddedVine: EmbeddedAboutVine | undefined
-    let cavernRng: ReturnType<typeof createMulberry32> | undefined
-    let aboutProfile: AboutSceneProfile = getAboutSceneProfile(window.innerWidth)
-    let journeySmooth = { entry: 0, depth: 0 }
 
     const interaction = createInteractionState()
     const pointer = new THREE.Vector2(0, 0)
@@ -147,7 +123,6 @@ export function OrigamiAviaryBackground() {
     const onScroll = () => {
       const max = Math.max(1, document.documentElement.scrollHeight - window.innerHeight)
       scrollNormRef.current = window.scrollY / max
-      journeyRef.current = readAboutScrollJourney()
     }
     onScroll()
     window.addEventListener('scroll', onScroll, { passive: true })
@@ -167,8 +142,6 @@ export function OrigamiAviaryBackground() {
       scene.background = new THREE.Color(AVIARY_COLORS.background)
       fog = new THREE.FogExp2(0x0c0e0c, tuning.fogDensity)
       scene.fog = fog
-      aboutProfile = getAboutSceneProfile(window.innerWidth)
-      aboutProfile.upper.fogDensity = tuning.fogDensity
 
       stage = new THREE.Group()
       stage.name = 'aviary-stage'
@@ -178,9 +151,13 @@ export function OrigamiAviaryBackground() {
       world.name = 'aviary-world'
       stage.add(world)
 
+      spinPivot = new THREE.Group()
+      spinPivot.name = 'aviary-nav-spin'
+      world.add(spinPivot)
+
       surfaceWorld = new THREE.Group()
       surfaceWorld.name = 'aviary-surface'
-      world.add(surfaceWorld)
+      spinPivot.add(surfaceWorld)
 
       camera = new THREE.PerspectiveCamera(tuning.baseFov, 1, 0.1, 120)
       const baseCam = BOTTOM_ANCHOR_CAMERA.clone().add(
@@ -216,43 +193,17 @@ export function OrigamiAviaryBackground() {
       setGpuDegraded(false)
 
       const accent = new THREE.Color(tuning.accentColor)
+      const muted = new THREE.Color(AVIARY_COLORS.lineMuted)
       const env = buildAviaryEnvironment(surfaceWorld, rng, tuning, accent)
       envRoots = env.roots
       depthLayers = env.depthLayers
       perches = env.perches
-      cat = env.cat
+      cats = env.cats
       birds = populateAviaryBirds(surfaceWorld, rng, tuning, perches)
+      batPerches = buildAviaryBatPerches(perches, rng, tuning)
+      bats = populateAviaryBats(surfaceWorld, rng, tuning, batPerches, accent, muted, env.roots)
       atmosphere = buildAviaryAtmosphere(stage, rng, tuning, accent)
       seedSurfaceOpacityBaselines(surfaceWorld, atmosphere.glowLayer, atmosphere.arcParent)
-
-      if (shouldUseEmbeddedAboutVine()) {
-        embeddedVine = buildEmbeddedAboutVine(world)
-      }
-
-      if (shouldBuildAviaryCavern()) {
-        cavernRng = createMulberry32(0xab0f4e75)
-        const cavernLayer = buildCavernLayer(world, cavernRng, aboutProfile, tuning.sceneDepth, envRoots)
-        cavern = cavernLayer.cavern
-        batPerches = cavernLayer.batPerches
-        cavernAtmosphere = cavernLayer.cavernAtmosphere
-        const cyan = new THREE.Color(aboutProfile.cavern.accentColor)
-        const cyanMuted = new THREE.Color(0x3d6a78)
-        bats = populateAboutBats(
-          cavern,
-          cavernRng,
-          batPerches,
-          aboutProfile.cavern,
-          cyan,
-          cyanMuted,
-          tuning.sceneDepth,
-          envRoots,
-        )
-      } else {
-        cavern = new THREE.Group()
-        cavern.name = 'about-cavern-empty'
-        cavern.visible = false
-        world.add(cavern)
-      }
 
       const clock = new THREE.Clock()
 
@@ -278,89 +229,61 @@ export function OrigamiAviaryBackground() {
       vv?.addEventListener('scroll', resize)
 
       const animate = () => {
-        if (disposed || !renderer || !scene || !camera || !world || !surfaceWorld || !stage || !fog || !cavern)
+        if (
+          disposed ||
+          !renderer ||
+          !scene ||
+          !camera ||
+          !world ||
+          !spinPivot ||
+          !surfaceWorld ||
+          !stage ||
+          !fog
+        )
           return
         raf = requestAnimationFrame(animate)
         if (tabHiddenRef.v || contextLost) return
         const gl = renderer.getContext()
         if (gl.isContextLost()) return
-        const aboutVinePause = shouldPauseAviaryWhileAboutVine()
         try {
           const delta = Math.min(clock.getDelta(), 0.05)
           const elapsed = clock.getElapsedTime()
           const rm = reducedMotionRef.current
-          const journeyTarget = journeyRef.current
-          const smoothRate = rm ? 1 : 1 - Math.exp(-delta * 6)
-          journeySmooth.entry += (journeyTarget.entry - journeySmooth.entry) * smoothRate
-          journeySmooth.depth += (journeyTarget.depth - journeySmooth.depth) * smoothRate
-          journeySmoothRef.current = { ...journeySmooth }
-
-          const { entry, depth } = journeySmooth
-          const scrollEntry = journeyTarget.entry
-          const surfaceLayers: THREE.Object3D[] = []
-          if (atmosphere) {
-            surfaceLayers.push(atmosphere.glowLayer, atmosphere.arcParent)
-          }
-
-          const transitionTargets = {
-            surfaceWorld,
-            cavern,
-            scene,
-            fog,
-            renderer,
-            birds,
-            bats,
-            surfaceLayers,
-            cat: cat ?? null,
-            readabilityEl: readabilityRef.current,
-            upperFogDensity: tuning.fogDensity,
-          }
-
-          const { t: entryT, revealCavern, surfaceVis } = applyAboutScrollTransition(
-            scrollEntry,
-            aboutProfile,
-            transitionTargets,
-          )
-          const cavernMix = applyCavernDepthEffects(
-            depth,
-            scrollEntry,
-            revealCavern,
-            surfaceVis,
-            aboutProfile,
-            transitionTargets,
-          )
-
-          const scrollForParallax = scrollNormRef.current * (1 - entryT * 0.65 - depth * 0.25)
+          const scrollForParallax = scrollNormRef.current
 
           updateInteractionState(interaction, pointer, scrollForParallax, delta, tuning, rm)
           applyCameraInteraction(camera, baseCam, baseLook, interaction, tuning, rm)
-          const { transition: tr, descent: d } = aboutProfile
-          const inv = entryT
-          camera.position.y += inv * tr.cameraDriftY + depth * d.cameraDepthY
-          camera.position.z += inv * tr.cameraDriftZ + depth * d.cameraDepthZ
           if (!rm) applyWideForestCamera(camera, camera.aspect, tuning)
-          if (rm) {
+
+          const navBusy = isNavRotationBusy()
+          if (rm || navBusy) {
             stage.rotation.set(0, 0, 0)
             stage.position.set(0, 0, 0)
-          } else if (shouldUseAboutCavernInversion()) {
-            applyCavernInversionMotion(
-              stage,
-              interaction.scrollSmooth,
-              aboutProfile.scrollRotateIntensity,
-              entry,
-              depth,
-              aboutProfile,
-            )
           } else {
-            const drive = scrollParallaxDrive(interaction.scrollSmooth)
-            const ri = aboutProfile.scrollRotateIntensity * 0.22
-            stage.rotation.x = drive * ri * 0.35
-            stage.rotation.y = drive * ri * 0.5
-            stage.rotation.z = drive * ri * 0.12
-            stage.position.y = drive * ri * 0.06
-            stage.position.z = drive * ri * 0.14
+            applyScrollParallaxRotation(stage, interaction.scrollSmooth, tuning.scrollRotateIntensity)
           }
+
           applyBottomAnchor(camera, world, camera.aspect, scrollForParallax, tuning.scrollDriftIntensity)
+          const frameBaseZ = camera.position.z
+          const frameBaseFov = camera.fov
+          applyNavRotationMotion(
+            {
+              spinPivot,
+              camera,
+              frameBaseZ,
+              frameBaseFov,
+              forestHalfWidth: tuning.forestHalfWidth,
+              sceneDepth: tuning.sceneDepth,
+            },
+            delta * 1000,
+            rm,
+          )
+          if (!rm) {
+            spinPivot.rotation.y += scrollForestYaw(
+              interaction.scrollSmooth,
+              tuning.scrollForestRevolutions,
+            )
+          }
           applyEnvironmentInteraction(depthLayers, interaction, tuning, rm)
 
           updateAviaryBirds(
@@ -374,60 +297,54 @@ export function OrigamiAviaryBackground() {
             interaction.pointerSmooth,
             camera,
             scrollForParallax,
-            surfaceVis,
+            1,
           )
-          if (cavernRng) {
-            updateAboutBats(bats, batPerches, elapsed, delta, aboutProfile.cavern, cavernRng, rm, depth)
-          }
-          if (embeddedVine) updateEmbeddedAboutVine(embeddedVine, elapsed, depth, rm)
-          cavernAtmosphere?.tick(
-            elapsed,
-            THREE.MathUtils.smoothstep(cavernMix, 0.25, 0.95),
-            rm,
-          )
-          atmosphere?.tick(elapsed, delta, interaction, tuning, rm, surfaceVis)
-          try {
-            cat?.tick(
-              elapsed,
-              delta,
-              tuning,
-              rm,
-              cat && !rm
-                ? {
-                    perches,
-                    attemptTreeLeapStrike: (pos, out) => captureTreeLeapStrike(pos, birds, perches, rng, elapsed, out),
-                    findPreyFocus: (pos, out) => findCatPreyFocus(birds, perches, pos, elapsed, out),
-                  }
-                : undefined,
-            )
-          } catch (e) {
-            console.error('[OrigamiAviaryBackground] cat tick error', e)
-          }
-          if (cat && !rm) {
-            try {
-              const activeCat = cat
-              handleCatBirdCollisions(
-                activeCat.getPosition(catPosScratch),
-                (target) => activeCat.pounceAt(target, elapsed),
-                activeCat.isPouncing,
-                birds,
+          updateAviaryBats(bats, batPerches, elapsed, delta, tuning, rng, rm)
+          atmosphere?.tick(elapsed, delta, interaction, tuning, rm, 1)
+
+          const catCtx = !rm
+            ? {
                 perches,
-                rng,
-                elapsed,
-                { suppress: activeCat.suppressCatBirdHandling() },
-              )
+                attemptTreeLeapStrike: (pos: THREE.Vector3, out: THREE.Vector3) =>
+                  captureTreeLeapStrike(pos, birds, perches, rng, elapsed, out),
+                findPreyFocus: (pos: THREE.Vector3, out: THREE.Vector3) =>
+                  findCatPreyFocus(birds, perches, pos, elapsed, out),
+              }
+            : undefined
+
+          for (const activeCat of cats) {
+            try {
+              activeCat.tick(elapsed, delta, tuning, rm, catCtx)
             } catch (e) {
-              console.error('[OrigamiAviaryBackground] cat collision error', e)
+              console.error('[OrigamiAviaryBackground] cat tick error', e)
             }
           }
-          applyAboutSurfaceFade(transitionTargets, surfaceVis)
-          const bloomOn = !rm && tuning.viewportProfile !== 'narrow' && !aboutVinePause
-          pipeline?.setBloomStrength(bloomOn ? tuning.bloomStrength * surfaceVis : 0)
+
+          if (!rm) {
+            for (const activeCat of cats) {
+              try {
+                handleCatBirdCollisions(
+                  activeCat.getPosition(catPosScratch),
+                  (target) => activeCat.pounceAt(target, elapsed),
+                  activeCat.isPouncing,
+                  birds,
+                  perches,
+                  rng,
+                  elapsed,
+                  { suppress: activeCat.suppressCatBirdHandling() },
+                )
+              } catch (e) {
+                console.error('[OrigamiAviaryBackground] cat collision error', e)
+              }
+            }
+          }
+
+          const bloomOn = !rm && tuning.viewportProfile !== 'narrow'
+          pipeline?.setBloomStrength(bloomOn ? tuning.bloomStrength : 0)
         } catch (e) {
           console.error('[OrigamiAviaryBackground] frame error', e)
         }
         try {
-          // DNA vine shares LineMaterial registry — restore aviary resolution every frame.
           const canvasEl = renderer.domElement
           setLineResolution(
             Math.max(1, canvasEl.clientWidth || canvasEl.width),
@@ -460,17 +377,13 @@ export function OrigamiAviaryBackground() {
         pipeline?.dispose()
         pipeline = undefined
         clearLineMaterialRegistry()
-        cat?.dispose()
-        cat = undefined
+        for (const activeCat of cats) activeCat.dispose()
+        cats = []
         atmosphere?.dispose()
         atmosphere = undefined
-        cavernAtmosphere?.dispose()
-        cavernAtmosphere = undefined
-        if (embeddedVine && world) disposeEmbeddedAboutVine(embeddedVine, world)
-        embeddedVine = undefined
         if (scene) {
-          if (cavern) disposeAboutBats(bats, cavern)
           disposeAviaryBirds(birds, world ?? scene)
+          disposeAviaryBats(bats, surfaceWorld ?? world ?? scene)
           envRoots.forEach((r) => {
             ;(world ?? scene).remove(r)
             disposeObject3D(r)

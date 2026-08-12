@@ -11,7 +11,7 @@ export function scrollParallaxDrive(scrollSmooth: number): number {
   return (scrollSmooth - 0.5) * 2 * scrollParallaxWeight(scrollSmooth)
 }
 
-/** Frame the ground plane toward the bottom of the viewport. */
+/** Nudge the world so foliage fills the frame rather than the ground plane. */
 export function applyBottomAnchor(
   camera: THREE.PerspectiveCamera,
   world: THREE.Group,
@@ -21,13 +21,19 @@ export function applyBottomAnchor(
 ) {
   const tall = aspect < 0.85
   const wide = aspect > 1.65
-  const baseLift = tall ? -1.15 : wide ? -0.72 : -0.92
-  const scrollShift = scrollParallaxDrive(scrollSmooth) * scrollDrift * 0.19
+  const baseLift = tall ? -0.95 : wide ? -0.68 : -0.78
+  const scrollShift = scrollParallaxDrive(scrollSmooth) * scrollDrift * 0.34
   world.position.set(0, baseLift - scrollShift, 0)
 }
 
-export const BOTTOM_ANCHOR_CAMERA = new THREE.Vector3(0, 2.05, 6.8)
-export const BOTTOM_ANCHOR_LOOK = new THREE.Vector3(0, 0.22, -11.5)
+export const BOTTOM_ANCHOR_CAMERA = new THREE.Vector3(0, 1.58, 2.75)
+export const BOTTOM_ANCHOR_LOOK = new THREE.Vector3(0, 1.08, -4.5)
+
+/** Y-axis spin (radians) for the 360° forest ring from scroll progress 0 → 1. */
+export function scrollForestYaw(scrollSmooth: number, revolutions: number): number {
+  const t = THREE.MathUtils.clamp(scrollSmooth, 0, 1)
+  return t * Math.PI * 2 * revolutions
+}
 
 /** Rotate and shift the aviary stage on scroll for a strong perspective tilt. */
 export function applyScrollParallaxRotation(
@@ -37,8 +43,8 @@ export function applyScrollParallaxRotation(
 ) {
   const t = scrollParallaxDrive(scrollSmooth)
   const i = rotateIntensity
-  stage.rotation.set(t * i * 0.68, t * i * 1.05, t * i * 0.32)
-  stage.position.set(0, t * i * 0.14, t * i * 0.42)
+  stage.rotation.set(t * i * 0.72, t * i * 0.28, t * i * 0.32)
+  stage.position.set(0, t * i * 0.16, t * i * 0.42)
 }
 
 /**
@@ -56,8 +62,8 @@ export function applyWideForestCamera(
   }
 
   if (aspect > 1.85) {
-    camera.position.z += (aspect - 1.85) * 1.1
-    camera.fov += (aspect - 1.85) * 4
+    camera.position.z += (aspect - 1.85) * 0.55
+    camera.fov += (aspect - 1.85) * 3.2
     camera.updateProjectionMatrix()
   }
 }

@@ -89,12 +89,14 @@ export function buildAviaryAtmosphere(
   const glows = new Float32Array(count)
   const drift: { vx: number; vy: number; vz: number; phase: number }[] = []
 
-  const xSpan = tuning.forestHalfWidth * 2
+  const ringSpan = tuning.forestHalfWidth * 2
 
   for (let i = 0; i < count; i++) {
-    positions[i * 3] = (rng() - 0.5) * xSpan
+    const angle = rng() * Math.PI * 2
+    const radius = tuning.forestHalfWidth * (0.18 + rng() * 0.72)
+    positions[i * 3] = Math.sin(angle) * radius
     positions[i * 3 + 1] = 0.8 + rng() * 6.5
-    positions[i * 3 + 2] = -2 - rng() * tuning.sceneDepth
+    positions[i * 3 + 2] = -Math.cos(angle) * radius
     sizes[i] = 0.5 + rng() * 1.5
     phases[i] = rng() * Math.PI * 2
     flickers[i] = 0.35 + rng() * 2.4
@@ -138,8 +140,10 @@ export function buildAviaryAtmosphere(
 
   for (let i = 0; i < tuning.lightColumnCount; i++) {
     const colBatch = createLineBatch(tuning.lineOpacity * 0.38, tuning.lineWidth * 0.75)
-    const x = (rng() - 0.5) * 10
-    const z = -4 - rng() * 7
+    const angle = rng() * Math.PI * 2
+    const radius = tuning.forestHalfWidth * (0.22 + rng() * 0.55)
+    const x = Math.sin(angle) * radius
+    const z = -Math.cos(angle) * radius
     const h = 2.5 + rng() * 4.5
     const y0 = 0.05
     const segs = 8 + Math.floor(rng() * 6)
@@ -193,7 +197,7 @@ export function buildAviaryAtmosphere(
     particleMat.uniforms.uIntensity.value = base * intensityScale
 
     const driftScale = reducedMotion ? 0 : tuning.atmosphereDrift * delta * 0.65
-    const xLimit = tuning.forestHalfWidth
+    const xLimit = ringSpan * 0.5
     const px = state.pointerSmooth.x * tuning.parallaxIntensity * 0.045
     const py = state.pointerSmooth.y * tuning.parallaxIntensity * 0.028
 

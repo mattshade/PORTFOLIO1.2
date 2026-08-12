@@ -6,6 +6,7 @@ import {
   getAboutDnaWebGLRendererOptions,
   setAboutVineSceneActive,
   shouldUseAboutDnaWebGL,
+  shouldUseEmbeddedAboutVine,
 } from '../OrigamiAviaryBackground/webglCapabilities'
 import {
   readAboutVineFadeOpacity,
@@ -173,7 +174,7 @@ function bindAboutVineVisibility(host: HTMLElement) {
 
 export function AboutDnaBackground() {
   const hostRef = useRef<HTMLDivElement>(null)
-  const useWebGL = shouldUseAboutDnaWebGL()
+  const useWebGL = shouldUseAboutDnaWebGL() && !shouldUseEmbeddedAboutVine()
   const [forceStaticArt, setForceStaticArt] = useState(false)
 
   useEffect(() => {
@@ -381,7 +382,7 @@ export function AboutDnaBackground() {
     }
   }, [useWebGL])
 
-  const showStaticArt = !useWebGL || forceStaticArt
+  const showStaticArt = (!useWebGL && !shouldUseEmbeddedAboutVine()) || forceStaticArt
 
   return (
     <div

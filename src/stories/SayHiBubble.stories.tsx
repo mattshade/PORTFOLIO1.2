@@ -1,22 +1,21 @@
-import type { Meta, StoryObj } from '@storybook/react';
-import { SayHiBubble } from '../components/SayHiBubble';
-import '../components/Hero.css';
-import '../App.css';
+import type { Meta, StoryObj } from '@storybook/react'
+import { ContactSection } from '../components/ContactSection'
+import '../App.css'
 
-const meta: Meta<typeof SayHiBubble> = {
-  title: 'Components/SayHiBubble',
-  component: SayHiBubble,
+const meta: Meta<typeof ContactSection> = {
+  title: 'Components/ContactSection',
+  component: ContactSection,
   decorators: [
     (Story) => (
-      <div style={{ padding: '5rem', background: '#0a0a0b', minHeight: '300px', display: 'flex', justifyContent: 'center' }}>
+      <div style={{ padding: '3rem 1.5rem', background: '#0a0a0b', minHeight: '480px' }}>
         <Story />
       </div>
     ),
   ],
   tags: ['autodocs'],
-};
+}
 
-export default meta;
-type Story = StoryObj<typeof SayHiBubble>;
+export default meta
+type Story = StoryObj<typeof ContactSection>
 
-export const Default: Story = {};
+export const Default: Story = {}

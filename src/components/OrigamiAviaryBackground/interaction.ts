@@ -92,16 +92,16 @@ export function applyCameraInteraction(
 
   camera.position.set(
     baseCam.x + state.pointerSmooth.x * s,
-    baseCam.y - state.pointerSmooth.y * s * 0.28 + scrollOff * 0.055 - scrollT * 0.22,
-    baseCam.z + scrollOff * 0.14 - scrollT * 0.55,
+    baseCam.y - state.pointerSmooth.y * s * 0.28 + scrollOff * 0.085 - scrollT * 0.38,
+    baseCam.z + scrollOff * 0.22 - scrollT * 0.95,
   )
   camera.lookAt(
     baseLook.x + state.pointerSmooth.x * s * 0.28,
-    baseLook.y - state.pointerSmooth.y * s * 0.16 + scrollOff * 0.04 - scrollT * 0.12,
-    baseLook.z,
+    baseLook.y - state.pointerSmooth.y * s * 0.16 + scrollOff * 0.06 - scrollT * 0.2,
+    baseLook.z - scrollT * 0.35,
   )
-  camera.rotation.z = scrollT * tuning.scrollRotateIntensity * 0.06
-  camera.fov = tuning.baseFov - scrollT * 5.5
+  camera.rotation.z = scrollT * tuning.scrollRotateIntensity * 0.14
+  camera.fov = tuning.baseFov - scrollT * 10.5
   camera.updateProjectionMatrix()
 }
 
@@ -127,9 +127,11 @@ export function applyEnvironmentInteraction(
   layers.forEach((layer, i) => {
     const depth = 0.28 + i * 0.28
     layer.position.x = state.pointerSmooth.x * s * depth
-    layer.position.y = state.pointerSmooth.y * s * depth * 0.35 + scrollOff * 0.032 * (i + 1)
-    layer.position.z = scrollOff * 0.022 * (i + 1)
-    layer.rotation.y = state.pointerSmooth.x * 0.003 * (i + 1) * rotScale
+    layer.position.y = state.pointerSmooth.y * s * depth * 0.35 + scrollOff * 0.058 * (i + 1)
+    layer.position.z = scrollOff * 0.042 * (i + 1)
+    layer.rotation.y =
+      state.pointerSmooth.x * 0.003 * (i + 1) * rotScale +
+      scrollParallaxDrive(state.scrollSmooth) * tuning.scrollRotateIntensity * 0.12 * (i + 1)
     layer.rotation.x = state.pointerSmooth.y * 0.002 * (i + 1) * rotScale
   })
 }

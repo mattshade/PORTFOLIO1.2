@@ -1,4 +1,6 @@
 import * as THREE from 'three'
+import { getAboutNavChoreoEntry } from '../../world/aboutJourneyBridge'
+import { shouldUseEmbeddedAboutVine } from '../OrigamiAviaryBackground/webglCapabilities'
 
 export type AboutScrollJourney = {
   /** 0 = aviary, 1 = full inversion into cavern (scroll through transition band) */
@@ -32,20 +34,20 @@ export function readAboutTransitionEntry(): number {
   const vh = window.visualViewport?.height ?? window.innerHeight
   const scrollY = pageScrollY()
 
+  let fromScroll = 0
+
   if (startEl && endEl) {
     const startTop = startEl.getBoundingClientRect().top + scrollY
     const endTop = endEl.getBoundingClientRect().top + scrollY
     const range = Math.max(vh * 0.4, endTop - startTop)
     const probe = scrollY + vh * 0.5
-    return THREE.MathUtils.clamp((probe - startTop) / range, 0, 1)
-  }
-
-  if (aboutEl) {
+    fromScroll = THREE.MathUtils.clamp((probe - startTop) / range, 0, 1)
+  } else if (aboutEl) {
     const aboutTop = aboutEl.getBoundingClientRect().top + scrollY
-    return THREE.MathUtils.clamp(1 - (aboutTop - scrollY - vh * 0.15) / (vh * 1.35), 0, 1)
+    fromScroll = THREE.MathUtils.clamp(1 - (aboutTop - scrollY - vh * 0.15) / (vh * 1.35), 0, 1)
   }
 
-  return 0
+  return Math.max(fromScroll, getAboutNavChoreoEntry())
 }
 
 /**
@@ -93,12 +95,15 @@ export function readStalkPanProgress(): number {
 export function readAboutVineFadeOpacity(): number {
   const entry = readAboutTransitionEntry()
   const scrollT = readAboutVineScrollT()
+  const embedded = shouldUseEmbeddedAboutVine()
+  const emergeStart = embedded ? 0.38 : 0.97
+  const emergeEnd = embedded ? 0.58 : 1
 
-  if (entry < 0.97 && scrollT < 0.01) return 0
+  if (entry < emergeStart && scrollT < 0.01) return 0
 
-  const fromEntry = THREE.MathUtils.smoothstep(0.97, 1, entry)
+  const fromEntry = THREE.MathUtils.smoothstep(emergeStart, emergeEnd, entry)
   const fromScroll = THREE.MathUtils.smoothstep(0, 0.04, scrollT)
-  return Math.min(1, Math.max(fromEntry, fromScroll, entry >= 0.97 ? 1 : 0))
+  return Math.min(1, Math.max(fromEntry, fromScroll, entry >= emergeEnd ? 1 : 0))
 }
 
 /** @deprecated Use isAboutVineScrollActive pattern in AboutDnaBackground */

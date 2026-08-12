@@ -1,11 +1,18 @@
 import { Link, useLocation } from 'react-router-dom'
 import { useState, useEffect } from 'react'
+import { useNavRotationTrigger } from '../world/useNavRotationTrigger'
 import './Nav.css'
 
 export function Nav() {
   const location = useLocation()
   const isHome = location.pathname === '/'
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const triggerNavRotation = useNavRotationTrigger()
+
+  const activateNav = () => {
+    triggerNavRotation()
+    setIsMenuOpen(false)
+  }
 
   // Close menu when location changes
   useEffect(() => {
@@ -34,10 +41,10 @@ export function Nav() {
           to="/" 
           className="nav-home"
           onClick={(e) => {
+            activateNav()
             if (location.pathname === '/') {
               e.preventDefault()
               window.scrollTo({ top: 0, behavior: 'smooth' })
-              setIsMenuOpen(false)
             }
           }}
         >
@@ -62,46 +69,41 @@ export function Nav() {
 
         <div className={`nav-links ${isMenuOpen ? 'open' : ''}`}>
           {isHome ? (
-            <a href="#about" className="nav-link bird-perch" onClick={() => setIsMenuOpen(false)}>
+            <a href="#about" className="nav-link bird-perch" onClick={activateNav}>
               About
             </a>
           ) : (
-            <Link to="/#about" className="nav-link bird-perch" onClick={() => setIsMenuOpen(false)}>
+            <Link to="/#about" className="nav-link bird-perch" onClick={activateNav}>
               About
             </Link>
           )}
           {isHome ? (
-            <a href="#projects" className="nav-link bird-perch" onClick={() => setIsMenuOpen(false)}>
+            <a href="#projects" className="nav-link bird-perch" onClick={activateNav}>
               Case Studies and Projects
             </a>
           ) : (
-            <Link to="/#projects" className="nav-link bird-perch" onClick={() => setIsMenuOpen(false)}>
+            <Link to="/#projects" className="nav-link bird-perch" onClick={activateNav}>
               Case Studies and Projects
             </Link>
           )}
           {isHome ? (
-            <a
-              href="#experience"
-              className="nav-link bird-perch"
-              onClick={() => setIsMenuOpen(false)}
-            >
+            <a href="#experience" className="nav-link bird-perch" onClick={activateNav}>
               Experience
             </a>
           ) : (
-            <Link
-              to="/#experience"
-              className="nav-link bird-perch"
-              onClick={() => setIsMenuOpen(false)}
-            >
+            <Link to="/#experience" className="nav-link bird-perch" onClick={activateNav}>
               Experience
             </Link>
           )}
-          <button 
-            className="nav-link bird-perch nav-contact-btn" 
-            onClick={() => window.dispatchEvent(new Event('open-contact'))}
-          >
-            Contact
-          </button>
+          {isHome ? (
+            <a href="#contact" className="nav-link bird-perch" onClick={activateNav}>
+              Contact
+            </a>
+          ) : (
+            <Link to="/#contact" className="nav-link bird-perch" onClick={activateNav}>
+              Contact
+            </Link>
+          )}
         </div>
       </div>
     </nav>

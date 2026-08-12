@@ -20,12 +20,15 @@ export function buildAviaryArchitecture(
 ): void {
   const muted = new THREE.Color(AVIARY_COLORS.lineMuted)
   const accentSoft = accent.clone().lerp(muted, 0.4)
-  const span = tuning.forestHalfWidth * 2
+  const inner = Math.max(3.6, tuning.forestHalfWidth * 0.1)
+  const outer = tuning.forestHalfWidth * 0.6
 
   for (let i = 0; i < tuning.portalFrameCount; i++) {
     const batch = createLineBatch(tuning.lineOpacity * 0.48, tuning.lineWidth * 0.95)
-    const z = -3.5 - rng() * (tuning.sceneDepth - 3)
-    const x = (rng() - 0.5) * span * 0.75
+    const angle = (i / Math.max(1, tuning.portalFrameCount)) * Math.PI * 2 + (rng() - 0.5) * 0.55
+    const radius = inner + rng() * (outer - inner)
+    const x = Math.sin(angle) * radius
+    const z = -Math.cos(angle) * radius
     const w = 1.4 + rng() * 1.8
     const h = 2.2 + rng() * 2.8
     const y = 0.02
@@ -42,9 +45,13 @@ export function buildAviaryArchitecture(
   const guides = createLineBatch(tuning.gridOpacity * 0.85, tuning.lineWidth * 0.85)
   const guideCount = tuning.floorGuideCount
   for (let g = 0; g < guideCount; g++) {
-    const t = (g + 1) / (guideCount + 1)
-    const x = (t - 0.5) * span
-    seg(guides.positions, x, 0.02, -1.2, x * 0.38, 0.02, -tuning.sceneDepth * 0.55)
+    const angle = (g / guideCount) * Math.PI * 2
+    const radius = inner + (outer - inner) * 0.35
+    const x = Math.sin(angle) * radius
+    const z = -Math.cos(angle) * radius
+    const xFar = Math.sin(angle) * outer * 0.72
+    const zFar = -Math.cos(angle) * outer * 0.72
+    seg(guides.positions, x, 0.02, z, xFar, 0.02, zFar)
   }
   flushLineBatch(guides, parent, muted, roots, tuning.sceneDepth, tuning.lineWidth * 0.85)
 }

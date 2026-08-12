@@ -41,13 +41,15 @@ export type OrigamiAviaryTuning = {
   scrollDriftIntensity: number
   /** Max scroll parallax rotation (radians scale at page top/bottom) */
   scrollRotateIntensity: number
+  /** Full forest revolutions (360° × n) from page top to bottom on the spin pivot. */
+  scrollForestRevolutions: number
   scrollSmoothing: number
   pointerInfluence: number
   wingFlutterIntensity: number
   accentColor: number
   fogDensity: number
   sceneDepth: number
-  /** Half-width of forest placement on X (full span ≈ 2× this) */
+  /** Outer radius of the 360° forest ring (world units). */
   forestHalfWidth: number
   maxPixelRatio: number
   pointerSmoothing: number
@@ -99,15 +101,23 @@ export type OrigamiAviaryTuning = {
   touchScrollScale: number
   /** Extra scale on first hero silhouettes on narrow viewports */
   heroSilhouetteBoost: number
+  /** Extra trees in the far depth band (fraction of treeCount). */
+  forestDeepFillFraction: number
   /** Scales lattice panels, vine bridges, and suspended lines in the forest pass */
   forestArchitectureDensity: number
+  /** Extra trees along the left/right forest edge (fraction of treeCount). */
+  forestEdgeFillFraction: number
+  /** Canopy bats — line origami silhouettes */
+  batCount: number
+  flyingBatCount: number
+  batScale: number
 }
 
 export const DEFAULT_AVIARY_TUNING: OrigamiAviaryTuning = {
   seed: 0x41766972,
-  birdCount: 8,
-  sculpturalBirdCount: 3,
-  treeCount: 15,
+  birdCount: 18,
+  sculpturalBirdCount: 5,
+  treeCount: 76,
   branchDepth: 5,
   latticePanelCount: 3,
   suspendedLineCount: 8,
@@ -124,28 +134,30 @@ export const DEFAULT_AVIARY_TUNING: OrigamiAviaryTuning = {
   bloomRadius: 0.38,
   bloomThreshold: 0.18,
   lineWidth: 1.1,
-  gridOpacity: 0.09,
+  gridOpacity: 0.048,
   lineOpacity: 0.17,
   animationIntensity: 0.92,
   parallaxIntensity: 0.42,
-  scrollDriftIntensity: 0.52,
-  scrollRotateIntensity: 0.62,
-  scrollSmoothing: 6,
+  scrollDriftIntensity: 0.68,
+  scrollRotateIntensity: 0.58,
+  scrollForestRevolutions: 0.3,
+  scrollSmoothing: 3.85,
   pointerInfluence: 0.5,
   pointerSmoothing: 11,
   wingFlutterIntensity: 0.88,
   accentColor: 0x7a9a6e,
-  fogDensity: 0.013,
-  sceneDepth: 16,
-  forestHalfWidth: 26,
+  fogDensity: 0.0105,
+  sceneDepth: 28,
+  forestHalfWidth: 22,
   maxPixelRatio: 1.25,
-  groundGridDivisions: 30,
+  groundGridDivisions: 42,
   posterComposition: false,
   posterHeroBirdSlot: 'upperLeft',
-  forestCenterFillFraction: 0.28,
-  forestLimbDensity: 1,
-  forestFineDetail: 1,
+  forestCenterFillFraction: 0.68,
+  forestLimbDensity: 1.18,
+  forestFineDetail: 1.12,
   forestRootDensity: 1,
+  forestDeepFillFraction: 0.4,
   heroBirdScaleMul: 1,
   heroBirdEdgeOpacityMul: 1,
   heroBirdFillOpacityMul: 1,
@@ -156,11 +168,11 @@ export const DEFAULT_AVIARY_TUNING: OrigamiAviaryTuning = {
 
   viewportProfile: 'desktop',
   touchPrimary: false,
-  baseFov: 43,
+  baseFov: 39,
   cameraOffsetX: 0,
-  cameraOffsetY: 0,
-  cameraOffsetZ: 0,
-  lookAtOffsetY: 0,
+  cameraOffsetY: 0.04,
+  cameraOffsetZ: -1.05,
+  lookAtOffsetY: 0.14,
   portraitFovTrim: 0,
   viewerApproachEnabled: true,
   heroPerchMinCenterFraction: 0.12,
@@ -169,6 +181,10 @@ export const DEFAULT_AVIARY_TUNING: OrigamiAviaryTuning = {
   touchScrollScale: 1,
   heroSilhouetteBoost: 1,
   forestArchitectureDensity: 1,
+  forestEdgeFillFraction: 0.58,
+  batCount: 5,
+  flyingBatCount: 2,
+  batScale: 1.22,
 }
 
 export const AVIARY_COLORS = {
@@ -256,7 +272,8 @@ export function getResponsiveAviaryTuning(): OrigamiAviaryTuning {
 
   const t: OrigamiAviaryTuning = { ...DEFAULT_AVIARY_TUNING }
   const aspect = w / Math.max(h, 1)
-  t.forestHalfWidth = 7 + aspect * 11.5
+  t.forestHalfWidth = 8.5 + aspect * 13.5
+  t.sceneDepth = aspect > 1.35 ? 34 : 30
 
   t.viewportProfile = getAviaryViewportProfile(w)
   t.touchPrimary = w <= 768 || coarsePointer
@@ -270,8 +287,8 @@ export function getResponsiveAviaryTuning(): OrigamiAviaryTuning {
       posterComposition: true,
       posterHeroBirdSlot: posterHeroSlotFromSeed(t.seed),
       sculpturalBirdCount: 1,
-      birdCount: phone ? 1 : 2,
-      treeCount: phone ? 6 : 8,
+      birdCount: phone ? 5 : 7,
+      treeCount: phone ? 28 : 34,
       branchDepth: phone ? 3 : 4,
       latticePanelCount: phone ? 0 : 1,
       suspendedLineCount: phone ? 3 : 4,
@@ -287,15 +304,17 @@ export function getResponsiveAviaryTuning(): OrigamiAviaryTuning {
       bloomRadius: phone ? 0.24 : 0.3,
       lineWidth: phone ? 1.48 : 1.38,
       lineOpacity: phone ? 0.22 : 0.2,
-      gridOpacity: phone ? 0.075 : 0.078,
-      groundGridDivisions: phone ? 12 : 14,
+      gridOpacity: phone ? 0.04 : 0.044,
+      groundGridDivisions: phone ? 16 : 18,
       maxPixelRatio: 1,
-      fogDensity: phone ? 0.011 : 0.0118,
-      forestCenterFillFraction: phone ? 0.06 : 0.1,
+      fogDensity: phone ? 0.0095 : 0.0102,
+      forestCenterFillFraction: phone ? 0.52 : 0.58,
       forestLimbDensity: phone ? 0.5 : 0.62,
       forestFineDetail: phone ? 0.35 : 0.48,
       forestRootDensity: phone ? 0.5 : 0.6,
       forestArchitectureDensity: phone ? 0.68 : 0.78,
+      forestEdgeFillFraction: phone ? 0.46 : 0.52,
+      forestDeepFillFraction: phone ? 0.3 : 0.36,
       heroBirdScaleMul: phone ? 1.48 : 1.38,
       heroBirdEdgeOpacityMul: phone ? 1.22 : 1.16,
       heroBirdFillOpacityMul: phone ? 1.1 : 1.06,
@@ -303,17 +322,21 @@ export function getResponsiveAviaryTuning(): OrigamiAviaryTuning {
       flockBirdEdgeOpacityMul: phone ? 0.88 : 0.92,
       flockBirdFillOpacityMul: phone ? 0.86 : 0.9,
       posterFlockZPush: phone ? -1.45 : -1.05,
+      batCount: phone ? 2 : 3,
+      flyingBatCount: 1,
+      batScale: phone ? 1.08 : 1.14,
       parallaxIntensity: touchPrimary ? (phone ? 0.14 : 0.18) : phone ? 0.18 : 0.24,
-      scrollDriftIntensity: touchPrimary ? 0.1 : phone ? 0.18 : 0.24,
-      scrollRotateIntensity: touchPrimary ? (phone ? 0.14 : 0.18) : phone ? 0.18 : 0.26,
+      scrollDriftIntensity: touchPrimary ? 0.48 : phone ? 0.54 : 0.62,
+      scrollRotateIntensity: touchPrimary ? (phone ? 0.42 : 0.48) : phone ? 0.48 : 0.52,
+      scrollForestRevolutions: phone ? 0.26 : 0.28,
       animationIntensity: phone ? 0.48 : 0.56,
       wingFlutterIntensity: phone ? 0.38 : 0.46,
       pointerInfluence: phone ? 0.42 : 0.46,
-      scrollSmoothing: touchPrimary ? 8 : phone ? 7.5 : 7,
+      scrollSmoothing: touchPrimary ? 5.5 : phone ? 5 : 4.6,
       baseFov: phone ? 44 : 43.5,
-      cameraOffsetZ: phone ? -0.95 : -0.72,
-      cameraOffsetY: phone ? 0.12 : 0.08,
-      lookAtOffsetY: phone ? 0.06 : 0.04,
+      cameraOffsetZ: phone ? -1.35 : -1.15,
+      cameraOffsetY: phone ? 0.02 : 0.05,
+      lookAtOffsetY: phone ? 0.1 : 0.12,
       portraitFovTrim: phone ? 2.6 : 2.1,
       viewerApproachEnabled: false,
       heroPerchMinCenterFraction: phone ? 0.32 : 0.28,
@@ -331,9 +354,12 @@ export function getResponsiveAviaryTuning(): OrigamiAviaryTuning {
     }
   } else if (w < 1100) {
     t.viewportProfile = 'tablet'
-    t.birdCount = 7
-    t.sculpturalBirdCount = 2
-    t.treeCount = 14
+    t.birdCount = 14
+    t.sculpturalBirdCount = 4
+    t.treeCount = 58
+    t.forestCenterFillFraction = 0.62
+    t.forestEdgeFillFraction = 0.52
+    t.forestDeepFillFraction = 0.36
     t.particleCount = 320
     t.particleIntensity = 0.52
     t.maxPixelRatio = Math.min(1.25, dpr)
@@ -344,11 +370,12 @@ export function getResponsiveAviaryTuning(): OrigamiAviaryTuning {
     }
   } else {
     t.maxPixelRatio = Math.min(t.maxPixelRatio, dpr)
-    if (aspect > 1.9) t.treeCount = 18
+    if (aspect > 1.9) t.treeCount = 92
   }
 
   if (reducedMotion) {
     t.scrollRotateIntensity = 0
+    t.scrollForestRevolutions = 0
     t.parallaxIntensity = Math.min(t.parallaxIntensity, 0.2)
     t.scrollDriftIntensity = Math.min(t.scrollDriftIntensity, 0.12)
     t.animationIntensity = Math.min(t.animationIntensity, 0.55)
@@ -356,14 +383,19 @@ export function getResponsiveAviaryTuning(): OrigamiAviaryTuning {
     t.particleIntensity *= 0.45
     t.bloomStrength = Math.min(t.bloomStrength, 0.1)
     t.atmosphereDrift = 0
+    t.flyingBatCount = 0
   }
 
   if (fragileGpu) {
     t.maxPixelRatio = Math.min(t.maxPixelRatio, 1)
     t.bloomStrength = 0
     t.particleCount = Math.min(t.particleCount, narrowPoster ? 64 : 180)
-    t.scrollRotateIntensity = Math.min(t.scrollRotateIntensity, narrowPoster ? 0.12 : 0.2)
+    t.treeCount = Math.min(t.treeCount, narrowPoster ? 28 : 52)
+    t.scrollRotateIntensity = Math.min(t.scrollRotateIntensity, narrowPoster ? 0.1 : 0.16)
+    t.scrollForestRevolutions = Math.min(t.scrollForestRevolutions, narrowPoster ? 0.22 : 0.26)
     t.animationIntensity = Math.min(t.animationIntensity, 0.5)
+    t.batCount = Math.min(t.batCount, narrowPoster ? 2 : 3)
+    t.flyingBatCount = Math.min(t.flyingBatCount, 1)
   }
 
   return t
