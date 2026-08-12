@@ -1,77 +1,135 @@
 # Matt Shade — Engineering & Design Portfolio
 
 <div align="center">
-  <img src="public/images/cnbc-ds-hero.png" alt="Portfolio Architecture" width="100%" />
-  <p><em>A high-fidelity, architectural portfolio ecosystem built with React, Vite, and a signature "Blueprint" design system.</em></p>
+  <p><em>Interactive portfolio built with React, Vite, Three.js, and a liquid-glass design system.</em></p>
 
   [![Vite](https://img.shields.io/badge/Vite-6.0-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
   [![React](https://img.shields.io/badge/React-18.3-61DAFB?logo=react&logoColor=black)](https://reactjs.org/)
   [![TypeScript](https://img.shields.io/badge/TypeScript-5.6-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-  [![Netlify](https://img.shields.io/badge/Netlify-Deployed-00AD9F?logo=netlify&logoColor=white)](https://www.netlify.com/)
+  [![Netlify](https://img.shields.io/badge/Netlify-Deployed-00AD9F?logo=netlify&logoColor=white)](https://www.mattshade.com/)
 </div>
 
 ---
 
-## 🏛️ Project Vision
+## Overview
 
-This portfolio is more than a list of links; it's a technical sandbox and a design statement. It embodies a **"Systems Thinking"** approach, where every interaction is intentional and every component is part of a larger architectural narrative.
+Single-page portfolio with an origami forest WebGL background, scroll-driven scene motion, nav-triggered world rotation, embedded case-study projects, inline contact, and a downloadable resume. Storybook documents UI components separately.
 
-- **Aesthetic**: Liquid glass, blueprint grids, and "Architectural Lime" accents.
-- **Performance**: Sub-second transitions and optimized asset loading.
-- **Scale**: A modular structure that supports both internal case studies and complex external deployments.
+**Live site:** [mattshade.com](https://www.mattshade.com/)
 
 ---
 
-## 🚀 Key Case Studies
+## Features
 
-### 📺 CNBC Design System
-*Architecture • Systems Engineering • Product Design*
-- **The Challenge**: Transforming scattered interface patterns into a production-ready ecosystem.
-- **The Solution**: A "Foundation to Module" hierarchy bridging Figma and Storybook.
-- **Impact**: 1,000+ components synced with 1:1 parity, drastically reducing design debt.
-- **Standalone Site**: [Visit Site ↗](https://cnbcdesignsystem.shadyworldwide.com/)
-
-### 💳 CNBC PRO Subscription
-*UX Strategy • Growth • Conversion Optimization*
-- **The Challenge**: Reducing friction in the premium investor journey.
-- **The Solution**: A data-led redesign of the subscription funnel with a unique "PRO" visual identity.
-- **Impact**: Contributed to a 400% increase in subscription velocity.
+| Area | What it does |
+|------|----------------|
+| **Origami aviary** | 360° forest ring, birds, bats, and origami cat — scroll parallax, pointer parallax, responsive tuning |
+| **Nav rotation** | Random 50–90° forest spin on section nav with smooth camera framing and landing ease |
+| **About** | Glass panel over the forest (forest-only mode — no cavern/vine descent on mobile) |
+| **Contact** | Inline `#contact` section with validation; `/contact` redirects to `/#contact` |
+| **Projects** | Embedded builds under `/projects/*` aggregated at deploy time |
+| **Landscape gate** | Phones/tablets in portrait see a rotate prompt before the full 3D experience |
+| **Resume** | On-site resume page + `public/MattShade.pdf` download |
+| **Storybook** | Component docs at `/storybook/` after build |
 
 ---
 
-## 🛠️ Tech Stack & Architecture
+## Tech stack
 
-### Core Technologies
-- **React 18** (Functional Components, Hooks)
-- **Vite 6** (Blazing fast HMR and optimized builds)
-- **TypeScript** (Rigorous type safety across data and UI)
-- **Vanilla CSS** (Custom properties for a bespoke design system)
+- **React 18** + **TypeScript** + **Vite 6**
+- **Three.js** — origami line-art scenes (aviary, about transition helpers)
+- **React Router 7** — section routing and project overlays
+- **Framer Motion** — UI motion
+- **Vanilla CSS** — custom properties, glass panels, blueprint grid language
+- **Vitest** + **Testing Library** — unit tests (≥80% coverage on testable `src/` modules)
+- **Storybook 10** — visual component catalog
 
-### Project Structure
+---
+
+## Project structure
+
 ```text
 src/
-├── components/      # Atomic and Molecular components
-├── data/            # Centralized "Source of Truth" for projects and resume
-├── hooks/           # Custom logic for interactions (parallax, mouse tracking)
-└── assets/          # Static markers and brand elements
+├── components/          # UI + Three.js scene modules
+│   ├── OrigamiAviaryBackground/   # Forest scene, birds, bats, nav rotation loop
+│   ├── ContactForm.tsx            # Inline contact with Netlify / Formspree / mailto fallback
+│   └── LandscapeGate.tsx          # Mobile portrait gate
+├── content/             # About copy and block rendering
+├── data/                # Resume source of truth + JSON-LD
+├── pages/               # Route shells (HomePage, ResumePage, Contact redirect)
+├── utils/               # Shared validation and navigation helpers
+├── world/               # Nav rotation + About descent bridges (non-React)
+└── test/                # Vitest setup
+
+public/
+├── MattShade.pdf        # Downloadable resume (replace + bump ?v= in resume.ts)
+└── projects/            # Static or copied embedded project assets
+
+scripts/
+├── build-portfolio-projects.cjs   # Build embedded RECENT-PROJECTS
+└── copy-projects.cjs              # Copy outputs into dist/
 ```
 
 ---
 
-## 🏗️ Deployment Flow
-
-The portfolio uses a sophisticated **"Multi-Repo Simulation"** flow on Netlify:
-1. **Isolated Builds**: Individual projects (like Canvas Intelligence) are built in their own environments.
-2. **Aggregation**: A custom `copy-projects.cjs` script aggregates multiple build outputs into a single deployment directory.
-3. **Canonical Routing**: `netlify.toml` manages complex redirects to ensure deep-linked projects behave like standalone apps.
+## Development
 
 ```bash
-# Run full development environment
+# Install
+npm install
+
+# Local dev (portfolio + /projects/* + /storybook/ when built)
 npm run dev
 
-# Execute the aggregated architectural build
+# Portfolio-only production build (no Storybook)
+npm run build:portfolio
+
+# Full Netlify build (projects + Vite + Storybook + copy)
 npm run build
+
+# Unit tests
+npm test
+
+# Unit tests with coverage (80% threshold on testable src/)
+npm run test:coverage
+
+# Storybook
+npm run storybook
 ```
+
+---
+
+## Resume PDF
+
+1. Export your ATS PDF and copy it to `public/MattShade.pdf`.
+2. Bump the cache-buster in `src/data/resume.ts`:
+
+   ```ts
+   resumePdf: '/MattShade.pdf?v=2',
+   ```
+
+3. Rebuild and deploy.
+
+Optional generators: `npm run generate:resume-ats` / `generate:resume-designer`.
+
+---
+
+## Deployment (Netlify)
+
+1. **Embedded projects** — `scripts/build-portfolio-projects.cjs` builds each entry in `scripts/portfolio-projects.cjs`.
+2. **Portfolio** — `vite build` outputs the main app.
+3. **Storybook** — bundled into `dist/storybook/`.
+4. **Copy** — `scripts/copy-projects.cjs` merges project `dist/` folders into the final deploy.
+
+`netlify.toml` handles SPA redirects and `/projects/*` deep links.
+
+---
+
+## Testing notes
+
+- **Unit tests** (`npm test`) cover navigation math, form validation, resume JSON-LD, scroll/rotation config, and key React components.
+- **WebGL scene shells** (large Three.js entry components) are excluded from coverage thresholds — their logic lives in tested sibling modules (`sceneAnchor`, `navRotationConfig`, `craneMotion`, etc.).
+- **Storybook browser tests** run via the Storybook Vitest addon (`vitest --project storybook`).
 
 ---
 

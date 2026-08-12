@@ -262,8 +262,3 @@
 body.modal-open .nav {
   display: none !important;
 }
-
-/* Contact dialog: keep header visible; block clicks from passing through to nav links */
-body.contact-open .nav {
-  pointer-events: none;
-}

@@ -8,11 +8,9 @@ import {
 import { getAboutDnaConfig, getStalkVerticalBounds, type AboutDnaConfig } from './dnaConfig'
 import { buildAboutVinePlant, type AboutVinePlant } from './vineFoliage'
 
-const CAMERA_LOOK_Y = -0.38
-
 function getCameraHalfHeight(cfg: AboutDnaConfig): number {
   const { yMin, yMax } = getStalkVerticalBounds(cfg)
-  return Math.min(4.25, Math.max(-yMin, yMax) * 0.21)
+  return Math.min(4.6, Math.max(-yMin, yMax) * 0.22)
 }
 
 export function computeStalkPanY(cfg: AboutDnaConfig, progress: number): number {
@@ -22,11 +20,10 @@ export function computeStalkPanY(cfg: AboutDnaConfig, progress: number): number 
   const viewSpan = halfH * 2
   const windowBottom = THREE.MathUtils.lerp(
     Math.max(yMin, yMax - viewSpan) + cfg.stalkPanStartBias,
-    yMin,
+    yMin - cfg.stalkPanEndBoost * 0.35,
     t,
   )
-  const frustumBottom = CAMERA_LOOK_Y - halfH
-  return frustumBottom - windowBottom
+  return -halfH - windowBottom
 }
 
 type OpacityMat = THREE.Material & { opacity: number; userData: { baseOpacity?: number } }
@@ -72,7 +69,7 @@ export type EmbeddedAboutVine = {
 }
 
 export function buildEmbeddedAboutVine(world: THREE.Group): EmbeddedAboutVine {
-  const cfg = getAboutDnaConfig('fragile-embed')
+  const cfg = getAboutDnaConfig('forest-embed')
   const rng = createMulberry32(0x7a1ec41e)
   const roots: THREE.Object3D[] = []
 
@@ -82,10 +79,10 @@ export function buildEmbeddedAboutVine(world: THREE.Group): EmbeddedAboutVine {
   world.add(rig)
 
   const plant = buildAboutVinePlant(rig, cfg, roots, rng)
-  plant.group.position.set(cfg.stalkOffsetX * 0.35, 0, 0)
-  rig.rotation.set(0.12, -0.42, 0.04)
-  rig.position.set(15.5, -1.2, -7.5)
-  rig.scale.setScalar(0.52)
+  plant.group.position.set(cfg.stalkOffsetX * 0.42, 0, 0)
+  rig.rotation.set(0.05, -0.18, 0.012)
+  rig.position.set(3.6, 0.2, -10.2)
+  rig.scale.setScalar(0.74)
 
   applyOpacityToRoot(plant.group, 1)
 
@@ -95,27 +92,41 @@ export function buildEmbeddedAboutVine(world: THREE.Group): EmbeddedAboutVine {
 export function updateEmbeddedAboutVine(
   embed: EmbeddedAboutVine,
   elapsed: number,
+  entry: number,
   depth: number,
   reducedMotion: boolean,
 ): number {
   const vineFade = readAboutVineFadeOpacity()
   const scrollT = readAboutVineScrollT()
-  const show = vineFade > 0.02
+  const emerge = Math.min(
+    1,
+    Math.max(vineFade, THREE.MathUtils.smoothstep(0.38, 0.76, entry)),
+  )
+  const show = emerge > 0.02
 
   embed.rig.visible = show
-  if (!show) return vineFade
+  if (!show) return emerge
 
   const scrollPhase = scrollT * embed.cfg.scrollHelixTurns * Math.PI * 2
   const panY = computeStalkPanY(embed.cfg, scrollT)
-  const idleTwist = reducedMotion ? 0 : Math.sin(elapsed * 0.42) * 0.06
+  const idleTwist = reducedMotion ? 0 : Math.sin(elapsed * 0.42) * 0.05
   embed.plant.updatePhase(scrollPhase + idleTwist)
 
-  const sway = reducedMotion ? 0 : Math.sin(elapsed * 0.38) * 0.02
-  embed.rig.rotation.set(0.12 + sway * 0.3, -0.42 + sway * 0.2, 0.04 + sway * 0.15)
-  embed.rig.position.set(15.5, -1.2 + panY * 0.22 - depth * 0.35, -7.5 - depth * 1.8)
+  const sway = reducedMotion ? 0 : Math.sin(elapsed * 0.38) * 0.018
+  const sink = entry * 0.42 + depth * 0.55
+  embed.rig.rotation.set(
+    0.05 + sway * 0.25 + entry * 0.04,
+    -0.18 + sway * 0.15,
+    0.012 + sway * 0.1,
+  )
+  embed.rig.position.set(
+    3.6 + sway * 0.08,
+    0.2 + panY * 0.32 - sink * 0.28,
+    -10.2 - sink * 1.05,
+  )
 
-  applyOpacityToRoot(embed.plant.group, vineFade)
-  return vineFade
+  applyOpacityToRoot(embed.plant.group, emerge)
+  return emerge
 }
 
 export function disposeEmbeddedAboutVine(embed: EmbeddedAboutVine, world: THREE.Group) {

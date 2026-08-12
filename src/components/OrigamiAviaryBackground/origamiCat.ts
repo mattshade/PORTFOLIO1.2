@@ -224,6 +224,7 @@ export function createOrigamiCat(
   accent: THREE.Color,
   lineMuted: THREE.Color,
   roots: THREE.Object3D[],
+  spawnHint?: { x: number; z: number },
 ): OrigamiCatSystem {
   const catColor = accent.clone().lerp(lineMuted, 0.55)
   const opacityMul = tuning.viewportProfile === 'narrow' ? 0.78 : tuning.viewportProfile === 'tablet' ? 0.7 : 0.58
@@ -451,6 +452,10 @@ export function createOrigamiCat(
 
   pickWaypoint(tuning)
   randomGroundPoint(rig.root.position, tuning)
+  if (spawnHint) {
+    rig.root.position.x = spawnHint.x
+    rig.root.position.z = clampCatZ(spawnHint.z, tuning.sceneDepth, tuning.viewportProfile)
+  }
   rig.root.position.y = CAT_TREE_TUNING.catSpawnGroundY
   rig.root.rotation.y = rng() * Math.PI * 2
   state = 'stalking'

@@ -102,7 +102,7 @@ export function buildCavernLayer(
   const cavern = new THREE.Group()
   cavern.name = 'about-cavern'
   cavern.visible = false
-  cavern.position.set(0, 0.35, -1.2)
+  cavern.position.set(0, -0.65, -2.4)
   world.add(cavern)
 
   const cyan = new THREE.Color(profile.cavern.accentColor)

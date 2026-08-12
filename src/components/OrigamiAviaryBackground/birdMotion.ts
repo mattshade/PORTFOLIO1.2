@@ -92,12 +92,97 @@ function pickPerch(rng: Rng, perches: Perch[], avoid: number): number {
   return pool[Math.floor(rng() * pool.length)]
 }
 
-function shuffleIndices(rng: Rng, indices: number[]) {
-  for (let i = indices.length - 1; i > 0; i--) {
-    const j = Math.floor(rng() * (i + 1))
-    ;[indices[i], indices[j]] = [indices[j], indices[i]]
+const BIRD_MIN_SPACING = {
+  sculptural: 3.05,
+  flock: 2.35,
+} as const
+
+function birdRestPosition(b: AviaryBird, perches: Perch[], out: THREE.Vector3): THREE.Vector3 {
+  const p = perches[b.perchIndex].position
+  return out.set(p.x, p.y, p.z + b.perchRestZOffset)
+}
+
+function collectBirdOccupancy(
+  birds: AviaryBird[],
+  perches: Perch[],
+  exclude?: AviaryBird,
+  out: THREE.Vector3[] = [],
+): THREE.Vector3[] {
+  out.length = 0
+  for (const b of birds) {
+    if (b === exclude) continue
+    if (b.state === 'flying' || b.state === 'takeoff' || b.state === 'landing') {
+      out.push(b.rig.root.position)
+      continue
+    }
+    out.push(birdRestPosition(b, perches, new THREE.Vector3()))
   }
-  return indices
+  return out
+}
+
+function clearOfPositions(pos: THREE.Vector3, others: THREE.Vector3[], minDist: number): boolean {
+  for (const q of others) {
+    if (pos.distanceTo(q) < minDist) return false
+  }
+  return true
+}
+
+function perchCandidatePool(rng: Rng, perches: Perch[], avoid: number): number[] {
+  const candidates = perches.map((_, i) => i).filter((i) => i !== avoid)
+  const ground = candidates.filter((i) => perches[i].surface === 'ground')
+  const tree = candidates.filter((i) => perches[i].surface === 'tree')
+  return rng() < 0.26 && ground.length > 0 ? ground : tree.length > 0 ? tree : candidates
+}
+
+function pickBestSpacedPerch(
+  rng: Rng,
+  perches: Perch[],
+  candidates: number[],
+  occupied: THREE.Vector3[],
+): number {
+  if (candidates.length === 0) return 0
+  if (occupied.length === 0) return candidates[Math.floor(rng() * candidates.length)]
+
+  let bestIdx = candidates[0]
+  let bestMin = -1
+  const scored: { i: number; minD: number }[] = []
+
+  for (const i of candidates) {
+    const p = perches[i].position
+    let minD = Infinity
+    for (const q of occupied) minD = Math.min(minD, p.distanceTo(q))
+    scored.push({ i, minD })
+    if (minD > bestMin) {
+      bestMin = minD
+      bestIdx = i
+    }
+  }
+
+  scored.sort((a, b) => b.minD - a.minD)
+  const topCount = Math.max(1, Math.ceil(scored.length * 0.4))
+  const pick = scored[Math.floor(rng() * topCount)]
+  return pick?.i ?? bestIdx
+}
+
+function pickSpacedPerch(
+  rng: Rng,
+  perches: Perch[],
+  avoid: number,
+  birds: AviaryBird[],
+  self: AviaryBird,
+  kind: AviaryBird['kind'],
+): number {
+  const occupied = collectBirdOccupancy(birds, perches, self)
+  let minDist = BIRD_MIN_SPACING[kind]
+
+  for (let relax = 0; relax < 5; relax++) {
+    const pool = perchCandidatePool(rng, perches, avoid)
+    const spaced = pool.filter((i) => clearOfPositions(perches[i].position, occupied, minDist))
+    if (spaced.length > 0) return pickBestSpacedPerch(rng, perches, spaced, occupied)
+    minDist *= 0.84
+  }
+
+  return pickPerch(rng, perches, avoid)
 }
 
 function perchClearOfOthers(
@@ -149,53 +234,57 @@ function pickInitialPerch(
   kind: AviaryBird['kind'],
 ): number {
   const forestHalfWidth = tuning.forestHalfWidth
-  const minDist = kind === 'sculptural' ? 2.35 : 1.45
+  const minDist = BIRD_MIN_SPACING[kind]
   const minCenterX = forestHalfWidth * tuning.heroPerchMinCenterFraction
 
-  let candidates = perches
-    .map((_, i) => i)
-    .filter((i) => !used.has(i) && perches[i].surface === 'tree')
-    .filter((i) => perchClearOfOthers(perches, i, placed, minDist))
+  for (let relax = 0; relax < 5; relax++) {
+    const spacing = minDist * (1 - relax * 0.11)
+    let candidates = perches
+      .map((_, i) => i)
+      .filter((i) => !used.has(i) && perches[i].surface === 'tree')
+      .filter((i) => perchClearOfOthers(perches, i, placed, spacing))
 
-  if (tuning.posterComposition && kind === 'sculptural') {
-    let best = -Infinity
-    let bestIdx = -1
-    for (const i of candidates) {
-      const s = scorePosterHeroPerch(perches, i, tuning.posterHeroBirdSlot, forestHalfWidth, tuning)
-      if (s > best) {
-        best = s
-        bestIdx = i
+    if (tuning.posterComposition && kind === 'sculptural') {
+      let best = -Infinity
+      let bestIdx = -1
+      for (const i of candidates) {
+        const s = scorePosterHeroPerch(perches, i, tuning.posterHeroBirdSlot, forestHalfWidth, tuning)
+        if (s > best) {
+          best = s
+          bestIdx = i
+        }
       }
+      if (bestIdx >= 0 && best > -1e8) return bestIdx
     }
-    if (bestIdx >= 0 && best > -1e8) return bestIdx
-  }
 
-  if (tuning.posterComposition && kind === 'flock') {
-    let best = -Infinity
-    let bestIdx = -1
-    for (const i of candidates) {
-      const s = scorePosterFlockPerch(perches, i)
-      if (s > best) {
-        best = s
-        bestIdx = i
+    if (tuning.posterComposition && kind === 'flock') {
+      let best = -Infinity
+      let bestIdx = -1
+      for (const i of candidates) {
+        const s = scorePosterFlockPerch(perches, i)
+        if (s > best) {
+          best = s
+          bestIdx = i
+        }
       }
+      if (bestIdx >= 0) return bestIdx
     }
-    if (bestIdx >= 0) return bestIdx
-  }
 
-  if (kind === 'sculptural') {
-    const offCenter = candidates.filter((i) => Math.abs(perches[i].position.x) >= minCenterX)
-    if (offCenter.length > 0) candidates = offCenter
-  }
+    if (kind === 'sculptural') {
+      const offCenter = candidates.filter((i) => Math.abs(perches[i].position.x) >= minCenterX)
+      if (offCenter.length > 0) candidates = offCenter
+    }
 
-  shuffleIndices(rng, candidates)
-  if (candidates.length > 0) return candidates[0]
+    if (candidates.length > 0) {
+      return pickBestSpacedPerch(rng, perches, candidates, placed)
+    }
+  }
 
   const fallback = perches
     .map((_, i) => i)
     .filter((i) => !used.has(i) && perches[i].surface === 'tree')
-  shuffleIndices(rng, fallback)
-  return fallback[0] ?? 0
+  if (fallback.length === 0) return 0
+  return pickBestSpacedPerch(rng, perches, fallback, placed)
 }
 
 function applyPosterBirdMaterials(rig: BirdRig, tuning: OrigamiAviaryTuning, kind: AviaryBird['kind']) {
@@ -299,7 +388,7 @@ function tryBeginViewerApproach(
     return false
   }
 
-  const target = pickPerch(rng, perches, b.perchIndex)
+  const target = pickSpacedPerch(rng, perches, b.perchIndex, birds, b, b.kind)
   b.perchIndexTarget = target
   beginApproachToViewer(b, b.rig.root.position.clone(), rng)
   enterState(b, 'takeoff', 0.45 + rng() * 0.22)
@@ -463,7 +552,7 @@ function chooseBirdAction(
 
   const flyChance = b.kind === 'sculptural' ? 0.34 : 0.42
   if (roll < 0.11 + flyChance) {
-    const target = pickPerch(rng, perches, b.perchIndex)
+    const target = pickSpacedPerch(rng, perches, b.perchIndex, birds, b, b.kind)
     b.perchIndexTarget = target
     const to = perches[target].position.clone()
     to.z += b.perchRestZOffset

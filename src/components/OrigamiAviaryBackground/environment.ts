@@ -17,17 +17,20 @@ export type Perch = {
 
 function buildGroundPerches(rng: Rng, tuning: OrigamiAviaryTuning): Perch[] {
   const perches: Perch[] = []
-  const span = tuning.forestHalfWidth * 2
+  const inner = Math.max(3.6, tuning.forestHalfWidth * 0.1)
+  const outer = tuning.forestHalfWidth * 0.6
   const count = tuning.posterComposition
     ? 3 + Math.floor(rng() * 3)
     : 6 + Math.floor(rng() * 5)
 
   for (let i = 0; i < count; i++) {
+    const angle = rng() * Math.PI * 2
+    const radius = inner + rng() * (outer - inner)
     perches.push({
       position: new THREE.Vector3(
-        (rng() - 0.5) * span * (0.5 + rng() * 0.42),
+        Math.sin(angle) * radius,
         0.03 + rng() * 0.05,
-        -2.4 - rng() * (tuning.sceneDepth - 2.5),
+        -Math.cos(angle) * radius,
       ),
       yaw: rng() * Math.PI * 2,
       depthLayer: 0,
@@ -48,7 +51,7 @@ export function buildAviaryEnvironment(
   roots: THREE.Object3D[]
   perches: Perch[]
   depthLayers: THREE.Group[]
-  cat: OrigamiCatSystem | null
+  cats: OrigamiCatSystem[]
 } {
   const roots: THREE.Object3D[] = []
   const lineMuted = new THREE.Color(AVIARY_COLORS.lineMuted)
@@ -58,7 +61,7 @@ export function buildAviaryEnvironment(
   depthLayers.forEach((g) => world.add(g))
   roots.push(...depthLayers)
 
-  const groundSize = tuning.forestHalfWidth * 2.35
+  const groundSize = tuning.forestHalfWidth * 2.65
   const grid = new THREE.GridHelper(groundSize, tuning.groundGridDivisions, accentSoft, lineMuted)
   grid.position.y = 0
   const gm = grid.material
@@ -80,23 +83,6 @@ export function buildAviaryEnvironment(
   perches.push(...buildGroundPerches(rng, tuning))
   buildAviaryArchitecture(depthLayers[1], rng, tuning, accent, roots)
 
-  const backPlaneGeo = new THREE.PlaneGeometry(groundSize * 0.55, 16, 12, 8)
-  const backPlane = new THREE.Mesh(
-    backPlaneGeo,
-    new THREE.MeshBasicMaterial({
-      color: lineMuted,
-      wireframe: true,
-      transparent: true,
-      opacity: tuning.gridOpacity * 0.42,
-      depthWrite: false,
-      toneMapped: false,
-      userData: { baseOpacity: tuning.gridOpacity * 0.42 },
-    }),
-  )
-  backPlane.position.set(0, 1.5, -tuning.sceneDepth * 0.72)
-  depthLayers[2].add(backPlane)
-  roots.push(backPlane)
-
   const horizonGeo = new THREE.PlaneGeometry(groundSize * 0.92, 0.02, 1, 1)
   const horizon = new THREE.Mesh(
     horizonGeo,
@@ -109,13 +95,22 @@ export function buildAviaryEnvironment(
       userData: { baseOpacity: tuning.lineOpacity * 0.25 },
     }),
   )
-  horizon.position.set(0, 0.01, -tuning.sceneDepth * 0.35)
+  horizon.position.set(0, 0.01, 0)
   horizon.rotation.x = -Math.PI / 2
   world.add(horizon)
   roots.push(horizon)
 
   const includeCat = options?.includeCat !== false
-  const cat = includeCat ? createOrigamiCat(world, rng, tuning, accent, lineMuted, roots) : null
+  const cats: OrigamiCatSystem[] = []
+  if (includeCat) {
+    cats.push(createOrigamiCat(world, rng, tuning, accent, lineMuted, roots))
+    cats.push(
+      createOrigamiCat(world, rng, tuning, accent, lineMuted, roots, {
+        x: tuning.forestHalfWidth * 0.42,
+        z: -8.4,
+      }),
+    )
+  }
 
-  return { roots, perches, depthLayers, cat }
+  return { roots, perches, depthLayers, cats }
 }

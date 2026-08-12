@@ -1,244 +1,121 @@
-.about-descent-marker {
-  display: block;
-  height: 1px;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  pointer-events: none;
-}
+/* —— About section (forest backdrop + glass panel) —— */
 
-.about-vine-region {
+.about-section {
   position: relative;
-  isolation: isolate;
-  overflow: visible;
-  /* Keep transparent through inversion — solid fill hid the cavern flip */
-  background: transparent;
-}
-
-/* Vine + About content share one grid cell; foreground z-index wins over sticky canvas. */
-.about-vine-stack {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  isolation: isolate;
-  overflow: visible;
-}
-
-.about-vine-stack > .about-dna-background,
-.about-vine-stack > .about-vine-stack__content {
-  grid-column: 1;
-  grid-row: 1;
-}
-
-.about-vine-stack > .about-dna-background {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
   width: 100%;
-  height: 100vh;
-  height: 100dvh;
-  z-index: 0;
-  pointer-events: none;
-  overflow: visible;
+  min-height: 130dvh;
+  padding:
+    calc(5rem + env(safe-area-inset-top, 0px))
+    1.5rem
+    clamp(2rem, 5vh, 3rem);
+  scroll-margin-top: calc(4.25rem + env(safe-area-inset-top, 0px));
 }
 
-.about-vine-stack__content {
-  position: relative;
-  z-index: 1;
-  isolation: isolate;
-  min-width: 0;
+.about-section > .section-inner {
+  width: 100%;
+  max-width: none;
 }
 
-@media (max-width: 768px) {
-  .about-vine-region {
-    background: linear-gradient(
-      180deg,
-      transparent 0%,
-      rgba(8, 12, 16, 0.35) 18%,
-      rgba(8, 12, 16, 0.55) 55%,
-      #080c10 100%
-    );
-  }
+.about-section__header {
+  margin-bottom: 1.25rem;
 }
 
-.about-vine-stack__content .footer {
-  position: relative;
-  z-index: 2;
-  margin-top: 0;
-  border-top-color: rgba(94, 196, 220, 0.22);
-  background: linear-gradient(
-    180deg,
-    rgba(8, 12, 16, 0.55) 0%,
-    rgba(8, 12, 16, 0.92) 28%,
-    #080c10 52%
-  );
-}
-
-.about-transition-spacer {
-  position: relative;
-  min-height: clamp(80vh, 125vh, 150vh);
-  pointer-events: none;
-}
-
-.about-transition-spacer::after {
-  content: '';
+.about-section__scrim {
   position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: clamp(18vh, 28vh, 36vh);
-  pointer-events: none;
-  background: linear-gradient(
-    180deg,
-    transparent 0%,
-    rgba(8, 12, 16, 0.03) 45%,
-    rgba(8, 12, 16, 0.14) 100%
-  );
-}
-
-.about-journey {
-  position: relative;
-  z-index: 2;
-  padding: clamp(10rem, 26vh, 14rem) 0 clamp(8rem, 18vh, 12rem);
-  min-height: 220vh;
-  /* Stay light — a darkening gradient behind the fixed vine made the stalk fade on scroll */
-  background: linear-gradient(
-    180deg,
-    rgba(8, 12, 16, 0.08) 0%,
-    rgba(8, 12, 16, 0.1) 40%,
-    rgba(8, 12, 16, 0.12) 100%
-  );
-}
-
-.about-journey__edge-fade {
-  position: absolute;
-  left: 0;
-  right: 0;
-  z-index: 1;
-  pointer-events: none;
-}
-
-.about-journey__edge-fade--top {
   top: 0;
-  height: clamp(18vh, 24vh, 32vh);
+  bottom: 0;
+  left: 50%;
   z-index: 1;
-  background: linear-gradient(
-    180deg,
-    transparent 0%,
-    transparent 55%,
-    rgba(8, 12, 16, 0.08) 78%,
-    rgba(8, 12, 16, 0.18) 100%
-  );
-}
-
-.about-journey__scrim {
-  position: absolute;
-  inset: 0;
-  z-index: 1; /* below reading column (4); above vine (stack layer 0) */
+  width: 100vw;
   pointer-events: none;
-  /* Softens DNA helix behind the reading column */
+  transform: translateX(-50%);
   background:
     radial-gradient(
-      ellipse 52% 38% at 50% 44%,
-      rgba(8, 12, 16, 0.32) 0%,
-      rgba(8, 12, 16, 0.14) 48%,
-      transparent 72%
+      ellipse 92% 75% at 50% 38%,
+      rgba(10, 10, 11, 0.28) 0%,
+      rgba(10, 10, 11, 0.1) 50%,
+      transparent 76%
     ),
-    linear-gradient(
-      180deg,
-      rgba(8, 12, 16, 0.1) 0%,
-      rgba(8, 12, 16, 0.22) 50%,
-      rgba(8, 12, 16, 0.28) 100%
-    );
-  -webkit-mask-image: linear-gradient(
-    180deg,
-    transparent 0%,
-    transparent 28%,
-    rgba(0, 0, 0, 0.35) 40%,
-    #000 50%,
-    #000 100%
-  );
-  mask-image: linear-gradient(
-    180deg,
-    transparent 0%,
-    transparent 28%,
-    rgba(0, 0, 0, 0.35) 40%,
-    #000 50%,
-    #000 100%
-  );
+    linear-gradient(180deg, rgba(10, 10, 11, 0.03) 0%, rgba(10, 10, 11, 0.1) 100%);
 }
 
-.about-journey__column {
+.about-panel,
+.about-panel.glass {
   position: relative;
-  z-index: 4;
-  isolation: isolate;
-  max-width: 50rem;
-  margin: 0 auto;
-  padding: clamp(2rem, 6vh, 4rem) clamp(1rem, 4vw, 2rem) 0;
+  z-index: 2;
+  width: 100%;
+  padding: 1.5rem 1.35rem;
+  border-radius: 0.875rem;
+  background: rgba(10, 11, 11, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  box-shadow: var(--shadow-glass);
+  backdrop-filter: blur(11px) saturate(120%);
+  -webkit-backdrop-filter: blur(11px) saturate(120%);
 }
 
-.about-journey__article {
+.about-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(
+    145deg,
+    rgba(190, 242, 100, 0.04) 0%,
+    transparent 42%,
+    transparent 100%
+  );
+}
+
+/* —— Document layout —— */
+
+.about-doc {
   position: relative;
-}
-
-/* Resume-style document (ATSv6 / site resume) — JetBrains Mono, single column */
-.about-journey .about-resume-doc {
-  text-shadow:
-    0 0 1px rgba(0, 0, 0, 0.9),
-    0 1px 14px rgba(0, 0, 0, 0.75),
-    0 2px 28px rgba(0, 0, 0, 0.45);
-}
-
-.about-resume-doc {
-  --about-cyan: #5ec4dc;
-  font-family: "JetBrains Mono", var(--font-mono);
+  z-index: 1;
+  font-family: var(--font-sans);
   font-size: 0.9375rem;
-  font-weight: 400;
-  line-height: 1.55;
+  line-height: 1.58;
   color: var(--text);
 }
 
-.about-journey .about-resume-doc ::selection {
-  background-color: var(--about-cyan);
-  color: #0a0a0b;
-}
-
-.about-journey .about-resume-doc ::-moz-selection {
-  background-color: var(--about-cyan);
-  color: #0a0a0b;
-}
-
-.about-resume-doc__body {
+.about-doc__body {
   margin: 0;
-  padding: 0;
-}
-
-.about-intro {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: clamp(1rem, 2.5vw, 1.35rem);
-  margin-bottom: 0.85rem;
-}
-
-.about-intro__text {
   width: 100%;
 }
 
-.about-portrait {
-  width: clamp(5.25rem, 13vw, 7.75rem);
-  flex-shrink: 0;
-  aspect-ratio: 1 / 1;
-  border-radius: 10px;
-  overflow: hidden;
-  border: 1px solid rgba(94, 196, 220, 0.22);
-  background: rgba(0, 0, 0, 0.35);
-  box-shadow:
-    0 12px 32px -16px rgba(0, 0, 0, 0.75),
-    0 0 24px rgba(94, 196, 220, 0.08);
+.about-doc__intro {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  margin: 0 0 1.15rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
 }
 
-.about-portrait img {
+.about-doc__intro-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.4rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.about-doc__portrait {
+  flex-shrink: 0;
+  width: 4rem;
+  height: 4rem;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  border: 1px solid var(--border-strong);
+  background: rgba(0, 0, 0, 0.35);
+  box-shadow:
+    var(--shadow-sm),
+    0 0 0 1px rgba(190, 242, 100, 0.06) inset;
+}
+
+.about-doc__portrait img {
   display: block;
   width: 100%;
   height: 100%;
@@ -246,154 +123,135 @@
   object-position: center 18%;
 }
 
-.about-intro .about-resume-doc__para {
-  margin: 0 0 0.5rem;
-  width: 100%;
-}
-
-.about-intro .about-resume-doc__para--lead:last-child {
-  margin-bottom: 0;
-}
-
-.about-resume-doc__para {
-  margin: 0 0 0.5rem;
-  color: var(--text-muted);
-  white-space: pre-line;
-  max-width: none;
-}
-
-.about-resume-doc__para--lead {
-  color: var(--text);
-  margin-bottom: 0.65rem;
-}
-
-.about-resume-doc__quote-cyan {
-  color: var(--about-cyan);
-}
-
-.about-resume-doc__para--pull {
-  color: var(--about-cyan);
+.about-doc__name {
+  margin: 0;
+  font-family: var(--font-name-mono);
+  font-size: 0.75rem;
   font-weight: 500;
-  margin: 0.35rem 0 0.65rem;
-}
-
-.about-resume-doc__role {
-  margin: 1.75rem 0 0.35rem;
-  font-size: 1.125rem;
-  font-weight: 600;
-  line-height: 1.35;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   color: var(--text);
-  letter-spacing: -0.01em;
 }
 
-.about-resume-doc__role::before {
-  content: '// ';
-  color: var(--about-cyan);
-  font-weight: 500;
-}
-
-.about-resume-doc__role:first-of-type {
-  margin-top: 1.25rem;
-}
-
-.about-resume-doc__list {
-  margin: 0.2rem 0 0.65rem;
+.about-doc__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.about-resume-doc__list li {
-  margin-bottom: 0.35rem;
+.about-doc__tags li {
+  padding: 0.2rem 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-dim);
+  border: 1px solid rgba(190, 242, 100, 0.22);
+  border-radius: 999px;
+}
+
+.about-doc__content {
+  width: 100%;
+  max-width: none;
+}
+
+.about-doc__para {
+  margin: 0 0 0.75rem;
   color: var(--text-muted);
-  padding-left: 0;
+  white-space: pre-line;
+}
+
+.about-doc__para--lead {
+  font-size: clamp(1rem, 1.8vw, 1.125rem);
+  line-height: 1.55;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+
+.about-doc__para:last-child {
+  margin-bottom: 0;
+}
+
+.about-doc__quote {
+  margin: 0.85rem 0 0;
+  padding: 0 0 0 0.85rem;
+  border: 0;
+  border-left: 2px solid var(--accent);
+  font-family: var(--font-sans);
+  font-size: clamp(0.9375rem, 1.8vw, 1.0625rem);
+  font-weight: 500;
+  line-height: 1.48;
+  letter-spacing: -0.012em;
+  color: var(--text);
+}
+
+.about-doc__quote p {
+  margin: 0;
+}
+
+.about-doc ::selection {
+  background-color: var(--accent);
+  color: var(--bg);
+}
+
+.about-doc ::-moz-selection {
+  background-color: var(--accent);
+  color: var(--bg);
 }
 
 @media (max-width: 768px) {
-  .about-portrait {
-    border-radius: 8px;
-    width: min(7.75rem, 42vw);
+  .about-section {
+    min-height: 120dvh;
+    padding:
+      calc(4rem + env(safe-area-inset-top, 0px))
+      1.5rem
+      clamp(1.75rem, 4vh, 2.5rem);
   }
 
-  .about-journey {
-    min-height: 180vh;
-    padding-top: clamp(7rem, 20vh, 10rem);
-    padding-bottom: 5rem;
-  }
-
-  .about-journey__edge-fade--top {
-    height: clamp(14vh, 20vh, 26vh);
-  }
-
-  .about-journey__scrim {
-    -webkit-mask-image: linear-gradient(
-      180deg,
-      transparent 0%,
-      transparent 42%,
-      #000 58%,
-      #000 86%,
-      transparent 100%
-    );
-    mask-image: linear-gradient(
-      180deg,
-      transparent 0%,
-      transparent 42%,
-      #000 58%,
-      #000 86%,
-      transparent 100%
-    );
-  }
-
-  .about-journey__column {
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
-    padding-top: clamp(1.25rem, 4vh, 2.5rem);
-  }
-
-  .about-journey__scrim {
+  .about-section__scrim {
     background:
       radial-gradient(
-        ellipse 58% 42% at 50% 44%,
-        rgba(8, 12, 16, 0.42) 0%,
-        rgba(8, 12, 16, 0.2) 50%,
-        transparent 74%
+        ellipse 100% 68% at 50% 32%,
+        rgba(10, 10, 11, 0.34) 0%,
+        rgba(10, 10, 11, 0.14) 56%,
+        transparent 80%
       ),
-      linear-gradient(
-        180deg,
-        rgba(8, 12, 16, 0.32) 0%,
-        rgba(6, 10, 14, 0.58) 100%
-      );
+      linear-gradient(180deg, rgba(10, 10, 11, 0.05) 0%, rgba(10, 10, 11, 0.14) 100%);
   }
 
-  .about-resume-doc {
-    font-size: 0.875rem;
-    line-height: 1.52;
-  }
-
-  .about-resume-doc__role {
-    font-size: 1.0625rem;
-    margin-top: 1.5rem;
-  }
-
-  .about-resume-doc__para,
-  .about-resume-doc__list li {
-    color: rgba(243, 244, 246, 0.88);
+  .about-panel,
+  .about-panel.glass {
+    padding: 1.25rem 1.15rem;
   }
 }
 
-@media (max-width: 480px) {
-  .about-journey__column {
-    padding-left: 1.25rem;
-    padding-right: 1.25rem;
+@media (orientation: landscape) and (max-height: 520px) {
+  .about-section {
+    min-height: 110dvh;
+    padding:
+      calc(3.75rem + env(safe-area-inset-top, 0px))
+      1.5rem
+      clamp(1.5rem, 4vh, 2rem);
   }
 
-  .about-portrait {
-    width: min(7rem, 40vw);
+  .about-panel,
+  .about-panel.glass {
+    padding: 1.1rem 1rem;
+  }
+
+  .about-doc {
+    font-size: 0.875rem;
+    line-height: 1.52;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .about-journey__scrim {
-    background: rgba(8, 12, 16, 0.55);
-    mask-image: none;
+  .about-section__scrim {
+    background: rgba(10, 10, 11, 0.22);
   }
 }

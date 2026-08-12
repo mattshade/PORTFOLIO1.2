@@ -1,0 +1,22 @@
+.contact-section {
+  padding: 5rem 1.5rem;
+}
+
+.contact-section__header {
+  margin-bottom: 1.5rem;
+}
+
+.contact-section__panel {
+  width: 100%;
+  padding: 1.5rem 1.35rem;
+}
+
+@media (max-width: 768px) {
+  .contact-section {
+    padding: 3.25rem 1.5rem;
+  }
+
+  .contact-section__panel {
+    padding: 1.25rem 1.15rem;
+  }
+}

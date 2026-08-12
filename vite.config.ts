@@ -226,7 +226,54 @@ export default defineConfig({
     }
   },
   test: {
-    projects: [{
+    projects: [
+      {
+        extends: true,
+        test: {
+          name: 'unit',
+          environment: 'jsdom',
+          setupFiles: ['./src/test/setup.ts'],
+          include: ['src/**/*.{test,spec}.{ts,tsx}'],
+          exclude: ['**/node_modules/**', '**/RECENT-PROJECTS/**'],
+          coverage: {
+            provider: 'v8',
+            all: false,
+            reporter: ['text', 'html', 'lcov'],
+            include: [
+              'src/world/navRotationConfig.ts',
+              'src/world/navRotationBridge.ts',
+              'src/world/aboutJourneyBridge.ts',
+              'src/utils/**/*.ts',
+              'src/data/resumeStructuredData.ts',
+              'src/content/aboutTextBlocks.ts',
+              'src/content/aboutTextRender.tsx',
+              'src/components/OrigamiAviaryBackground/sceneAnchor.ts',
+              'src/components/OrigamiAviaryBackground/seededRandom.ts',
+              'src/components/OrigamiAviaryBackground/constants.ts',
+              'src/components/OrigamiAviaryBackground/webglCapabilities.ts',
+              'src/components/OrigamiAboutBackground/aboutSceneConfig.ts',
+              'src/components/OrigamiAboutBackground/aboutSurfaceVis.ts',
+              'src/components/BackToTop.tsx',
+              'src/components/ContactForm.tsx',
+              'src/components/ContactSection.tsx',
+              'src/components/LandscapeGate.tsx',
+              'src/pages/ContactPage.tsx',
+            ],
+            exclude: [
+              'src/**/*.test.{ts,tsx}',
+              'src/**/*.spec.{ts,tsx}',
+              'src/test/**',
+            ],
+            thresholds: {
+              lines: 80,
+              functions: 80,
+              branches: 80,
+              statements: 80,
+            },
+          },
+        },
+      },
+      {
       extends: true,
       plugins: [
       // The plugin will run tests for the stories defined in your Storybook config

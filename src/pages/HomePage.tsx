@@ -4,7 +4,7 @@ import { Bio } from '../components/Bio'
 import { Projects } from '../components/Projects'
 import { Experience } from '../components/Experience'
 import { AboutContent } from '../components/AboutContent'
-import { AboutDnaBackground } from '../components/AboutDnaBackground/AboutDnaBackground'
+import { ContactSection } from '../components/ContactSection'
 import { Footer } from '../components/Footer'
 import { BackToTop } from '../components/BackToTop'
 import '../components/AboutContent.css'
@@ -19,26 +19,21 @@ export function HomePage() {
           <Bio />
           <Projects />
           <Experience />
-          <div id="about-descent-start" className="about-descent-marker" aria-hidden />
-          <div className="about-transition-spacer" aria-hidden />
-          <div id="about-descent-end" className="about-descent-marker" aria-hidden />
-          <div id="about-vine-region" className="about-vine-region">
-            <div className="about-vine-stack">
-              <AboutDnaBackground />
-              <div className="about-vine-stack__content">
-                <section id="about" className="about-journey" aria-label="About Matt Shade">
-                  <div className="about-journey__edge-fade about-journey__edge-fade--top" aria-hidden />
-                  <div className="about-journey__scrim" aria-hidden />
-                  <div className="about-journey__column">
-                    <AboutContent />
-                  </div>
-                  <div id="about-journey-end" className="about-descent-marker" aria-hidden />
-                </section>
-                <Footer />
+          <section id="about" className="section about-section" aria-labelledby="about-heading">
+            <div className="about-section__scrim" aria-hidden />
+            <div className="section-inner">
+              <header className="about-section__header">
+                <h2 id="about-heading" className="section-title section-title--mono">
+                  About
+                </h2>
+              </header>
+              <div className="about-panel glass">
+                <AboutContent />
               </div>
             </div>
-            <div id="about-vine-end" className="about-descent-marker" aria-hidden />
-          </div>
+          </section>
+          <ContactSection />
+          <Footer />
         </main>
         <BackToTop />
       </div>

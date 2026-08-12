@@ -11,6 +11,7 @@ import { scrollParallaxDrive } from '../OrigamiAviaryBackground/sceneAnchor'
 import type { AviaryBird } from '../OrigamiAviaryBackground/birdMotion'
 import type { OrigamiCatSystem } from '../OrigamiAviaryBackground/origamiCat'
 import type { AboutBat } from './batMotion'
+import { computeAboutSurfaceVis } from './aboutSurfaceVis'
 
 const aviaryFogColor = new THREE.Color(AVIARY_COLORS.fog)
 const cavernFogColor = new THREE.Color(ABOUT_COLORS.cavernFog)
@@ -33,12 +34,8 @@ export type AboutTransitionTargets = {
   upperFogDensity: number
 }
 
-/** 1 = full forest, 0 = transition complete (about-descent-end). */
-export function computeAboutSurfaceVis(entry: number): number {
-  if (entry >= 1) return 0
-  // Fade only at the end of the inversion band — early fade made trees look like sparse dots
-  return 1 - THREE.MathUtils.smoothstep(0.72, 1, entry)
-}
+/** Re-export for callers that only need the visibility curve. */
+export { computeAboutSurfaceVis } from './aboutSurfaceVis'
 
 type OpacityMat = THREE.Material & { opacity: number; userData: { baseOpacity?: number } }
 
@@ -163,7 +160,7 @@ export function applyAboutScrollTransition(
 ) {
   const invT = aboutTransitionT(entry, profile.transition) * profile.transition.inversionStrength
   const surfaceVis = computeAboutSurfaceVis(entry)
-  const cavernVis = THREE.MathUtils.smoothstep(0.18, 0.9, entry)
+  const cavernVis = THREE.MathUtils.smoothstep(0.06, 0.72, entry)
 
   targets.cavern.visible = cavernVis > 0.001
   setGroupOpacity(targets.cavern, cavernVis)

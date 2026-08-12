@@ -212,9 +212,33 @@ export function getStalkVerticalBounds(cfg: AboutDnaConfig): { yMin: number; yMa
   return { yMin, yMax }
 }
 
-export type AboutDnaTier = 'desktop' | 'mobile' | 'fragile-embed'
+/** Vine inside the aviary forest ring — shares world space with trees and cavern. */
+const FOREST_EMBED: AboutDnaConfig = {
+  ...DESKTOP,
+  strandOpacity: 0.58,
+  backboneLineWidth: 1.02,
+  stalkHeight: 18,
+  yCenter: 0.56,
+  stalkBelowExtra: 1.6,
+  stalkPanEndBoost: 0.72,
+  stalkPanStartBias: 0.18,
+  stalkOffsetX: 1.65,
+  scaleXZ: 0.82,
+  scaleY: 1.22,
+  scrollHelixTurns: 3.1,
+  leafCount: 38,
+  branchCount: 16,
+  swirlBranchCount: 44,
+  stalkDotCount: 160,
+  batCount: 0,
+  flyingBatCount: 0,
+  batPerchPool: 0,
+}
+
+export type AboutDnaTier = 'desktop' | 'mobile' | 'fragile-embed' | 'forest-embed'
 
 export function getAboutDnaConfig(tier: AboutDnaTier): AboutDnaConfig {
+  if (tier === 'forest-embed') return FOREST_EMBED
   if (tier === 'fragile-embed') return FRAGILE_EMBED
   if (tier === 'mobile') return MOBILE
   return DESKTOP

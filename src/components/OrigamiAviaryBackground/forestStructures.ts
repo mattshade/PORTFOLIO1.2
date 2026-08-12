@@ -7,6 +7,38 @@ import type { createMulberry32 } from './seededRandom'
 
 type Rng = ReturnType<typeof createMulberry32>
 
+/** Angle 0 faces into the scene (-Z); full ring wraps the spin pivot. */
+function forestPolarToXZ(angle: number, radius: number): { x: number; z: number } {
+  return {
+    x: Math.sin(angle) * radius,
+    z: -Math.cos(angle) * radius,
+  }
+}
+
+function forestInnerRadius(tuning: OrigamiAviaryTuning): number {
+  return Math.max(3.6, tuning.forestHalfWidth * 0.1)
+}
+
+function forestOuterRadius(tuning: OrigamiAviaryTuning): number {
+  return tuning.forestHalfWidth * (0.6 + Math.min(0.05, tuning.sceneDepth / 480))
+}
+
+function sampleForestRing(
+  rng: Rng,
+  tuning: OrigamiAviaryTuning,
+  minRadiusMul: number,
+  maxRadiusMul: number,
+  angleJitter = 0,
+): { x: number; z: number } {
+  const inner = forestInnerRadius(tuning)
+  const outer = forestOuterRadius(tuning)
+  const minR = inner + (outer - inner) * minRadiusMul
+  const maxR = inner + (outer - inner) * maxRadiusMul
+  const angle = rng() * Math.PI * 2 + (rng() - 0.5) * angleJitter
+  const radius = minR + rng() * Math.max(0.35, maxR - minR)
+  return forestPolarToXZ(angle, radius)
+}
+
 function seg(batch: LineBatch, ax: number, ay: number, az: number, bx: number, by: number, bz: number) {
   batch.positions.push(ax, ay, az, bx, by, bz)
 }
@@ -118,7 +150,7 @@ function addOrganicCanopy(
   radius: number,
   rng: Rng,
 ) {
-  const twigs = 16 + Math.floor(rng() * 12)
+  const twigs = 22 + Math.floor(rng() * 14)
   for (let i = 0; i < twigs; i++) {
     const a = rng() * Math.PI * 2
     const incl = 0.2 + rng() * 0.75
@@ -213,8 +245,22 @@ export function buildDetailedForestTree(
 ): { lines: LineBatch; perches: Perch[] } {
   const batch = createLineBatch(layerOpacity)
   const perches: Perch[] = []
+  const localPerchPositions: THREE.Vector3[] = []
   const fine = Math.min(1, Math.max(0, tuning.forestFineDetail))
   const limbDensity = Math.min(1.2, Math.max(0.35, tuning.forestLimbDensity))
+
+  const tryAddPerch = (position: THREE.Vector3, yaw: number, depthLayer: number) => {
+    for (const existing of localPerchPositions) {
+      if (position.distanceTo(existing) < 1.05) return
+    }
+    localPerchPositions.push(position.clone())
+    perches.push({
+      position,
+      yaw,
+      depthLayer,
+      surface: 'tree',
+    })
+  }
 
   addOrganicRoots(batch, x, 0, z, rng, tuning)
 
@@ -223,21 +269,20 @@ export function buildDetailedForestTree(
 
   for (let s = 0; s < 2 + Math.floor(rng() * 2); s++) {
     const t = 0.35 + rng() * 0.35
-    perches.push({
-      position: new THREE.Vector3(
+    tryAddPerch(
+      new THREE.Vector3(
         x + trunkLean * t + (rng() - 0.5) * 0.15,
         height * t + (rng() - 0.5) * 0.08,
         z + (rng() - 0.5) * 0.1,
       ),
-      yaw: (rng() - 0.5) * 1.4,
-      depthLayer: 0,
-      surface: 'tree',
-    })
+      (rng() - 0.5) * 1.4,
+      0,
+    )
   }
 
-  const limbCount = Math.max(3, Math.floor((5 + Math.floor(rng() * 5)) * limbDensity))
+  const limbCount = Math.max(4, Math.floor((6 + Math.floor(rng() * 5)) * limbDensity))
   for (let b = 0; b < limbCount; b++) {
-    const t = 0.38 + (b / limbCount) * 0.52 + (rng() - 0.5) * 0.08
+    const t = 0.42 + (b / limbCount) * 0.5 + (rng() - 0.5) * 0.08
     const by = height * Math.min(0.95, t)
     const bx = x + trunkLean * t + (rng() - 0.5) * 0.08
     const bz = z + (rng() - 0.5) * 0.12
@@ -279,19 +324,14 @@ export function buildDetailedForestTree(
     const tipY = by + (dy / mag) * (0.65 + rng() * 0.35)
     const tipZ = bz + (dz / mag) * (0.65 + rng() * 0.35)
 
-    if (rng() > 1 - 0.8 * fine) {
-      addOrganicCanopy(batch, tipX, tipY + 0.1, tipZ, 0.35 + rng() * 0.4, rng)
-      perches.push({
-        position: new THREE.Vector3(tipX, tipY + 0.05, tipZ),
-        yaw: yaw + (rng() - 0.5) * 0.6,
-        depthLayer: 1,
-        surface: 'tree',
-      })
+    if (rng() > 1 - 0.92 * fine) {
+      addOrganicCanopy(batch, tipX, tipY + 0.1, tipZ, 0.52 + rng() * 0.48, rng)
+      tryAddPerch(new THREE.Vector3(tipX, tipY + 0.05, tipZ), yaw + (rng() - 0.5) * 0.6, 1)
     }
   }
 
-  if (rng() > 1 - 0.65 * fine) {
-    addOrganicCanopy(batch, trunk.topX, trunk.topY + 0.05, trunk.topZ, 0.4 + rng() * 0.35, rng)
+  if (rng() > 1 - 0.82 * fine) {
+    addOrganicCanopy(batch, trunk.topX, trunk.topY + 0.05, trunk.topZ, 0.58 + rng() * 0.48, rng)
   }
 
   return { lines: batch, perches }
@@ -310,7 +350,7 @@ function placeForestTree(
   treeAnchors: { x: number; y: number; z: number }[],
   perches: Perch[],
 ) {
-  const height = 3.2 + rng() * 6.4
+  const height = 5.4 + rng() * 7.6
   const opacity = tuning.lineOpacity * (0.72 + layer * 0.12)
   treeAnchors.push({ x, y: height * 0.62, z })
   const tree = buildDetailedForestTree(rng, x, z, height, tuning, opacity)
@@ -359,41 +399,53 @@ export function buildDetailedForest(
   const accentSoft = accent.clone().lerp(lineMuted, 0.45)
 
   const treeAnchors: { x: number; y: number; z: number }[] = []
+  const outer = forestOuterRadius(tuning)
 
-  const span = tuning.forestHalfWidth * 2
   const centerFillCount = tuning.posterComposition
     ? Math.max(0, Math.round(tuning.treeCount * tuning.forestCenterFillFraction))
     : Math.max(4, Math.round(tuning.treeCount * tuning.forestCenterFillFraction))
 
+  // Primary ring — evenly stratified around 360° with radius jitter
   for (let i = 0; i < tuning.treeCount; i++) {
     const layer = i % 3
-    const z = -2.2 - rng() * (tuning.sceneDepth - 2)
-    let x: number
-    if (i % 8 === 0) {
-      x = (rng() > 0.5 ? 1 : -1) * tuning.forestHalfWidth * (0.82 + rng() * 0.18)
-    } else if (rng() < 0.38) {
-      x = (rng() - 0.5) * span * (0.38 + rng() * 0.22)
-    } else {
-      x = (rng() - 0.5) * span
-    }
+    const baseAngle = (i / tuning.treeCount) * Math.PI * 2
+    const angle = baseAngle + (rng() - 0.5) * (Math.PI * 2) / Math.max(8, tuning.treeCount * 0.35)
+    const radiusBand = i % 8 === 0 ? 0.72 : rng() < 0.28 ? 0.38 : 0.52
+    const radius =
+      forestInnerRadius(tuning) +
+      (outer - forestInnerRadius(tuning)) * (radiusBand + (rng() - 0.5) * 0.22)
+    const { x, z } = forestPolarToXZ(angle, radius)
     placeForestTree(rng, x, z, layer, tuning, accentSoft, lineMuted, depthLayers, roots, treeAnchors, perches)
   }
 
-  // Extra trees in the center / mid-ground where random placement often leaves gaps
+  // Inner ring fill — closes gaps near the clearing
   for (let i = 0; i < centerFillCount; i++) {
     const layer = i % 3
-    const z = -2.6 - rng() * (tuning.sceneDepth - 2.8)
-    const band = rng()
-    let x: number
-    if (band < 0.55) {
-      x = (rng() - 0.5) * span * (0.28 + rng() * 0.18)
-      if (Math.abs(x) < span * 0.07) x += (x < 0 ? -1 : 1) * span * 0.11
-    } else if (band < 0.82) {
-      const side = rng() > 0.5 ? 1 : -1
-      x = side * tuning.forestHalfWidth * (0.32 + rng() * 0.22)
-    } else {
-      x = (rng() - 0.5) * span * 0.62
-    }
+    const { x, z } = sampleForestRing(rng, tuning, 0.08, 0.46, 0.35)
+    placeForestTree(rng, x, z, layer, tuning, accentSoft, lineMuted, depthLayers, roots, treeAnchors, perches)
+  }
+
+  // Outer ring — dense perimeter all the way around
+  const edgeFillCount = Math.max(
+    8,
+    Math.round(tuning.treeCount * Math.max(0, tuning.forestEdgeFillFraction)),
+  )
+  for (let i = 0; i < edgeFillCount; i++) {
+    const layer = (i + 1) % 3
+    const angle = (i / edgeFillCount) * Math.PI * 2 + (rng() - 0.5) * 0.45
+    const radius = outer * (0.82 + rng() * 0.16)
+    const { x, z } = forestPolarToXZ(angle, radius)
+    placeForestTree(rng, x, z, layer, tuning, accentSoft, lineMuted, depthLayers, roots, treeAnchors, perches)
+  }
+
+  // Far ring — pushes depth on every heading
+  const deepFillCount = Math.max(
+    14,
+    Math.round(tuning.treeCount * Math.max(0, tuning.forestDeepFillFraction)),
+  )
+  for (let i = 0; i < deepFillCount; i++) {
+    const layer = 2
+    const { x, z } = sampleForestRing(rng, tuning, 0.62, 1, 0.25)
     placeForestTree(rng, x, z, layer, tuning, accentSoft, lineMuted, depthLayers, roots, treeAnchors, perches)
   }
 
@@ -402,11 +454,12 @@ export function buildDetailedForest(
   for (let i = 0; i < Math.max(0, Math.round(tuning.latticePanelCount * archMul)); i++) {
     const layer = 1 + (i % 2)
     const batch = createLineBatch(tuning.lineOpacity * 0.28)
+    const { x, z } = sampleForestRing(rng, tuning, 0.34, 0.78, 0.2)
     addLatticePanel(
       batch,
-      (rng() - 0.5) * span * 0.65,
+      x,
       0.8 + rng() * 2.5,
-      -4 - rng() * 5,
+      z,
       1.2 + rng() * 1.5,
       1.8 + rng() * 1.2,
       3 + Math.floor(rng() * 2),
@@ -438,13 +491,17 @@ export function buildDetailedForest(
 
   for (let i = 0; i < Math.max(0, Math.round(tuning.suspendedLineCount * archMul)); i++) {
     const batch = createLineBatch(tuning.lineOpacity * 0.32)
-    const z = -5 - rng() * 6
+    const { x: cx, z: cz } = sampleForestRing(rng, tuning, 0.28, 0.72, 0.15)
     const y = 2.2 + rng() * 2.8
-    const x0 = (rng() - 0.5) * span * 0.85
-    const x1 = x0 + (rng() - 0.5) * span * 0.2
+    const tangent = Math.atan2(cx, -cz)
+    const span = outer * 0.14
+    const x0 = cx + Math.sin(tangent) * span * (0.35 + rng() * 0.25)
+    const x1 = cx - Math.sin(tangent) * span * (0.35 + rng() * 0.25)
+    const z0 = cz - Math.cos(tangent) * span * (0.35 + rng() * 0.25)
+    const z1 = cz + Math.cos(tangent) * span * (0.35 + rng() * 0.25)
     const droop = 0.2 + rng() * 0.35
-    seg(batch, x0, y, z, (x0 + x1) * 0.5, y - droop, z - 0.1)
-    seg(batch, (x0 + x1) * 0.5, y - droop, z - 0.1, x1, y - 0.1, z - 0.2)
+    seg(batch, x0, y, z0, (x0 + x1) * 0.5, y - droop, (z0 + z1) * 0.5 - 0.08)
+    seg(batch, (x0 + x1) * 0.5, y - droop, (z0 + z1) * 0.5 - 0.08, x1, y - 0.1, z1 - 0.12)
     flushLineBatch(batch, depthLayers[0], lineMuted, roots, tuning.sceneDepth, tuning.lineWidth * 0.85)
   }
 

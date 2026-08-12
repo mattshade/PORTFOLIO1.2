@@ -35,11 +35,6 @@
     transform: translateY(-8px) scale(1.1);
     box-shadow: 0 15px 45px rgba(0, 0, 0, 0.5), 0 0 20px var(--accent-dim);
   }
-
-  .back-to-top--cavern:hover {
-    border-color: #5ec4dc;
-    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.5), 0 0 20px rgba(94, 196, 220, 0.28);
-  }
 }
 
 @media (hover: none), (max-width: 768px), (pointer: coarse) {
@@ -49,28 +44,6 @@
     border-color: var(--accent);
     box-shadow: 0 0 24px var(--accent-dim);
   }
-
-  .back-to-top--cavern.visible:active,
-  .back-to-top--cavern.visible:focus-visible {
-    border-color: #5ec4dc;
-    box-shadow: 0 0 24px rgba(94, 196, 220, 0.35);
-  }
-}
-
-.back-to-top--cavern {
-  border-color: rgba(94, 196, 220, 0.4);
-}
-
-.back-to-top--cavern .boid-flyer {
-  color: #5ec4dc;
-}
-
-.back-to-top--cavern.is-flying .boid-flyer {
-  color: #5ec4dc;
-}
-
-.back-to-top--cavern .trail-line {
-  background: #5ec4dc;
 }
 
 .back-to-top:hover .boid-flyer {
