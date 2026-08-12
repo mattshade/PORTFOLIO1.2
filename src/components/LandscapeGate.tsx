@@ -1,21 +1,16 @@
 import { useEffect, useState } from 'react'
+import {
+  isAndroidTouchDevice,
+  markTouchMobileDocument,
+  shouldShowLandscapeGate,
+  subscribeLandscapeGate,
+} from '../utils/landscapeViewport'
 import './LandscapeGate.css'
 
-function isMobileViewport(): boolean {
-  if (typeof window === 'undefined') return false
-  return window.matchMedia('(max-width: 900px) and (pointer: coarse)').matches
-}
-
-function isPortraitViewport(): boolean {
-  if (typeof window === 'undefined') return false
-  if (window.matchMedia('(orientation: portrait)').matches) return true
-  const vv = window.visualViewport
-  const w = vv?.width ?? window.innerWidth
-  const h = vv?.height ?? window.innerHeight
-  return h > w * 1.02
-}
-
 async function tryLockLandscape(): Promise<void> {
+  // Orientation lock is supported on some Android PWAs; iOS Safari blocks it in-tab.
+  if (!isAndroidTouchDevice()) return
+
   const orientation = screen.orientation as ScreenOrientation & {
     lock?: (orientation: OrientationLockType) => Promise<void>
   }
@@ -23,7 +18,7 @@ async function tryLockLandscape(): Promise<void> {
   try {
     await orientation.lock('landscape')
   } catch {
-    // Expected in mobile Safari and most in-tab browsers.
+    // Expected in most in-browser views.
   }
 }
 
@@ -31,30 +26,23 @@ export function LandscapeGate() {
   const [blocked, setBlocked] = useState(false)
 
   useEffect(() => {
-    const sync = () => {
-      const shouldBlock = isMobileViewport() && isPortraitViewport()
+    markTouchMobileDocument()
+    return subscribeLandscapeGate(() => {
+      const shouldBlock = shouldShowLandscapeGate()
       setBlocked(shouldBlock)
       document.documentElement.classList.toggle('landscape-gate-active', shouldBlock)
       if (shouldBlock) void tryLockLandscape()
-    }
-
-    sync()
-    window.addEventListener('resize', sync)
-    window.addEventListener('orientationchange', sync)
-    window.visualViewport?.addEventListener('resize', sync)
-
-    return () => {
-      document.documentElement.classList.remove('landscape-gate-active')
-      window.removeEventListener('resize', sync)
-      window.removeEventListener('orientationchange', sync)
-      window.visualViewport?.removeEventListener('resize', sync)
-    }
+    })
   }, [])
 
-  if (!blocked) return null
-
   return (
-    <div className="landscape-gate" role="dialog" aria-modal="true" aria-label="Rotate your device">
+    <div
+      className={`landscape-gate${blocked ? ' landscape-gate--active' : ''}`}
+      role="dialog"
+      aria-modal="true"
+      aria-hidden={blocked ? 'false' : 'true'}
+      aria-label="Rotate your device"
+    >
       <div className="landscape-gate__panel">
         <div className="landscape-gate__icon" aria-hidden>
           <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
@@ -71,7 +59,7 @@ export function LandscapeGate() {
           </svg>
         </div>
         <p className="landscape-gate__title">Rotate for the full forest</p>
-        <p className="landscape-gate__body">This portfolio is built for landscape on phones and tablets.</p>
+        <p className="landscape-gate__body">Turn your phone or tablet sideways to explore the portfolio.</p>
       </div>
     </div>
   )
